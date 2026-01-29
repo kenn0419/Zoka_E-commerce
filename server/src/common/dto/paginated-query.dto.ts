@@ -1,6 +1,6 @@
 import { Type } from 'class-transformer';
 import { IsInt, IsOptional, IsString, Min } from 'class-validator';
-import { PaginatedSort } from '../enums/paginated-sort.enum';
+import { PaginatedSort } from '../enums/pagination.enum';
 
 export class PaginatedQueryDto<TSort = PaginatedSort> {
   @IsOptional()

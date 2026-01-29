@@ -42,7 +42,7 @@ model UserSession {
   userId       String
   device       String?
   ipAddress    String?
-  refreshToken String
+  refreshToken String?
   publicKey    String
   privateKey   String
   expiresAt    DateTime
@@ -333,13 +333,17 @@ model CouponProduct {
 // ===================== ORDER =====================
 
 model Order {
-  id         String   @id @default(uuid())
-  buyerId    String
-  shopId     String
-  totalPrice Decimal
-  status     String   @default("PENDING")
-  createdAt  DateTime @default(now())
-  updatedAt  DateTime @updatedAt
+  id            String    @id @default(uuid())
+  buyerId       String
+  shopId        String
+  totalPrice    Decimal
+  status        String    @default("PENDING")
+  paymentMethod String
+  paymentId     String?
+  paidAt        DateTime?
+  expiresAt     DateTime
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
 
   buyer    User        @relation("UserOrders", fields: [buyerId], references: [id])
   shop     Shop        @relation(fields: [shopId], references: [id])
@@ -389,16 +393,23 @@ model Conversation {
   buyer    User      @relation("BuyerConversations", fields: [buyerId], references: [id])
   seller   User      @relation("SellerConversations", fields: [sellerId], references: [id])
   messages Message[]
+
+  @@unique([buyerId, sellerId])
 }
 
 model Message {
-  id             String   @id @default(uuid())
+  id             String @id @default(uuid())
   conversationId String
   senderId       String
   content        String
-  createdAt      DateTime @default(now())
-  updatedAt      DateTime @updatedAt
+
+  isRead    Boolean   @default(false)
+  readAt    DateTime?
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
 
   conversation Conversation @relation(fields: [conversationId], references: [id])
   sender       User         @relation(fields: [senderId], references: [id])
+
+  @@index([conversationId, createdAt])
 }

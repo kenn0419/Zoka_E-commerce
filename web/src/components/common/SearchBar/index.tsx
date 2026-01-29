@@ -68,7 +68,7 @@ export default function SearchBar() {
                 key={item.id}
                 className={styles.item}
                 onClick={() => {
-                  navigate(`/product/${item.slug}`);
+                  navigate(`/${PATH.PRODUCTS}/${item.slug}`);
                   clearKeyword();
                 }}
               >

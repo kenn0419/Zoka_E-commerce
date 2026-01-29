@@ -37,7 +37,7 @@ export class ShopCouponController {
     @Param('shopId') shopId: string,
     @Body() data: CreateCouponDto,
   ) {
-    return this.couponService.create(req.user.userId, shopId, data);
+    return this.couponService.create(req.user.sub, shopId, data);
   }
 
   @Get()
@@ -48,7 +48,7 @@ export class ShopCouponController {
     @Query() query: CouponQueryDto,
   ) {
     return this.couponService.findAll(
-      req.user.userId,
+      req.user.sub,
       shopId,
       query.search,
       query.page,
@@ -63,7 +63,7 @@ export class ShopCouponController {
     @Param('shopId') shopId: string,
     @Param('id') id: string,
   ) {
-    return this.couponService.findById(req.user.userId, shopId, id);
+    return this.couponService.findById(req.user.sub, shopId, id);
   }
 
   @Patch('/:id')
@@ -73,7 +73,7 @@ export class ShopCouponController {
     @Param('id') id: string,
     @Body() data: UpdateCouponDto,
   ) {
-    return this.couponService.updateCoupon(req.user.userId, shopId, id, data);
+    return this.couponService.updateCoupon(req.user.sub, shopId, id, data);
   }
 
   @Patch('/:id/active')
@@ -82,7 +82,7 @@ export class ShopCouponController {
     @Param('shopId') shopId: string,
     @Param('id') id: string,
   ) {
-    return this.couponService.activeCoupon(req.user.userId, shopId, id);
+    return this.couponService.activeCoupon(req.user.sub, shopId, id);
   }
 
   @Patch('/:id/deactive')
@@ -91,6 +91,6 @@ export class ShopCouponController {
     @Param('shopId') shopId: string,
     @Param('id') id: string,
   ) {
-    return this.couponService.deactivateCoupon(req.user.userId, shopId, id);
+    return this.couponService.deactivateCoupon(req.user.sub, shopId, id);
   }
 }

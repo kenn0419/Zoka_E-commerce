@@ -9,7 +9,7 @@ import {
   Res,
   UseGuards,
 } from '@nestjs/common';
-import { AuthService } from './auth.service';
+import { AuthService } from './services/auth.service';
 import { SignupDto } from './dto/signup.dto';
 import { VerifyEmailDto } from './dto/verify-email.dto';
 import { Serialize } from 'src/common/decorators/serialize.decorator';
@@ -93,7 +93,7 @@ export class AuthController {
   @HttpCode(HttpStatus.OK)
   @Serialize(UserResponseDto, 'Get current user successfully!')
   getCurrent(@Req() req) {
-    return this.authService.getCurrent(req.user.userId);
+    return this.authService.getCurrent(req.user.sub);
   }
 
   @Post('/logout')
@@ -158,7 +158,7 @@ export class AuthController {
   @HttpCode(HttpStatus.OK)
   @Serialize(null, 'Logout all device successfully!')
   async logoutAll(@Req() req, @Res() res: Response) {
-    await this.authService.logoutAll(req.user.userId);
+    await this.authService.logoutAll(req.user.sub);
 
     res.clearCookie('accessToken', {
       secure: true,

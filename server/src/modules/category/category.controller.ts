@@ -25,7 +25,7 @@ import { PositiveIntPipe } from 'src/common/pipes/positive-int.pipe';
 import { JwtSessionGuard } from 'src/common/guards/jwt-session.guard';
 import { Roles } from 'src/common/decorators/role.decorator';
 import { Role } from 'src/common/enums/role.enum';
-import { CategorySort } from 'src/common/enums/category-sort.enum';
+import { CategorySort } from 'src/common/enums/category.enum';
 
 @Controller('category')
 export class CategoryController {

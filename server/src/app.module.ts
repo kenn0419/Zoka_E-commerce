@@ -16,14 +16,21 @@ import { CartModule } from './modules/cart/cart.module';
 import { CouponModule } from './modules/coupon/coupon.module';
 import { OrderModule } from './modules/order/order.module';
 import { ChatModule } from './modules/chat/chat.module';
+import { AuthCoreModule } from './common/auth/auth-core.module';
+import { CatalogModule } from './modules/catalog/catalog.module';
+import { EventEmitterModule } from '@nestjs/event-emitter';
+import { ScheduleModule } from '@nestjs/schedule';
 
 @Module({
   imports: [
+    ScheduleModule.forRoot(),
+    EventEmitterModule.forRoot(),
     ConfigModule.forRoot({
       isGlobal: true,
       envFilePath: '.env',
       load: [jwtConfig],
     }),
+    AuthCoreModule,
     JwtGlobalModule,
     RedisModule,
     PrismaModule,
@@ -39,6 +46,7 @@ import { ChatModule } from './modules/chat/chat.module';
     CouponModule,
     OrderModule,
     ChatModule,
+    CatalogModule,
   ],
 })
 export class AppModule {}

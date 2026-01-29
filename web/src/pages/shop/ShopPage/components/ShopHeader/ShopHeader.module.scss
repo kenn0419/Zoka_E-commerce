@@ -3,7 +3,7 @@
   background: #fff;
   padding: 20px;
   border-radius: 4px;
-  margin-bottom: 16px;
+  margin: 16px 0;
 }
 
 .left {
@@ -17,6 +17,10 @@
   padding: 16px;
   border-radius: 4px;
   color: #fff;
+
+  .avatar {
+    cursor: pointer;
+  }
 }
 
 .shopInfo {

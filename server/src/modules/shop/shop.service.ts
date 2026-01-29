@@ -8,7 +8,6 @@ import { CreateShopDto } from './dto/create-shop.dto';
 import { UpdateShopStatusDto } from './dto/update-shop-status.dto';
 import { ShopRepository } from './shop.repository';
 import { RbacRepository } from '../rbac/rbac.repository';
-import { ShopStatus } from 'src/common/enums/shop-status.enum';
 import { UserRepository } from '../user/repositories/user.repository';
 import { UploadService } from 'src/infrastructure/upload/upload.service';
 import { ConfigService } from '@nestjs/config';
@@ -18,7 +17,7 @@ import { Prisma } from 'generated/prisma';
 import { buildSearchOr } from 'src/common/utils/build-search-or.util';
 import { paginatedResult } from 'src/common/utils/pagninated-result.util';
 import { buildShopSort } from 'src/common/utils/shop-sort.util';
-import { ShopSort } from 'src/common/enums/shop-sort.enum';
+import { ShopSort, ShopStatus } from 'src/common/enums/shop.enum';
 
 @Injectable()
 export class ShopService {

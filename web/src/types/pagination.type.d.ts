@@ -1,6 +1,6 @@
 interface IPaginatedResponse<T> {
   items: T[];
-  meta: {
+  meta?: {
     totalItems: number;
     totalPages: number;
     currentPage: number;
@@ -12,4 +12,17 @@ interface IPaginationQueries {
   limit?: number;
   search?: string;
   sort?: string;
+}
+
+interface IInfinityQueries {
+  cursor?: string;
+  limit?: number;
+}
+
+interface IInfinityResponse<T> {
+  items: T[];
+  meta: {
+    nextCursor: string | null;
+    hasNextPage: boolean;
+  };
 }

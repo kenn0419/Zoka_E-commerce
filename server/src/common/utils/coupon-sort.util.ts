@@ -1,6 +1,6 @@
 import { Prisma } from 'generated/prisma';
-import { CounponSort } from '../enums/coupon-sort.enum';
 import { buildSort } from './build-sort.util';
+import { CounponSort } from '../enums/coupon.enum';
 
 const couponSortMap: Record<
   CounponSort,

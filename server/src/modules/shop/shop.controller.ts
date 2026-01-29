@@ -44,7 +44,7 @@ export class ShopController {
     @UploadedFile() file?: Express.Multer.File,
   ) {
     return await this.shopService.registerShop(
-      req.user.userId,
+      req.user.sub,
       createShopDto,
       file,
     );
@@ -64,7 +64,7 @@ export class ShopController {
   @Roles(Role.SHOP)
   @Serialize(null, 'Lock shop successfully!')
   async lockShop(@Req() req, @Param('shopId') shopId: string) {
-    return await this.shopService.lockShop(req.user.userId, shopId);
+    return await this.shopService.lockShop(req.user.sub, shopId);
   }
 
   @Patch('/active/:shopId')
@@ -89,7 +89,7 @@ export class ShopController {
   @Get('/me')
   @Serialize(ShopResponseDto, 'Get all my shops successfully!')
   fetchAllMyShops(@Req() req) {
-    return this.shopService.findAllMyShops(req.user.userId);
+    return this.shopService.findAllMyShops(req.user.sub);
   }
 
   @Get('/public/:slug')

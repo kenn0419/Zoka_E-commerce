@@ -39,5 +39,14 @@ export const useDetailShopBySlugQuery = (slug: string) => {
   return useQuery({
     queryKey: ["shop", "detail", slug],
     queryFn: () => shopService.fetchDetailShopBySlug(slug),
+    enabled: !!slug,
+  });
+};
+
+export const useDetailShopByProductSlugQuery = (productSlug: string) => {
+  return useQuery({
+    queryKey: ["shop", "detail", "product", productSlug],
+    queryFn: () => shopService.fetchDetailShopByProductSlug(productSlug),
+    enabled: !!productSlug,
   });
 };

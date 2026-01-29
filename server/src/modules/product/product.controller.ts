@@ -73,7 +73,7 @@ export class ProductController {
       throw new BadRequestException(errors);
     }
     return this.productService.create(
-      req.user.userId,
+      req.user.sub,
       data,
       files.thumbnail?.[0] ?? null,
       files.variantImages ?? [],
@@ -191,7 +191,7 @@ export class ProductController {
   ) {
     return this.productService.findProductsByShop(
       shopId,
-      req.user.userId,
+      req.user.sub,
       search,
       page,
       limit,
@@ -233,7 +233,7 @@ export class ProductController {
   @HttpCode(HttpStatus.OK)
   async findProductDetailById(@Req() req, @Param('id') id: string) {
     const product = await this.productService.findById(id);
-    const userId = req.user.userId;
+    const userId = req.user.sub;
     const isAccess =
       req.user.roles.includes(Role.SHOP) && product.shop.owner.id === userId;
 

@@ -6,13 +6,13 @@ import {
 import { CouponRepository } from '../repositories/coupon.repository';
 import { Coupon, Prisma } from 'generated/prisma';
 import { CouponQueryDto } from '../dto/coupon-query.dto';
-import { CouponStatus } from 'src/common/enums/coupon-status.enum';
 import { PrismaService } from 'src/infrastructure/prisma/prisma.service';
 import { paginatedResult } from 'src/common/utils/pagninated-result.util';
 import { buildCouponSort } from 'src/common/utils/coupon-sort.util';
 import { UserCouponRepository } from '../repositories/user-coupon.repository';
 import { ShopRepository } from 'src/modules/shop/shop.repository';
-import { ShopStatus } from 'src/common/enums/shop-status.enum';
+import { CouponStatus } from 'src/common/enums/coupon.enum';
+import { ShopStatus } from 'src/common/enums/shop.enum';
 
 @Injectable()
 export class UserCouponService {

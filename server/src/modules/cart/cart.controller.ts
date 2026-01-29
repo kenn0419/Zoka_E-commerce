@@ -24,19 +24,19 @@ export class CartController {
   @Get()
   @Serialize(CartResponseDto, 'Get cart successfully.')
   getUserCart(@Req() req) {
-    return this.cartService.getUserCart(req.user.userId);
+    return this.cartService.getUserCart(req.user.sub);
   }
 
   @Get('/summary')
   @Serialize(CartSummaryResponseDto, 'Get cart summary successfully.')
   getUserCartSummary(@Req() req) {
-    return this.cartService.getUserCartSummary(req.user.userId);
+    return this.cartService.getUserCartSummary(req.user.sub);
   }
 
   @Post()
   @Serialize(CartResponseDto, 'Item added to cart successfully')
   addToCart(@Req() req, @Body() data: AddCartDto) {
-    return this.cartService.addToCart(req.user.userId, data);
+    return this.cartService.addToCart(req.user.sub, data);
   }
 
   @Delete('/:id')

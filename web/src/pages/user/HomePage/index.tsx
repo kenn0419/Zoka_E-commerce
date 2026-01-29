@@ -2,11 +2,11 @@ import styles from "./HomePage.module.scss";
 import BannerCarousel from "../../../components/layout/user/BannerCarousel";
 import CategorySection from "../../../components/common/CategorySection";
 import FlashSale from "../../../components/common/FlashSale";
-import ProductList from "../../../components/product/ProductList";
 import { useActiveProductsQuery } from "../../../queries/product.query";
 import { useAvailableCouponsQuery } from "../../../queries/coupon.query";
 import CouponSection from "../../../components/coupon/CouponSection";
 import { useAuthStore } from "../../../store/auth.store";
+import ProductGrid from "../../../components/product/ProductGrid";
 
 export default function HomePage() {
   const user = useAuthStore((state) => state.user);
@@ -30,12 +30,10 @@ export default function HomePage() {
       />
       <CategorySection />
       <FlashSale />
-      <ProductList
-        meta={coupons.meta}
+      <ProductGrid
         title="Gợi ý hôm nay"
         products={products?.items ?? []}
         isLoading={productsLoading}
-        // skeletonCount={12}
       />
     </div>
   );

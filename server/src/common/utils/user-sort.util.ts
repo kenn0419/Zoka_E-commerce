@@ -1,6 +1,6 @@
 import { Prisma } from 'generated/prisma';
 import { buildSort } from './build-sort.util';
-import { PaginatedSort } from '../enums/paginated-sort.enum';
+import { PaginatedSort } from '../enums/pagination.enum';
 
 const userSortMap: Record<PaginatedSort, Prisma.UserOrderByWithRelationInput> =
   {

@@ -5,10 +5,6 @@ import {
 } from '@nestjs/common';
 import { CouponRepository } from '../repositories/coupon.repository';
 import { Coupon, Prisma } from 'generated/prisma';
-import { CouponType } from 'src/common/enums/coupon-type.enum';
-import { CouponScope } from 'src/common/enums/coupon-scope.enum';
-import { CouponStatus } from 'src/common/enums/coupon-status.enum';
-import { CounponSort } from 'src/common/enums/coupon-sort.enum';
 import { buildSearchOr } from 'src/common/utils/build-search-or.util';
 import { paginatedResult } from 'src/common/utils/pagninated-result.util';
 import { buildCouponSort } from 'src/common/utils/coupon-sort.util';
@@ -18,6 +14,12 @@ import { generateCouponCode } from 'src/common/utils/generate-coupon-code.util';
 import { CategoryRepository } from 'src/modules/category/category.repository';
 import { ProductRepository } from 'src/modules/product/repositories/product.repository';
 import { PrismaService } from 'src/infrastructure/prisma/prisma.service';
+import {
+  CounponSort,
+  CouponScope,
+  CouponStatus,
+  CouponType,
+} from 'src/common/enums/coupon.enum';
 
 @Injectable()
 export class AdminCouponService {

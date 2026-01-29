@@ -1,7 +1,6 @@
 import { IsEnum, IsOptional } from 'class-validator';
 import { PaginatedQueryDto } from 'src/common/dto/paginated-query.dto';
-import { CouponScope } from 'src/common/enums/coupon-scope.enum';
-import { CounponSort } from 'src/common/enums/coupon-sort.enum';
+import { CounponSort, CouponScope } from 'src/common/enums/coupon.enum';
 
 export class CouponQueryDto extends PaginatedQueryDto<CounponSort> {
   @IsOptional()

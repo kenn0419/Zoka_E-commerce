@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { Category, Prisma } from 'generated/prisma';
-import { CategoryStatus } from 'src/common/enums/category-status.enum';
+import { CategoryStatus } from 'src/common/enums/category.enum';
 import { PrismaService } from 'src/infrastructure/prisma/prisma.service';
 
 @Injectable()

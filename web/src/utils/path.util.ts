@@ -30,4 +30,5 @@ export const PATH = {
   REGISTER_SHOP: "register-shop",
   CREATE_PRODUCT: "create-product",
   EDIT_PRODUCT: "edit-product",
+  CHECKOUT: "checkout",
 };

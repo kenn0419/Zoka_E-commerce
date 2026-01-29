@@ -13,7 +13,7 @@ export class AuthRepository {
     ipAddress?: string;
     publicKey: string;
     privateKey: string;
-    refreshToken: string;
+    refreshToken?: string;
     expiresAt: Date;
   }) {
     return this.prisma.userSession.create({ data });

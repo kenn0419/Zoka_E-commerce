@@ -11,16 +11,21 @@ import RelatedProducts from "../../../components/product/RelatedProducts";
 import VariantSelector from "../../../components/product/VariantSelector";
 import QuantitySelector from "../../../components/product/QuantitySelector";
 import { useProductDetailBySlugQuery } from "../../../queries/product.query";
+import { useDetailShopByProductSlugQuery } from "../../../queries/shop.query";
+import ShopHeader from "../../shop/ShopPage/components/ShopHeader";
 
 const ProductDetailPage = () => {
   const { productSlug } = useParams<{ productSlug: string }>();
 
-  const { data: product, isLoading } = useProductDetailBySlugQuery(productSlug);
-
   const [selectedVariant, setSelectedVariant] = useState(0);
   const [selectedQuantity, setSelectedQuantity] = useState(1);
 
-  if (isLoading || !product) {
+  const { data: shop, isLoading: shopLoading } =
+    useDetailShopByProductSlugQuery(productSlug!);
+  const { data: product, isLoading: productLoading } =
+    useProductDetailBySlugQuery(productSlug);
+
+  if (productLoading || !product) {
     return <Spin />;
   }
 
@@ -51,7 +56,7 @@ const ProductDetailPage = () => {
       </div>
 
       <ProductDescription description={product.description} />
-
+      <ShopHeader shop={shop!} isLoading={shopLoading} />
       <RelatedProducts categorySlug={product.category.slug} />
     </div>
   );

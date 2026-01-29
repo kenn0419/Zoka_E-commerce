@@ -1,34 +1,28 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Patch,
+  Param,
+  Delete,
+  UseGuards,
+  Req,
+} from '@nestjs/common';
 import { OrderService } from './order.service';
-import { CreateOrderDto } from './dto/create-order.dto';
-import { UpdateOrderDto } from './dto/update-order.dto';
+import { JwtSessionGuard } from 'src/common/guards/jwt-session.guard';
+import { CheckoutDto } from './dto/checkout.dto';
+import { Serialize } from 'src/common/decorators/serialize.decorator';
+import { CheckoutResponseDto } from './dto/checkout-response.dto';
 
-@Controller('order')
+@Controller('orders')
+@UseGuards(JwtSessionGuard)
 export class OrderController {
   constructor(private readonly orderService: OrderService) {}
 
-  @Post()
-  create(@Body() createOrderDto: CreateOrderDto) {
-    return this.orderService.create(createOrderDto);
-  }
-
-  @Get()
-  findAll() {
-    return this.orderService.findAll();
-  }
-
-  @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.orderService.findOne(+id);
-  }
-
-  @Patch(':id')
-  update(@Param('id') id: string, @Body() updateOrderDto: UpdateOrderDto) {
-    return this.orderService.update(+id, updateOrderDto);
-  }
-
-  @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.orderService.remove(+id);
+  @Post('/checkout')
+  @Serialize(CheckoutResponseDto, 'Checkout successfully!')
+  checkout(@Req() req, @Body() dto: CheckoutDto) {
+    return this.orderService.checkout(req.user.sub, dto);
   }
 }

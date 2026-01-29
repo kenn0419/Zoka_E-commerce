@@ -10,12 +10,12 @@ import { ConfigService } from '@nestjs/config';
 import slugify from 'slugify';
 import { UploadService } from 'src/infrastructure/upload/upload.service';
 import { UpdateUserDto } from './dto/update-user.dto';
-import { UserStatus } from 'src/common/enums/user-status.enum';
+import { UserStatus } from 'src/common/enums/user.enum';
 import { Prisma } from 'generated/prisma';
 import { buildSearchOr } from 'src/common/utils/build-search-or.util';
 import { paginatedResult } from 'src/common/utils/pagninated-result.util';
 import { buildUserSort } from 'src/common/utils/user-sort.util';
-import { PaginatedSort } from 'src/common/enums/paginated-sort.enum';
+import { PaginatedSort } from 'src/common/enums/pagination.enum';
 
 @Injectable()
 export class UserService {

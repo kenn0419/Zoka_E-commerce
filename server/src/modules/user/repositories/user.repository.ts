@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { Prisma, User } from 'generated/prisma';
-import { UserStatus } from 'src/common/enums/user-status.enum';
+import { UserStatus } from 'src/common/enums/user.enum';
 import { PrismaService } from 'src/infrastructure/prisma/prisma.service';
 
 @Injectable()
@@ -18,6 +18,20 @@ export class UserRepository {
         roles: {
           include: {
             role: true,
+          },
+        },
+      },
+    });
+  }
+
+  findByRole(roleName: string) {
+    return this.prisma.user.findFirst({
+      where: {
+        roles: {
+          some: {
+            role: {
+              name: roleName,
+            },
           },
         },
       },

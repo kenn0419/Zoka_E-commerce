@@ -6,51 +6,62 @@ import {
   OnModuleInit,
 } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
-import Redis from 'ioredis';
+import { createClient, RedisClientType } from 'redis';
 
 @Global()
 @Injectable()
 export class RedisService implements OnModuleInit, OnModuleDestroy {
-  private client: Redis;
   private readonly logger = new Logger(RedisService.name);
 
-  constructor(private configService: ConfigService) {}
+  private client: RedisClientType;
 
-  onModuleInit() {
-    this.client = new Redis({
-      host: this.configService.get<string>('REDIS_HOST') || '127.0.0.1',
-      port: parseInt(
-        this.configService.get<string>('REDIS_PORT') || '6379',
-        10,
-      ),
-      password: this.configService.get<string>('REDIS_PASSWORD'),
-    });
+  constructor(private readonly config: ConfigService) {}
 
-    this.client.on('connect', () => this.logger.log('Connected to redis'));
-    this.client.on('error', (error) => this.logger.log('Redis error', error));
-  }
+  async onModuleInit() {
+    const host = this.config.get('REDIS_HOST') || '127.0.0.1';
+    const port = this.config.get('REDIS_PORT') || '6379';
+    const password = this.config.get('REDIS_PASSWORD');
 
-  async set(key: string, value: string, ttl?: number) {
-    if (ttl) {
-      await this.client.set(key, value, 'EX', ttl);
-    } else {
-      await this.client.set(key, value);
-    }
+    const url = password
+      ? `redis://:${password}@${host}:${port}`
+      : `redis://${host}:${port}`;
+
+    this.client = createClient({ url });
+
+    await this.client.connect();
+
+    this.logger.log('Redis connected (cache + socket pub/sub)');
   }
 
   async get(key: string) {
     return this.client.get(key);
   }
 
+  async set(key: string, value: string, ttl?: number) {
+    if (ttl) {
+      await this.client.set(key, value, { EX: ttl });
+    } else {
+      await this.client.set(key, value);
+    }
+  }
+
   async del(key: string) {
-    return this.client.del(key);
+    await this.client.del(key);
+  }
+
+  async sadd(key: string, value: string) {
+    await this.client.sAdd(key, value);
+  }
+
+  async smembers(key: string) {
+    return await this.client.sMembers(key);
+  }
+
+  get cacheClient() {
+    return this.client;
   }
 
   async onModuleDestroy() {
-    await this.client.quit();
-  }
-
-  get clientInstance() {
-    return this.client;
+    this.client.quit();
   }
 }

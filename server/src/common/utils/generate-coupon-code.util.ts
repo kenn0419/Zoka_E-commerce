@@ -1,6 +1,5 @@
 import { customAlphabet } from 'nanoid';
-import { CouponScope } from '../enums/coupon-scope.enum';
-import { CouponType } from '../enums/coupon-type.enum';
+import { CouponScope, CouponType } from '../enums/coupon.enum';
 
 const ALPHABET = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
 const nanoid = customAlphabet(ALPHABET, 8);

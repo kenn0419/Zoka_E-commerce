@@ -39,7 +39,7 @@ export class UserCouponController {
   @UseGuards(JwtSessionGuard)
   @SerializePaginated(CouponResponseDto, 'Get all my coupons')
   getMyCoupons(@Req() req, @Query() query: CouponQueryDto) {
-    return this.couponService.findAllCoupons(query, req.user.userId);
+    return this.couponService.findAllCoupons(query, req.user.sub);
   }
 
   @Get('me/shop/:shopSlug')
@@ -56,7 +56,7 @@ export class UserCouponController {
     return this.couponService.findAllPublicCouponsByShop(
       shopSlug,
       query,
-      req.user.userId,
+      req.user.sub,
     );
   }
 
@@ -64,7 +64,7 @@ export class UserCouponController {
   @UseGuards(JwtSessionGuard)
   @Serialize(null, 'Claim coupon successfully.')
   claimCoupon(@Req() req, @Param('id') couponId: string) {
-    return this.couponService.claimCoupon(req.user.userId, couponId);
+    return this.couponService.claimCoupon(req.user.sub, couponId);
   }
 
   @Get(':code')

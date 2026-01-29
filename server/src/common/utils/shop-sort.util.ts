@@ -1,6 +1,6 @@
 import { Prisma } from 'generated/prisma';
 import { buildSort } from './build-sort.util';
-import { ShopSort } from '../enums/shop-sort.enum';
+import { ShopSort } from '../enums/shop.enum';
 
 const shopSortMap: Record<ShopSort, Prisma.ShopOrderByWithRelationInput> = {
   [ShopSort.NAME_ASC]: { name: 'asc' },

@@ -44,4 +44,12 @@ export const shopService = {
 
     return res.data;
   },
+
+  async fetchDetailShopByProductSlug(
+    productSlug: string,
+  ): Promise<IShopResponse> {
+    const res = await shopApi.fetchDetailShopByProductSlug(productSlug);
+
+    return res.data;
+  },
 };

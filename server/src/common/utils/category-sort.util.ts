@@ -1,6 +1,6 @@
 import { Prisma } from 'generated/prisma';
-import { CategorySort } from '../enums/category-sort.enum';
 import { buildSort } from './build-sort.util';
+import { CategorySort } from '../enums/category.enum';
 
 const categorySortMap: Record<
   CategorySort,

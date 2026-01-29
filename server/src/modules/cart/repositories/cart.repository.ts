@@ -38,11 +38,34 @@ export class CartRepository {
     });
   }
 
-  async removeItem(cartItemId: string) {
+  removeItem(cartItemId: string) {
     return this.prisma.cartItem.delete({ where: { id: cartItemId } });
   }
 
-  async clearCart(cartId: string) {
+  clearCart(cartId: string) {
     return this.prisma.cartItem.deleteMany({ where: { cartId } });
+  }
+
+  clearCartByUserId(userId: string) {
+    return this.prisma.cartItem.deleteMany({
+      where: {
+        cart: {
+          userId,
+        },
+      },
+    });
+  }
+
+  findUnique(userId: string) {
+    return this.prisma.cart.findUnique({
+      where: { userId },
+      include: {
+        items: {
+          include: {
+            product: true,
+          },
+        },
+      },
+    });
   }
 }

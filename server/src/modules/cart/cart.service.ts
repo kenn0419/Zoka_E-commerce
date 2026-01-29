@@ -3,7 +3,7 @@ import { AddCartDto } from './dto/add-cart.dto';
 import { CartRepository } from './repositories/cart.repository';
 import { ProductVariantRepository } from '../product/repositories/product-variant.repository';
 import { CartItemRepository } from './repositories/cart-item.repository';
-import { CartMapper } from 'src/common/mapper/cart.mapper';
+import { CartMapper } from 'src/common/mappers/cart.mapper';
 
 @Injectable()
 export class CartService {

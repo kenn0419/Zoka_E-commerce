@@ -7,6 +7,8 @@ import {
 } from "@ant-design/icons";
 import styles from "./ShopHeader.module.scss";
 import dayjs from "dayjs";
+import { useNavigate } from "react-router-dom";
+import { PATH } from "../../../../../utils/path.util";
 
 interface ShopHeaderProps {
   shop: IShopResponse;
@@ -14,14 +16,25 @@ interface ShopHeaderProps {
 }
 
 export default function ShopHeader({ shop, isLoading }: ShopHeaderProps) {
+  const navigate = useNavigate();
   if (isLoading) {
     return <Spin />;
   }
+
+  const handleClickThumbnail = () => {
+    navigate(`/public/${PATH.SHOP}/${shop.slug}`);
+  };
   return (
     <div className={styles.wrapper}>
       <div className={styles.left}>
         <div className={styles.banner}>
-          <Avatar size={72} src={shop?.logoUrl} icon={<UserOutlined />} />
+          <Avatar
+            size={72}
+            src={shop?.logoUrl}
+            icon={<UserOutlined />}
+            className={styles.avatar}
+            onClick={handleClickThumbnail}
+          />
           <div className={styles.shopInfo}>
             <div className={styles.shopName}>{shop?.name}</div>
             <div className={styles.online}>Online 2 phút trước</div>

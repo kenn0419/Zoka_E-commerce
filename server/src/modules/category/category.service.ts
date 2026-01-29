@@ -5,12 +5,11 @@ import { CategoryRepository } from './category.repository';
 import { ConfigService } from '@nestjs/config';
 import { UploadService } from 'src/infrastructure/upload/upload.service';
 import slugify from 'slugify';
-import { CategoryStatus } from 'src/common/enums/category-status.enum';
 import { buildCategorySort } from 'src/common/utils/category-sort.util';
-import { CategorySort } from 'src/common/enums/category-sort.enum';
 import { Prisma } from 'generated/prisma';
 import { buildSearchOr } from 'src/common/utils/build-search-or.util';
 import { paginatedResult } from 'src/common/utils/pagninated-result.util';
+import { CategorySort, CategoryStatus } from 'src/common/enums/category.enum';
 
 @Injectable()
 export class CategoryService {

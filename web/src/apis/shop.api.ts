@@ -39,4 +39,10 @@ export const shopApi = {
   ): Promise<IApiResponse<IShopResponse>> => {
     return await instance.get(`/shops/public/${slug}`);
   },
+
+  fetchDetailShopByProductSlug: async (
+    productSlug: string,
+  ): Promise<IApiResponse<IShopResponse>> => {
+    return await instance.get(`/catalogs/shop-by-product/${productSlug}`);
+  },
 };

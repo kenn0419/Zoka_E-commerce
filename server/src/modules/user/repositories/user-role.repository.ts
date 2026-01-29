@@ -5,7 +5,7 @@ import { PrismaService } from 'src/infrastructure/prisma/prisma.service';
 export class UserRoleRepository {
   constructor(private prisma: PrismaService) {}
 
-  async getUserRolesPermissions(userId: string) {
+  async getUserRolesPermissions(userId?: string) {
     const roles = await this.prisma.userRole.findMany({
       where: { userId },
       include: {

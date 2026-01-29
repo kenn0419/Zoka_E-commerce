@@ -8,21 +8,20 @@ import { UpdateProductDto } from './dto/update-product.dto';
 import { ProductRepository } from './repositories/product.repository';
 import { CategoryRepository } from '../category/category.repository';
 import { ShopRepository } from '../shop/shop.repository';
-import { ShopStatus } from 'src/common/enums/shop-status.enum';
 import { ConfigService } from '@nestjs/config';
 import { UploadService } from 'src/infrastructure/upload/upload.service';
 import { Prisma } from 'generated/prisma';
-import { CategoryStatus } from 'src/common/enums/category-status.enum';
 import { VariantImageRepository } from './repositories/variant-image.repository';
 import { ProductVariantRepository } from './repositories/product-variant.repository';
 import { PrismaService } from 'src/infrastructure/prisma/prisma.service';
 import { SlugifyUtil } from 'src/common/utils/slugify.util';
-import { ProductStatus } from 'src/common/enums/product-status.enum';
-import { ProductSort } from 'src/common/enums/product-sort.enum';
 import { buildProductSort } from 'src/common/utils/product-sort.util';
 import { buildSearchOr } from 'src/common/utils/build-search-or.util';
 import { paginatedResult } from 'src/common/utils/pagninated-result.util';
 import { buildProductFilter } from 'src/common/utils/build-product-filter.util';
+import { ProductSort, ProductStatus } from 'src/common/enums/product.enum';
+import { CategoryStatus } from 'src/common/enums/category.enum';
+import { ShopStatus } from 'src/common/enums/shop.enum';
 
 @Injectable()
 export class ProductService {

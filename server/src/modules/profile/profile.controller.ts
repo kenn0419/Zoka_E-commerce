@@ -27,24 +27,24 @@ export class ProfileController {
   @Get()
   @Serialize(UserResponseDto, 'Get profile successfully!')
   getProfile(@Req() req) {
-    return this.profileService.getProfile(req.user.userId);
+    return this.profileService.getProfile(req.user.sub);
   }
 
   @Patch()
   updateProfile(@Req() req, @Body() updateProfileDto: UpdateProfileDto) {
-    return this.profileService.updateProfile(req.user.userId, updateProfileDto);
+    return this.profileService.updateProfile(req.user.sub, updateProfileDto);
   }
 
   @Patch('/change-password')
   @Serialize(null, 'Change password successfully!')
   changePassword(@Req() req, @Body() data: ChangePasswordDto) {
-    return this.profileService.changePassword(req.user.userId, data);
+    return this.profileService.changePassword(req.user.sub, data);
   }
 
   @Patch('/change-avatar')
   @UseInterceptors(FileInterceptor('avatar'))
   @Serialize(UserResponseDto, 'Change avatar successfully!')
   changeAvatar(@Req() req, @UploadedFile() file?: Express.Multer.File) {
-    return this.profileService.changeAvatar(req.user.userId, file);
+    return this.profileService.changeAvatar(req.user.sub, file);
   }
 }

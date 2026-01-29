@@ -7,8 +7,7 @@ import {
   IsString,
   Min,
 } from 'class-validator';
-import { CouponScope } from 'src/common/enums/coupon-scope.enum';
-import { CouponType } from 'src/common/enums/coupon-type.enum';
+import { CouponScope, CouponType } from 'src/common/enums/coupon.enum';
 
 export class CreateCouponDto {
   @IsOptional()

@@ -8,7 +8,7 @@ import {
   Min,
 } from 'class-validator';
 import { PaginatedQueryDto } from 'src/common/dto/paginated-query.dto';
-import { ProductSort } from 'src/common/enums/product-sort.enum';
+import { ProductSort } from 'src/common/enums/product.enum';
 
 export class ProductListQueryDto extends PaginatedQueryDto<ProductSort> {
   @IsOptional()
