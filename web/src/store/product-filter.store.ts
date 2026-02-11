@@ -1,5 +1,4 @@
 import { create } from "zustand";
-import type { IProductFilterQueries } from "../types/product.type";
 
 interface ProductFilterState {
   filter: IProductFilterQueries;

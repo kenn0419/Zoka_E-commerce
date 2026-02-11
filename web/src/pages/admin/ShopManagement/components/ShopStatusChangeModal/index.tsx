@@ -6,7 +6,7 @@ import {
   ProFormTextArea,
 } from "@ant-design/pro-components";
 import { message } from "antd";
-import { SHOP_STATUS_LABEL } from "../../../../../constant/shop.constant";
+import { SHOP_STATUS_LABEL } from "../../../../../utils/constant.util";
 
 interface ShopStatusChangeModalProps {
   shop: IShopResponse;
@@ -32,7 +32,7 @@ export const ShopStatusChangeModal: React.FC<ShopStatusChangeModalProps> = ({
       initialValues={shop ?? {}}
       onFinish={async (values) => {
         try {
-          await onSave({ id: shop.id, status: values.status });
+          await onSave({ id: shop?.id, status: values.status });
           message.success("Cập nhật trạng thái thành công!");
           onClose();
           return true;

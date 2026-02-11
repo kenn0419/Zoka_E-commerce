@@ -1,6 +1,6 @@
 export interface PaymentStrategy {
   createPayment(input: {
-    orderId: string;
+    paymentId: string;
     amount: number;
     orderInfo: string;
   }): Promise<{

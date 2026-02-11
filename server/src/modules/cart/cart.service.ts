@@ -1,9 +1,14 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import {
+  BadRequestException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { AddCartDto } from './dto/add-cart.dto';
 import { CartRepository } from './repositories/cart.repository';
 import { ProductVariantRepository } from '../product/repositories/product-variant.repository';
 import { CartItemRepository } from './repositories/cart-item.repository';
 import { CartMapper } from 'src/common/mappers/cart.mapper';
+import { UpdateCartDto } from './dto/update-cart.dto';
 
 @Injectable()
 export class CartService {
@@ -25,7 +30,7 @@ export class CartService {
 
   async getUserCartSummary(userId: string) {
     const cart = await this.getOrCreateCartEntity(userId);
-    const cartItems = await CartMapper.toCartItemResponses(cart);
+    const cartItems = CartMapper.toCartItemResponses(cart);
     return CartMapper.toCartSummaryResponse(cartItems);
   }
 
@@ -75,8 +80,50 @@ export class CartService {
     return CartMapper.toCartResponse(updatedCart);
   }
 
-  async removeFromCart(cartItemId: string) {
-    return this.cartRepo.removeItem(cartItemId);
+  async updateItemQuantity(
+    userId: string,
+    cartItemId: string,
+    quantity: number,
+  ) {
+    if (quantity <= 0) {
+      return this.removeFromCart(userId, cartItemId);
+    }
+    const cart = await this.getOrCreateCartEntity(userId);
+    const item = cart.items.find((i) => i.id === cartItemId);
+    if (!item) {
+      throw new NotFoundException('Cart item not found.');
+    }
+
+    const stock = item.variant?.stock;
+    const finalQty = Math.min(quantity, stock!);
+
+    await this.cartItemRepo.updateCartItem(
+      { id: cartItemId },
+      {
+        quantity: finalQty,
+        priceSnapshot: item.variant?.price,
+        stockSnapshot: stock,
+      },
+    );
+
+    const updatedCart = await this.getOrCreateCartEntity(userId);
+
+    return CartMapper.toCartResponse(updatedCart);
+  }
+
+  async removeFromCart(userId: string, cartItemId: string) {
+    const cart = await this.getOrCreateCartEntity(userId);
+
+    const item = cart.items.some((i) => i.id === cartItemId);
+    if (!item) {
+      throw new NotFoundException('Cart item not found');
+    }
+
+    await this.cartRepo.removeItem(cartItemId);
+
+    const updatedCart = await this.getOrCreateCartEntity(userId);
+
+    return CartMapper.toCartResponse(updatedCart);
   }
 
   async clearUserCart(userId: string) {
@@ -85,5 +132,20 @@ export class CartService {
       throw new NotFoundException('Cart not found');
     }
     return this.cartRepo.clearCart(cart.id);
+  }
+
+  async updateSelection(userId: string, cartItemIds: string[]) {
+    await this.cartItemRepo.updateCartItems(
+      { cart: { userId } },
+      { isSelected: false },
+    );
+
+    await this.cartItemRepo.updateCartItems(
+      {
+        cart: { userId },
+        id: { in: cartItemIds },
+      },
+      { isSelected: true },
+    );
   }
 }

@@ -28,6 +28,7 @@ export const PATH = {
   CART: "cart",
   SELLER: "seller",
   REGISTER_SHOP: "register-shop",
+  SELECT_SHOP: "select-shop",
   CREATE_PRODUCT: "create-product",
   EDIT_PRODUCT: "edit-product",
   CHECKOUT: "checkout",

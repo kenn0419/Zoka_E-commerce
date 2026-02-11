@@ -8,9 +8,9 @@ import {
 import { message, Spin } from "antd";
 import { useState } from "react";
 
-import { CouponScope } from "../../../../../constant/coupon.constant";
 import { useActiveCategoriesQuery } from "../../../../../queries/category.query";
 import { useCouponAdminUpdateMutation } from "../../../../../queries/coupon.query";
+import { CouponScope } from "../../../../../utils/constant.util";
 
 type CouponUpdateDrawerProps = {
   coupon: ICouponResponse;
@@ -31,7 +31,7 @@ export default function CouponUpdateDrawer({
     },
     {
       enabled: !!search,
-    }
+    },
   );
 
   return (

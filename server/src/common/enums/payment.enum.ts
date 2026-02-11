@@ -3,3 +3,8 @@ export enum PaymentMethod {
   VNPAY = 'VNPAY',
   COD = 'COD',
 }
+
+export enum PaymentProvider {
+  MOMO = 'MOMO',
+  VNPAY = 'VNPAY',
+}

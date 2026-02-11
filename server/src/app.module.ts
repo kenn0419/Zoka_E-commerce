@@ -20,6 +20,9 @@ import { AuthCoreModule } from './common/auth/auth-core.module';
 import { CatalogModule } from './modules/catalog/catalog.module';
 import { EventEmitterModule } from '@nestjs/event-emitter';
 import { ScheduleModule } from '@nestjs/schedule';
+import { AddressModule } from './modules/address/address.module';
+import { PaymentModule } from './modules/payment/payment.module';
+import { CommentModule } from './modules/comment/comment.module';
 
 @Module({
   imports: [
@@ -47,6 +50,9 @@ import { ScheduleModule } from '@nestjs/schedule';
     OrderModule,
     ChatModule,
     CatalogModule,
+    AddressModule,
+    PaymentModule,
+    CommentModule,
   ],
 })
 export class AppModule {}

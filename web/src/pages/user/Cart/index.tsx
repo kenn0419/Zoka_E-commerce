@@ -5,44 +5,40 @@ import CartSummary from "../../../components/cart/CartSummary";
 import EmptyCart from "../../../components/cart/EmptyCard.tsx";
 import { useCartQuery } from "../../../queries/cart.query.ts";
 import { useEffect } from "react";
+import { useAuthStore } from "../../../store/auth.store.ts";
 
 export default function CartPage() {
-  const items = useCartStore((s) => s.items);
-  const toggleAll = useCartStore((s) => s.toggleAll);
-  const setItems = useCartStore((s) => s.setItems);
-
-  const { data, isLoading } = useCartQuery(true);
+  const user = useAuthStore((state) => state.user);
+  const { data, isLoading } = useCartQuery(!!user);
+  const { init, toggleAll, checkedMap } = useCartStore();
 
   useEffect(() => {
-    if (!data) return;
-    if (items.length === 0) {
-      setItems(data.items);
+    if (data?.items) {
+      init(data.items);
     }
-  }, [data, items.length, setItems]);
-  if (isLoading) {
-    return <Spin />;
-  }
+  }, [data, init]);
+  if (isLoading) return <Spin />;
+  if (!data?.items.length) return <EmptyCart />;
 
-  if (!items.length) {
-    return <EmptyCart />;
-  }
+  const availableIds = data.items.filter((i) => i.isAvailable).map((i) => i.id);
 
-  const allChecked = items.every((i) => i.checked || !i.isAvailable);
+  const allChecked =
+    availableIds.length > 0 && availableIds.every((id) => checkedMap[id]);
 
   return (
     <div style={{ padding: 24, maxWidth: 1200, margin: "0 auto" }}>
       <div style={{ marginBottom: 16 }}>
         <Checkbox
           checked={allChecked}
-          onChange={(e) => toggleAll(e.target.checked)}
+          onChange={(e) => toggleAll(availableIds, e.target.checked)}
         >
-          Chọn tất cả ({items.length})
+          Chọn tất cả ({availableIds.length})
         </Checkbox>
       </div>
 
       <Row gutter={16}>
         <Col span={16}>
-          {items.map((item) => (
+          {data.items.map((item) => (
             <CartItem key={item.id} item={item} />
           ))}
         </Col>

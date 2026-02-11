@@ -33,4 +33,7 @@ export class CartItemResponseDto {
 
   @Expose()
   isAvailable: boolean;
+
+  @Expose()
+  isSelected: boolean;
 }

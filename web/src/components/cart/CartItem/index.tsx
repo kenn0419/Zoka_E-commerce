@@ -1,16 +1,27 @@
-import { Checkbox, InputNumber } from "antd";
+import { Checkbox, InputNumber, Popconfirm } from "antd";
 import styles from "./CartItem.module.scss";
 import { useCartStore } from "../../../store/cart.store";
+import {
+  useRemoveCartItemMutation,
+  useUpdateCartItemMutation,
+} from "../../../queries/cart.query";
 
-export default function CartItem({ item }: { item: any }) {
+interface ICartItemProps {
+  item: ICartItemResponse;
+}
+
+export default function CartItem({ item }: ICartItemProps) {
+  const checkedMap = useCartStore((s) => s.checkedMap);
   const toggleItem = useCartStore((s) => s.toggleItem);
-  const setQty = useCartStore((s) => s.setQty);
+  const checked = !!checkedMap[item.id];
+  const updateMutation = useUpdateCartItemMutation();
+  const removeMutation = useRemoveCartItemMutation();
 
   return (
     <div className={styles.cartItem}>
       <div className={styles.checkbox}>
         <Checkbox
-          checked={item.checked}
+          checked={checked}
           disabled={!item.isAvailable}
           onChange={() => toggleItem(item.id)}
         />
@@ -33,7 +44,10 @@ export default function CartItem({ item }: { item: any }) {
         disabled={!item.isAvailable}
         onChange={(value) => {
           if (typeof value === "number") {
-            setQty(item.id, value);
+            updateMutation.mutate({
+              cartItemId: item.id,
+              quantity: value,
+            });
           }
         }}
       />
@@ -42,7 +56,12 @@ export default function CartItem({ item }: { item: any }) {
         ₫{(item.priceSnapshot * item.quantity).toLocaleString()}
       </div>
 
-      <button className={styles.remove}>Xóa</button>
+      <Popconfirm
+        title="Xóa sản phẩm này?"
+        onConfirm={() => removeMutation.mutate(item.id)}
+      >
+        <button className={styles.remove}>Xóa</button>
+      </Popconfirm>
     </div>
   );
 }

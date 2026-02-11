@@ -8,7 +8,6 @@ export class OrderPaymentListener {
 
   @OnEvent('payment.result')
   async handle(payload: { orderId: string; isSuccess: boolean }) {
-    console.log('Received event emitter');
     await this.orderService.handlePaymentResult(
       payload.orderId,
       payload.isSuccess,

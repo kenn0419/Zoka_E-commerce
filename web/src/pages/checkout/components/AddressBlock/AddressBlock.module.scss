@@ -1,0 +1,25 @@
+.wrapper {
+  background: #fff;
+  padding: 16px;
+  margin-bottom: 16px;
+  border-radius: 4px;
+  display: flex;
+  justify-content: space-between;
+}
+
+.title {
+  color: #ee4d2d;
+  font-weight: 600;
+}
+
+.content {
+  flex: 1;
+  margin-left: 16px;
+}
+
+.change {
+  color: #05a;
+  background: none;
+  border: none;
+  cursor: pointer;
+}

@@ -7,17 +7,16 @@ import {
 } from "@ant-design/icons";
 import styles from "./Header.module.scss";
 import { useAuthStore } from "../../../../store/auth.store";
-import { useCartStore } from "../../../../store/cart.store";
 import logo from "../../../../assets/images/logo-zoka-ecommerce.png";
 import { Link, useNavigate } from "react-router-dom";
 import { PATH } from "../../../../utils/path.util";
 import SearchBar from "../../../common/SearchBar";
 import { useLogoutMutation } from "../../../../queries/auth.query";
+import { useCartSummaryQuery } from "../../../../queries/cart.query";
 
 export default function Header() {
   const { user } = useAuthStore();
-  const totalItems = useCartStore((s) => s.totalItems);
-
+  const { data: summary } = useCartSummaryQuery(!!user);
   const navigate = useNavigate();
   const logoutMutation = useLogoutMutation();
 
@@ -59,7 +58,7 @@ export default function Header() {
       <div className={styles.actions}>
         {user ? (
           <>
-            <Badge count={totalItems}>
+            <Badge count={summary?.totalItems ?? 0}>
               <Link to={`/${PATH.CART}`}>
                 <ShoppingCartOutlined className={styles.icon} />
               </Link>

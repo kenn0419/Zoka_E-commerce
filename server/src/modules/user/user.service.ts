@@ -16,6 +16,7 @@ import { buildSearchOr } from 'src/common/utils/build-search-or.util';
 import { paginatedResult } from 'src/common/utils/pagninated-result.util';
 import { buildUserSort } from 'src/common/utils/user-sort.util';
 import { PaginatedSort } from 'src/common/enums/pagination.enum';
+import { AddressRepository } from '../address/address.repository';
 
 @Injectable()
 export class UserService {
@@ -23,6 +24,7 @@ export class UserService {
     private configService: ConfigService,
     private uploadService: UploadService,
     private userRepo: UserRepository,
+    private addressRepo: AddressRepository,
   ) {}
 
   async createUser(data: CreateUserDto, file?: Express.Multer.File) {
@@ -60,9 +62,15 @@ export class UserService {
       phone: data.phone,
       fullName: data.fullName,
       slug: slugify(data.fullName, { lower: true }) + '-' + crypto.randomUUID(),
-      address: data.address,
       avatarUrl,
     });
+
+    await this.addressRepo.createAddress(
+      newUser.id,
+      data.address,
+      data.fullName,
+      data.phone,
+    );
 
     return newUser;
   }

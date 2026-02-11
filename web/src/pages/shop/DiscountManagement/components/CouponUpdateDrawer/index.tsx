@@ -8,10 +8,10 @@ import {
 import { message, Spin } from "antd";
 import { useState } from "react";
 
-import { useCouponUpdateMutation } from "../../../../../queries/coupon.query";
 import { useSellerStore } from "../../../../../store/seller.store";
-import { CouponScope } from "../../../../../constant/coupon.constant";
 import { useProductsByShop } from "../../../../../queries/product.query";
+import { CouponScope } from "../../../../../utils/constant.util";
+import { useCouponAdminUpdateMutation } from "../../../../../queries/coupon.query";
 
 type CouponUpdateDrawerProps = {
   coupon: ICouponResponse & {
@@ -23,7 +23,7 @@ export default function CouponUpdateDrawer({
   coupon,
 }: CouponUpdateDrawerProps) {
   const shopId = useSellerStore((state) => state.currentShopId!);
-  const updateShopCoupon = useCouponUpdateMutation();
+  const updateShopCoupon = useCouponAdminUpdateMutation();
 
   const [search, setSearch] = useState("");
 
@@ -36,7 +36,7 @@ export default function CouponUpdateDrawer({
     },
     {
       enabled: !!search,
-    }
+    },
   );
 
   return (

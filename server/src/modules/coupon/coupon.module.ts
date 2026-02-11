@@ -25,5 +25,6 @@ import { UserCouponRepository } from './repositories/user-coupon.repository';
     CouponRepository,
     UserCouponRepository,
   ],
+  exports: [CouponRepository],
 })
 export class CouponModule {}

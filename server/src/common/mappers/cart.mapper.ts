@@ -1,20 +1,21 @@
+import { ProductStatus } from '../enums/product.enum';
+
 export class CartMapper {
   static toCartResponse(cart: any) {
     const items = this.toCartItemResponses(cart);
-    // const summary = this.toCartSummaryResponse(items);
 
     return {
       id: cart.id,
       userId: cart.userId,
       items,
-      // summary,
       updatedAt: cart.updatedAt,
     };
   }
 
   static toCartSummaryResponse(items: any) {
+    const availableItems = items.filter((i) => i.isAvailable);
     return {
-      totalItems: items.length,
+      totalItems: availableItems.length,
       totalQuantity: items.reduce((sum, i) => sum + i.quantity, 0),
       subtotal: items.reduce((sum, i) => sum + i.subtotal, 0),
     };
@@ -22,6 +23,11 @@ export class CartMapper {
 
   static toCartItemResponses(cart: any) {
     return cart.items.map((item) => {
+      const price = Number(item.variant.price);
+      const stock = item.variant.stock;
+
+      const isAvailable =
+        item.product.status === ProductStatus.ACTIVE && stock > 0;
       const subtotal = Number(item.priceSnapshot) * item.quantity;
       return {
         id: item.id,
@@ -30,11 +36,12 @@ export class CartMapper {
         productName: item.productName,
         variantName: item.variantName,
         imageUrl: item.imageUrl,
-        priceSnapshot: Number(item.priceSnapshot),
+        priceSnapshot: price,
         quantity: item.quantity,
         stockSnapshot: item.stockSnapshot,
+        isSelected: item.isSelected,
         subtotal,
-        isAvailable: item.stockSnapshot >= item.quantity,
+        isAvailable,
       };
     });
   }

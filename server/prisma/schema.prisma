@@ -12,6 +12,52 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+enum OrderStatus {
+  PENDING
+  PAID
+  PROCESSING
+  SHIPPED
+  COMPLETED
+  CANCELLED
+  FAILED
+}
+
+enum PaymentMethod {
+  MOMO
+  VNPAY
+  COD
+}
+
+enum PaymentProvider {
+  MOMO
+  VNPAY
+}
+
+enum PaymentStatus {
+  PENDING
+  SUCCESS
+  FAILED
+  EXPIRED
+}
+
+enum NotificationType {
+  LIKE
+  COMMENT
+  POST
+  MESSAGE
+  ORDER
+}
+
+enum ProductReviewStatus {
+  ACTIVE
+  INACTIVE
+}
+
+enum ProductReviewReplyStatus {
+  ACTIVE
+  INACTIVE
+}
+
 model User {
   id             String   @id @default(uuid())
   email          String   @unique
@@ -20,21 +66,24 @@ model User {
   slug           String   @unique
   phone          String   @unique
   avatarUrl      String?
-  address        String
   status         String   @default("PENDING")
   createdAt      DateTime @default(now())
   updatedAt      DateTime @updatedAt
 
-  sessions              UserSession[]
-  roles                 UserRole[]
-  shops                 Shop[]
-  coupons               UserCoupon[]
-  orders                Order[]         @relation("UserOrders")
-  reviews               ProductReview[]
-  conversationsAsBuyer  Conversation[]  @relation("BuyerConversations")
-  conversationsAsSeller Conversation[]  @relation("SellerConversations")
-  messages              Message[]
-  carts                 Cart[]
+  sessions                UserSession[]
+  roles                   UserRole[]
+  shops                   Shop[]
+  coupons                 UserCoupon[]
+  orders                  Order[]              @relation("UserOrders")
+  reviews                 ProductReview[]
+  conversationsAsBuyer    Conversation[]       @relation("BuyerConversations")
+  conversationsAsSeller   Conversation[]       @relation("SellerConversations")
+  messages                Message[]
+  carts                   Cart[]
+  addresses               Address[]
+  notificationsAsSender   Notification[]       @relation("SenderNotifications")
+  notificationsAsReceiver Notification[]       @relation("ReceiverNotifications")
+  productReviewReplies    ProductReviewReply[]
 }
 
 model UserSession {
@@ -97,6 +146,25 @@ model RolePermission {
   permission Permission @relation(fields: [permissionId], references: [id])
 
   @@id([roleId, permissionId])
+}
+
+// ===================== ADDRESS ==================
+model Address {
+  id            String @id @default(uuid())
+  userId        String
+  receiverName  String
+  receiverPhone String
+
+  addressText String
+
+  isDefault Boolean @default(false)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  user User @relation(fields: [userId], references: [id])
+
+  @@index([userId])
 }
 
 // ===================== SHOP =====================
@@ -222,6 +290,7 @@ model CartItem {
   variantId     String
   productName   String
   variantName   String
+  isSelected    Boolean  @default(false)
   imageUrl      String
   priceSnapshot Decimal
   stockSnapshot Int
@@ -333,52 +402,127 @@ model CouponProduct {
 // ===================== ORDER =====================
 
 model Order {
-  id            String    @id @default(uuid())
-  buyerId       String
-  shopId        String
-  totalPrice    Decimal
-  status        String    @default("PENDING")
-  paymentMethod String
-  paymentId     String?
-  paidAt        DateTime?
-  expiresAt     DateTime
-  createdAt     DateTime  @default(now())
-  updatedAt     DateTime  @updatedAt
+  id String @id @default(uuid())
 
-  buyer    User        @relation("UserOrders", fields: [buyerId], references: [id])
-  shop     Shop        @relation(fields: [shopId], references: [id])
-  items    OrderItem[]
+  buyerId String
+  shopId  String
+
+  receiverName  String
+  receiverPhone String
+  addressText   String
+  note          String?
+
+  subtotal    Decimal
+  shippingFee Decimal
+  discount    Decimal @default(0)
+  totalPrice  Decimal
+
+  status        OrderStatus   @default(PENDING)
+  paymentMethod PaymentMethod
+
+  paidAt    DateTime?
+  expiresAt DateTime?
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+
+  paymentId String?
+  payment   Payment? @relation(fields: [paymentId], references: [id])
+
   couponId String?
-  coupon   Coupon?     @relation(fields: [couponId], references: [id])
+  coupon   Coupon? @relation(fields: [couponId], references: [id])
+
+  buyer User        @relation("UserOrders", fields: [buyerId], references: [id])
+  shop  Shop        @relation(fields: [shopId], references: [id])
+  items OrderItem[]
+
+  @@index([buyerId])
+  @@index([shopId])
+  @@index([status])
 }
 
 model OrderItem {
+  id String @id @default(uuid())
+
   orderId   String
   productId String
-  quantity  Int
-  price     Decimal
+  variantId String?
+
+  productName String
+  variantName String?
+  imageUrl    String
+
+  quantity Int
+  price    Decimal
+
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
   order   Order   @relation(fields: [orderId], references: [id])
   product Product @relation(fields: [productId], references: [id])
 
-  @@id([orderId, productId])
+  @@unique([orderId, productId, variantId])
+  @@index([orderId])
+}
+
+model Payment {
+  id String @id @default(uuid())
+
+  provider PaymentProvider
+  status   PaymentStatus   @default(PENDING)
+
+  amount   Decimal
+  currency String  @default("VND")
+
+  requestId   String
+  providerRef String?
+
+  rawRequest  Json?
+  rawResponse Json?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  orders Order[]
 }
 
 // ===================== REVIEW =====================
 
 model ProductReview {
-  id        String   @id @default(uuid())
+  id        String              @id @default(uuid())
   productId String
   buyerId   String
   rating    Int
   comment   String?
+  status    ProductReviewStatus @default(ACTIVE)
+  isEdit    Boolean             @default(false)
+  editedAt  DateTime?
+  createdAt DateTime            @default(now())
+  updatedAt DateTime            @updatedAt
+
+  product Product              @relation(fields: [productId], references: [id])
+  buyer   User                 @relation(fields: [buyerId], references: [id])
+  replies ProductReviewReply[]
+
+  @@unique([productId, buyerId])
+  @@index([productId, createdAt])
+  @@index([buyerId])
+}
+
+model ProductReviewReply {
+  id       String                   @id @default(uuid())
+  reviewId String
+  senderId String
+  content  String
+  status   ProductReviewReplyStatus @default(ACTIVE)
+
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  product Product @relation(fields: [productId], references: [id])
-  buyer   User    @relation(fields: [buyerId], references: [id])
+  review ProductReview @relation(fields: [reviewId], references: [id], onDelete: Cascade)
+
+  sender User @relation(fields: [senderId], references: [id])
+
+  @@index([reviewId, createdAt])
 }
 
 // ===================== CHAT =====================
@@ -412,4 +556,23 @@ model Message {
   sender       User         @relation(fields: [senderId], references: [id])
 
   @@index([conversationId, createdAt])
+}
+
+// ===================== NOTIFICATION =====================
+model Notification {
+  id         String           @id @default(uuid())
+  senderId   String
+  receiverId String
+  content    String
+  url        String
+  isRead     Boolean          @default(false)
+  type       NotificationType
+  createdAt  DateTime         @default(now())
+  updatedAt  DateTime         @updatedAt
+
+  sender   User @relation("SenderNotifications", fields: [senderId], references: [id])
+  receiver User @relation("ReceiverNotifications", fields: [receiverId], references: [id])
+
+  @@index([receiverId, isRead])
+  @@index([receiverId, createdAt])
 }

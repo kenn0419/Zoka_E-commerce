@@ -3,7 +3,7 @@ import { useState } from "react";
 import CouponTable from "./components/CouponTable";
 import { useAllAdminCoupons } from "../../../queries/coupon.query";
 import { CouponCreateModal } from "./components/CouponCreateModal";
-import { CouponSort } from "../../../constant/coupon.constant";
+import { CouponSort } from "../../../utils/constant.util";
 
 export default function DiscountManagement() {
   const [page, setPage] = useState(1);

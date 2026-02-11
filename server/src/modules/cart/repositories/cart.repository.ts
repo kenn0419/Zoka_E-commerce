@@ -22,6 +22,7 @@ export class CartRepository {
                 id: true,
                 name: true,
                 slug: true,
+                status: true,
               },
             },
             variant: {

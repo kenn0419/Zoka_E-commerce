@@ -2,8 +2,8 @@ import { ProTable, type ProColumns } from "@ant-design/pro-components";
 import { Popconfirm, Tag } from "antd";
 import CouponStatusSwitcher from "../CouponStatusSwitcher";
 import CouponUpdateDrawer from "../CouponUpdateDrawer";
-import { CouponSort } from "../../../../../constant/coupon.constant";
 import dayjs from "dayjs";
+import { CouponSort } from "../../../../../utils/constant.util";
 
 type Props = {
   data: ICouponResponse[];
@@ -89,7 +89,7 @@ export default function CouponTable({
           onSortChange(
             sorter.order === "ascend"
               ? CouponSort.START_AT_ASC
-              : CouponSort.START_AT_DESC
+              : CouponSort.START_AT_DESC,
           );
         }
       }}

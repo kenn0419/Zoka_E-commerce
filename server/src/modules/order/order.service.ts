@@ -1,107 +1,409 @@
+import {
+  Address,
+  Coupon,
+  Order,
+  Payment,
+  PaymentMethod,
+  PaymentStatus,
+  Prisma,
+} from 'generated/prisma';
 import { BadRequestException, Injectable } from '@nestjs/common';
-import { OrderRepository } from './order.repository';
-import { CheckoutDto } from './dto/checkout.dto';
-import { Cart, Prisma } from 'generated/prisma';
-import { PaymentMethod } from 'src/common/enums/payment.enum';
 import ms from 'ms';
-import { PrismaService } from 'src/infrastructure/prisma/prisma.service';
-import { OrderStatus } from 'src/common/enums/order.enum';
-import { PaymentService } from 'src/infrastructure/payment/payment.service';
-import { CartRepository } from '../cart/repositories/cart.repository';
 
-type CartWithItems = Prisma.CartGetPayload<{
-  include: {
-    items: {
-      include: {
-        product: true;
-      };
-    };
-  };
-}>;
+import { PrismaService } from 'src/infrastructure/prisma/prisma.service';
+import { PaymentService } from '../payment/payment.service';
+import { PaymentRepository } from '../payment/payment.repository';
+import { OrderRepository } from './order.repository';
+import { CartItemRepository } from '../cart/repositories/cart-item.repository';
+import { AddressRepository } from '../address/address.repository';
+import { CouponRepository } from '../coupon/repositories/coupon.repository';
+
+import { OrderStatus } from 'src/common/enums/order.enum';
+import {
+  CouponScope,
+  CouponStatus,
+  CouponType,
+} from 'src/common/enums/coupon.enum';
+import { mapMethodToProvider } from 'src/common/mappers/map-method-to-provider';
+import { groupByMap } from 'src/common/utils/group-by.util';
+
+import { CheckoutPreviewDto } from './dto/checkout-preview.dto';
+import { CheckoutConfirmDto } from './dto/checkout-confirm.dto';
+import { CartItemWithProduct } from './types/cart-item-with-product.type';
+import { CalculatedShopOrder } from './types/calculated-shop-order.type';
 
 @Injectable()
 export class OrderService {
   constructor(
-    private prisma: PrismaService,
+    private readonly prisma: PrismaService,
     private readonly paymentService: PaymentService,
+    private readonly paymentRepo: PaymentRepository,
     private readonly orderRepo: OrderRepository,
-    private readonly cartRepo: CartRepository,
+    private readonly cartItemRepo: CartItemRepository,
+    private readonly couponRepo: CouponRepository,
+    private readonly addressRepo: AddressRepository,
   ) {}
 
-  async checkout(userId: string, dto: CheckoutDto) {
-    const cart = await this.cartRepo.findUnique(userId);
-    if (!cart) {
-      throw new BadRequestException('Cart not initialized!');
-    }
-    const order = await this.createOrder(userId, cart, dto.paymentMethod);
+  async preview(userId: string, dto: CheckoutPreviewDto) {
+    const cartItems = await this.loadAndValidateCartItems(userId);
 
-    if (dto.paymentMethod !== PaymentMethod.COD) {
-      const payment = await this.paymentService.createPayment(
-        dto.paymentMethod,
-        {
-          orderId: order.id,
-          amount: Number(order.totalPrice),
-          orderInfo: `Order ${order.id}`,
-        },
+    const address = await this.addressRepo.findDefaultByUserId(userId);
+
+    const coupons = await this.couponRepo.findCouponsForCheckoutPreview(
+      userId,
+      cartItems,
+    );
+
+    let appliedCoupon: Coupon | null = null;
+
+    if (dto.couponCode) {
+      appliedCoupon = await this.validateCouponAvailability(
+        userId,
+        dto.couponCode,
       );
-
-      return {
-        orderId: order.id,
-        payUrl: payment.payUrl,
-      };
     }
 
-    return { orderId: order.id };
+    const shopOrders = this.calculateShopOrders(cartItems, appliedCoupon);
+
+    const summary = this.calculateSummary(shopOrders);
+
+    return {
+      shops: shopOrders,
+      summary,
+      address,
+      coupons,
+    };
   }
 
-  async handlePaymentResult(orderId: string, isSuccess: boolean) {
-    const order = await this.orderRepo.findById(orderId);
-    if (!order) {
+  async confirm(userId: string, dto: CheckoutConfirmDto) {
+    const cartItems = await this.cartItemRepo.getCartItemsByUser(userId);
+    if (!cartItems.length) {
+      throw new BadRequestException('Invalid cart items');
+    }
+
+    const address = await this.addressRepo.findDefaultByUserId(userId);
+    if (!address) {
+      throw new BadRequestException('Address not found');
+    }
+
+    const coupon = dto.couponCode
+      ? await this.validateCouponAvailability(userId, dto.couponCode)
+      : null;
+
+    const shopOrders = this.calculateShopOrders(cartItems, coupon);
+
+    let payment: Payment | null = null;
+    const orders: Order[] = [];
+
+    await this.prisma.$transaction(async (tx) => {
+      await this.decrementStock(cartItems, tx);
+
+      if (dto.paymentMethod !== PaymentMethod.COD) {
+        const totalAmount = shopOrders.reduce((s, i) => s + i.total, 0);
+        const provider = mapMethodToProvider(dto.paymentMethod);
+        payment = await this.paymentRepo.create(provider!, totalAmount, tx);
+      }
+
+      for (const shopOrder of shopOrders) {
+        const order = await this.createOrderTx(
+          userId,
+          shopOrder,
+          dto.paymentMethod,
+          address,
+          coupon,
+          payment?.id ?? null,
+          tx,
+        );
+        orders.push(order);
+      }
+
+      if (coupon) {
+        await this.couponRepo.markUsed(userId, coupon.id, tx);
+      }
+
+      await this.cartItemRepo.removeItemByIds(userId, dto.cartItemIds, tx);
+    });
+
+    if (dto.paymentMethod === PaymentMethod.COD) {
+      return { orderIds: orders.map((o) => o.id) };
+    }
+
+    const payRes = await this.paymentService.createPayment(dto.paymentMethod, {
+      paymentId: payment!.id,
+      amount: Number(payment!.amount),
+      orderInfo: `Payment ${payment!.id}`,
+    });
+
+    return {
+      paymentId: payment!.id,
+      orderIds: orders.map((o) => o.id),
+      payUrl: payRes.payUrl,
+    };
+  }
+
+  async handlePaymentResult(paymentId: string, success: boolean) {
+    const payment = await this.prisma.payment.findUnique({
+      where: { id: paymentId },
+      include: {
+        orders: {
+          include: { items: true },
+        },
+      },
+    });
+
+    if (!payment) {
+      throw new BadRequestException('Payment not found');
+    }
+
+    if (payment.status !== PaymentStatus.PENDING) {
       return;
     }
 
-    if (order.status !== OrderStatus.PENDING) {
+    const hasExpiredOrder = payment.orders.some(
+      (o) => o.status === OrderStatus.CANCELLED,
+    );
+
+    if (hasExpiredOrder) {
       return;
     }
 
     await this.prisma.$transaction(async (tx) => {
-      await this.orderRepo.updateStatus(
-        order.id,
-        isSuccess ? OrderStatus.PAID : OrderStatus.CANCELLED,
-        tx,
-      );
+      if (success) {
+        await tx.payment.update({
+          where: { id: paymentId },
+          data: { status: PaymentStatus.SUCCESS },
+        });
 
-      await this.cartRepo.clearCartByUserId(order.buyerId);
+        await tx.order.updateMany({
+          where: { paymentId, status: OrderStatus.PENDING },
+          data: {
+            status: OrderStatus.PAID,
+            expiresAt: null,
+          },
+        });
+      } else {
+        await tx.payment.update({
+          where: { id: paymentId },
+          data: { status: PaymentStatus.FAILED },
+        });
+
+        for (const order of payment.orders) {
+          await tx.order.update({
+            where: { id: order.id },
+            data: { status: OrderStatus.CANCELLED },
+          });
+
+          for (const item of order.items) {
+            if (!item.variantId) continue;
+
+            await tx.productVariant.update({
+              where: { id: item.variantId },
+              data: {
+                stock: { increment: item.quantity },
+              },
+            });
+          }
+        }
+
+        const couponId = payment.orders.find((o) => o.couponId)?.couponId;
+        const buyerId = payment.orders[0]?.buyerId;
+
+        if (couponId) {
+          await this.couponRepo.rollbackUsed(buyerId, couponId, tx);
+        }
+      }
     });
   }
 
-  private async createOrder(
-    userId: string,
-    cart: CartWithItems,
-    paymentMethod: PaymentMethod,
-  ) {
-    const expiresAt = new Date(Date.now() + ms('15m'));
+  private async loadAndValidateCartItems(userId: string) {
+    const cartItems = await this.cartItemRepo.getCartItemsByUser(userId);
 
-    return this.prisma.$transaction(async (tx) => {
-      const payload = {
+    if (!cartItems.length) {
+      throw new BadRequestException('Cart items not found');
+    }
+
+    for (const item of cartItems) {
+      if (item.quantity > item.stockSnapshot) {
+        throw new BadRequestException(`Out of stock: ${item.productName}`);
+      }
+    }
+
+    return cartItems;
+  }
+
+  private async validateCouponAvailability(
+    userId: string,
+    code: string,
+  ): Promise<Coupon> {
+    const coupon = await this.couponRepo.findByCode(code);
+
+    if (!coupon || coupon.status !== CouponStatus.ACTIVE) {
+      throw new BadRequestException('Invalid coupon');
+    }
+
+    const now = new Date();
+    if (
+      (coupon.startAt && coupon.startAt > now) ||
+      (coupon.endAt && coupon.endAt < now)
+    ) {
+      throw new BadRequestException('Coupon expired');
+    }
+
+    if (coupon.usageLimit && coupon.usedCount >= coupon.usageLimit) {
+      throw new BadRequestException('Coupon usage limit reached');
+    }
+
+    const hasUsed = await this.couponRepo.hasUserUsed(userId, coupon.id);
+    if (hasUsed) {
+      throw new BadRequestException('Coupon already used');
+    }
+
+    return coupon;
+  }
+
+  private calculateDiscount(coupon: Coupon, subtotal: number) {
+    let discount =
+      coupon.type === CouponType.PERCENTAGE
+        ? (subtotal * Number(coupon.discount)) / 100
+        : Number(coupon.discount);
+
+    if (coupon.maxDiscount) {
+      discount = Math.min(discount, Number(coupon.maxDiscount));
+    }
+
+    return Math.max(0, discount);
+  }
+
+  private calculateShopOrders(
+    cartItems: CartItemWithProduct[],
+    coupon: Coupon | null,
+  ): CalculatedShopOrder[] {
+    const shopMap = groupByMap(cartItems, (i) => i.product.shopId);
+    const result: CalculatedShopOrder[] = [];
+
+    const totalSubtotal = cartItems.reduce(
+      (s, i) => s + Number(i.priceSnapshot) * i.quantity,
+      0,
+    );
+
+    let remainingGlobalDiscount = 0;
+
+    if (coupon?.scope === CouponScope.GLOBAL) {
+      if (coupon.minOrder && totalSubtotal < Number(coupon.minOrder)) {
+        throw new BadRequestException('Order not eligible for coupon');
+      }
+      remainingGlobalDiscount = this.calculateDiscount(coupon, totalSubtotal);
+    }
+
+    for (const [shopId, items] of shopMap.entries()) {
+      const subtotal = items.reduce(
+        (s, i) => s + Number(i.priceSnapshot) * i.quantity,
+        0,
+      );
+
+      let discount = 0;
+
+      if (coupon?.scope === CouponScope.SHOP && coupon.shopId === shopId) {
+        if (coupon.minOrder && subtotal < Number(coupon.minOrder)) {
+          throw new BadRequestException('Order not eligible for coupon');
+        }
+        discount = this.calculateDiscount(coupon, subtotal);
+      }
+
+      if (coupon?.scope === CouponScope.GLOBAL && remainingGlobalDiscount > 0) {
+        const maxDiscountForShop = this.calculateDiscount(coupon, subtotal);
+
+        discount = Math.min(subtotal, maxDiscountForShop);
+        remainingGlobalDiscount -= discount;
+      }
+
+      const shippingFee = subtotal > 500_000 ? 0 : 30_000;
+      const total = subtotal + shippingFee - discount;
+
+      result.push({
+        shopId,
+        items,
+        subtotal,
+        shippingFee,
+        discount,
+        total,
+      });
+    }
+
+    return result;
+  }
+
+  private calculateSummary(shops: CalculatedShopOrder[]) {
+    return {
+      subtotal: shops.reduce((s, i) => s + i.subtotal, 0),
+      shippingFee: shops.reduce((s, i) => s + i.shippingFee, 0),
+      discount: shops.reduce((s, i) => s + i.discount, 0),
+      total: shops.reduce((s, i) => s + i.total, 0),
+    };
+  }
+
+  private async decrementStock(
+    cartItems: CartItemWithProduct[],
+    tx: Prisma.TransactionClient,
+  ) {
+    for (const item of cartItems) {
+      const { count } = await tx.productVariant.updateMany({
+        where: {
+          id: item.variantId,
+          stock: { gte: item.quantity },
+        },
+        data: {
+          stock: { decrement: item.quantity },
+        },
+      });
+
+      if (count === 0) {
+        throw new BadRequestException(`Out of stock: ${item.productName}`);
+      }
+    }
+  }
+
+  private async createOrderTx(
+    userId: string,
+    shopOrder: CalculatedShopOrder,
+    paymentMethod: PaymentMethod,
+    address: Address,
+    coupon: Coupon | null,
+    paymentId: string | null,
+    tx: Prisma.TransactionClient,
+  ) {
+    return this.orderRepo.createOrder(
+      {
         buyerId: userId,
-        shopId: cart.items[0].product.shopId,
-        totalPrice: cart.items.reduce(
-          (cur, next) => cur + Number(next.priceSnapshot),
-          0,
-        ),
+        shopId: shopOrder.shopId,
+        subtotal: shopOrder.subtotal,
+        shippingFee: shopOrder.shippingFee,
+        discount: shopOrder.discount,
+        totalPrice: shopOrder.total,
+        couponId: coupon?.id ?? null,
+        paymentId,
+        receiverName: address.receiverName,
+        receiverPhone: address.receiverPhone,
+        addressText: address.addressText,
         paymentMethod,
         status: OrderStatus.PENDING,
-        expiresAt,
+        expiresAt:
+          paymentMethod === PaymentMethod.COD
+            ? null
+            : new Date(Date.now() + ms('15m')),
         items: {
-          create: cart.items.map((i) => ({
+          create: shopOrder.items.map((i) => ({
             productId: i.productId,
-            quantity: i.quantity,
+            variantId: i.variantId,
+            productName: i.productName,
+            variantName: i.variantName,
+            imageUrl: i.imageUrl,
             price: i.priceSnapshot,
+            quantity: i.quantity,
           })),
         },
-      };
-      return this.orderRepo.createOrder(payload, tx);
-    });
+      },
+      tx,
+    );
   }
 }

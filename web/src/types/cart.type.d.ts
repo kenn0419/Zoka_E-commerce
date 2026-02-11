@@ -15,7 +15,7 @@ interface ICartItemResponse {
   stockSnapshot: number;
   subtotal: number;
   isAvailable: boolean;
-
+  isSelected: boolean;
   checked?: boolean;
 }
 
@@ -27,5 +27,10 @@ interface ICartResponse {
 
 interface IAddCartRequest {
   variantId: string;
+  quantity: number;
+}
+
+interface IUpdateCartRequest {
+  cartItemId: string;
   quantity: number;
 }

@@ -20,8 +20,7 @@ import { SlugifyUtil } from 'src/common/utils/slugify.util';
 import { UserStatus } from 'src/common/enums/user.enum';
 import { UserMapper } from 'src/common/mappers/user.mapper';
 import { AuthRepository } from '../auth.repository';
-import { JwtUtil } from 'src/common/utils/jwt.util';
-import { RefreshTokenPayload } from 'src/common/interfaces/refresh-token-payload.interface';
+import { AddressRepository } from 'src/modules/address/address.repository';
 
 @Injectable()
 export class AuthService {
@@ -37,7 +36,7 @@ export class AuthService {
     private readonly userRepo: UserRepository,
     private readonly userRoleRepo: UserRoleRepository,
     private readonly authRepo: AuthRepository,
-
+    private readonly addressRepo: AddressRepository,
     private readonly sessionService: SessionService,
     private readonly tokenService: TokenService,
   ) {}
@@ -90,11 +89,17 @@ export class AuthService {
       fullName: data.fullName,
       email: data.email,
       phone: data.phone,
-      address: data.address,
       hashedPassword: data.hashedPassword,
       slug: SlugifyUtil.createSlug(data.fullName),
       status: UserStatus.ACTIVE,
     });
+
+    await this.addressRepo.createAddress(
+      user.id,
+      data.address,
+      data.fullName,
+      data.phone,
+    );
 
     await this.rbacService.assignRole(user.id, 'user');
     await this.redis.del(key);

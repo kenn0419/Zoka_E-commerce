@@ -2,13 +2,13 @@ import { Form, Input, Button, Typography } from "antd";
 import { Link, useNavigate } from "react-router-dom";
 import { PATH } from "../../../utils/path.util";
 import { useAuthStore } from "../../../store/auth.store";
-import { Role } from "../../../constant/role.constant";
 import AuthCard from "../../../components/auth/AuthCard";
 import PageHeader from "../../../components/auth/PageHeader";
 import layout from "./../../../layouts/AuthLayout/AuthLayout.module.scss";
 import { useSigninMutation } from "../../../queries/auth.query";
 import { useEffect } from "react";
 import { includeRole } from "../../../utils/checkRole.util";
+import { Role } from "../../../utils/constant.util";
 
 const { Text } = Typography;
 

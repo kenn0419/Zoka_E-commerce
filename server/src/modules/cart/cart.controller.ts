@@ -15,6 +15,8 @@ import { AddCartDto } from './dto/add-cart.dto';
 import { Serialize } from 'src/common/decorators/serialize.decorator';
 import { CartResponseDto } from './dto/cart-response.dto';
 import { CartSummaryResponseDto } from './dto/cart-summary-response.dto';
+import { UpdateCartDto } from './dto/update-cart.dto';
+import { UpdateSelectionDto } from './dto/update-selection.dto';
 
 @Controller('cart')
 @UseGuards(JwtSessionGuard)
@@ -39,9 +41,26 @@ export class CartController {
     return this.cartService.addToCart(req.user.sub, data);
   }
 
-  @Delete('/:id')
-  removeFromCart(@Param('id') cartItemId: string) {
-    return this.cartService.removeFromCart(cartItemId);
+  @Patch('/items/:id')
+  @Serialize(CartResponseDto, 'Update cart item successfully.')
+  updateItemQuantity(
+    @Req() req,
+    @Param('id') id: string,
+    @Body() data: UpdateCartDto,
+  ) {
+    return this.cartService.updateItemQuantity(req.user.sub, id, data.quantity);
+  }
+
+  @Patch('/select-batch')
+  @Serialize(CartResponseDto, 'Update cart successfully.')
+  updateSelection(@Req() req, @Body() data: UpdateSelectionDto) {
+    return this.cartService.updateSelection(req.user.sub, data.cartItemIds);
+  }
+
+  @Delete('/items/:id')
+  @Serialize(CartResponseDto, 'Remove cart item successfully.')
+  removeFromCart(@Req() req, @Param('id') cartItemId: string) {
+    return this.cartService.removeFromCart(req.user.sub, cartItemId);
   }
 
   @Delete('/clear')

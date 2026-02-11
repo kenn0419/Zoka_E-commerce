@@ -20,4 +20,19 @@ export const cartService = {
 
     return res.data;
   },
+  async updateQuantity(data: IUpdateCartRequest) {
+    const res = await cartApi.updateQuantity(data);
+
+    return res.data;
+  },
+  async removeCartItem(cartItemId: string) {
+    const res = await cartApi.removeCartItem(cartItemId);
+
+    return res.data;
+  },
+  async updateSelection(cartItemIds: string[]) {
+    const res = await cartApi.updateSelection(cartItemIds);
+
+    return res.data;
+  },
 };

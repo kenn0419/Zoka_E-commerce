@@ -7,8 +7,8 @@ import { CartItemRepository } from './repositories/cart-item.repository';
 
 @Module({
   imports: [ProductModule],
-  exports: [CartRepository],
   controllers: [CartController],
   providers: [CartService, CartRepository, CartItemRepository],
+  exports: [CartRepository, CartItemRepository],
 })
 export class CartModule {}

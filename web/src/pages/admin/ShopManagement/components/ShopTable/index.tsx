@@ -5,7 +5,7 @@ import { EditOutlined, DeleteOutlined } from "@ant-design/icons";
 import {
   SHOP_STATUS_COLOR,
   SHOP_STATUS_LABEL,
-} from "../../../../../constant/shop.constant";
+} from "../../../../../utils/constant.util";
 
 type ShopTableProps = {
   data: IShopResponse[];
@@ -56,11 +56,11 @@ export const ShopTable: React.FC<ShopTableProps> = ({
           dataIndex: ["owner", "fullName"],
           render: (_, record) => (
             <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-              <Avatar size={32} src={record.owner.avatarUrl} />
+              <Avatar size={32} src={record?.owner?.avatarUrl} />
               <div>
-                <div>{record.owner.fullName}</div>
+                <div>{record?.owner?.fullName}</div>
                 <div style={{ fontSize: 12, color: "#999" }}>
-                  {record.owner.email}
+                  {record?.owner?.email}
                 </div>
               </div>
             </div>

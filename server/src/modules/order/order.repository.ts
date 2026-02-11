@@ -20,7 +20,7 @@ export class OrderRepository {
     return this.prisma.order.findUnique({ where: { id: orderId } });
   }
 
-  updateStatus(
+  updateOrder(
     orderId: string,
     status: OrderStatus,
     tx?: Prisma.TransactionClient,
@@ -29,6 +29,25 @@ export class OrderRepository {
     return client.order.update({
       where: { id: orderId },
       data: { status },
+    });
+  }
+
+  async updateStatusOrdersByPaymentId(
+    paymentId: string,
+    isSuccess: boolean,
+    tx?: Prisma.TransactionClient,
+  ) {
+    const client = tx ?? this.prisma;
+
+    return await client.order.updateMany({
+      where: {
+        paymentId,
+        status: OrderStatus.PENDING,
+      },
+      data: {
+        status: isSuccess ? OrderStatus.PAID : OrderStatus.FAILED,
+        paidAt: isSuccess ? new Date() : null,
+      },
     });
   }
 }

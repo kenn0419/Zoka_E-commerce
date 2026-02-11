@@ -1,54 +1,40 @@
 import { create } from "zustand";
 
 interface CartState {
-  totalItems: number;
-  items: ICartItemResponse[];
+  checkedMap: Record<string, boolean>;
 
-  setTotalItems: (count: number) => void;
-  setItems: (items: ICartItemResponse[]) => void;
+  init: (items: { id: string; isSelected: boolean }[]) => void;
   toggleItem: (id: string) => void;
-  toggleAll: (checked: boolean) => void;
-  setQty: (id: string, qty: number) => void;
-  clearCart: () => void;
+  toggleAll: (ids: string[], checked: boolean) => void;
+  getSelectedIds: () => string[];
+  clear: () => void;
 }
 
-export const useCartStore = create<CartState>()((set, get) => ({
-  totalItems: 0,
-  items: [],
+export const useCartStore = create<CartState>((set, get) => ({
+  checkedMap: {},
 
-  setTotalItems: (count) => set({ totalItems: count }),
-  setItems: (items) => {
+  init: (items) =>
     set({
-      items: items.map((i) => ({
-        ...i,
-        checked: i.isAvailable,
-      })),
-    });
-  },
+      checkedMap: Object.fromEntries(items.map((i) => [i.id, i.isSelected])),
+    }),
 
   toggleItem: (id) =>
     set({
-      items: get().items.map((i) =>
-        i.id === id ? { ...i, checked: !i.checked } : i
-      ),
+      checkedMap: {
+        ...get().checkedMap,
+        [id]: !get().checkedMap[id],
+      },
     }),
 
-  toggleAll: (checked) =>
+  toggleAll: (ids, checked) =>
     set({
-      items: get().items.map((i) => (i.isAvailable ? { ...i, checked } : i)),
+      checkedMap: Object.fromEntries(ids.map((id) => [id, checked])),
     }),
 
-  setQty: (id, qty) =>
-    set({
-      items: get().items.map((i) =>
-        i.id === id
-          ? {
-              ...i,
-              quantity: Math.min(Math.max(qty, 1), i.stockSnapshot),
-            }
-          : i
-      ),
-    }),
+  getSelectedIds: () =>
+    Object.entries(get().checkedMap)
+      .filter(([_, v]) => v)
+      .map(([k]) => k),
 
-  clearCart: () => set({ items: [] }),
+  clear: () => set({ checkedMap: {} }),
 }));

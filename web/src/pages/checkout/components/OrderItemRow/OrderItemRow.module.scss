@@ -1,0 +1,10 @@
+.row {
+  display: grid;
+  grid-template-columns: 60px 1fr 60px 120px;
+  align-items: center;
+  margin-bottom: 12px;
+}
+
+.price {
+  text-align: right;
+}

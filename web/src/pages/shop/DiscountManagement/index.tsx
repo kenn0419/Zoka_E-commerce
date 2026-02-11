@@ -4,7 +4,7 @@ import CouponTable from "./components/CouponTable";
 import { useAllShopCoupons } from "../../../queries/coupon.query";
 import { useSellerStore } from "../../../store/seller.store";
 import { CouponCreateModal } from "./components/CouponCreateModal";
-import { CouponSort } from "../../../constant/coupon.constant";
+import { CouponSort } from "../../../utils/constant.util";
 
 export default function DiscountManagement() {
   const currentShopId = useSellerStore((state) => state.currentShopId);

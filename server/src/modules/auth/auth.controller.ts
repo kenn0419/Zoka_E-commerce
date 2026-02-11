@@ -28,6 +28,7 @@ export class AuthController {
   constructor(private authService: AuthService) {}
 
   @Post('/signup')
+  @HttpCode(HttpStatus.CREATED)
   @Serialize(null, 'Register successfully. Please verify email to access!')
   signup(@Body() data: SignupDto) {
     return this.authService.signup(data);

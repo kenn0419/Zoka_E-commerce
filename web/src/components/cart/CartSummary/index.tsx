@@ -1,17 +1,39 @@
 import styles from "./CartSummary.module.scss";
 import { useCartStore } from "../../../store/cart.store";
 import { Button } from "antd";
+import { useNavigate } from "react-router-dom";
+import { PATH } from "../../../utils/path.util";
+import {
+  useCartQuery,
+  useUpdateSelectionMutation,
+} from "../../../queries/cart.query";
 
 export default function CartSummary() {
-  const selectedCount = useCartStore(
-    (s) => s.items.filter((i) => i.checked && i.isAvailable).length
+  const navigate = useNavigate();
+
+  const { data } = useCartQuery();
+  const checkedMap = useCartStore((s) => s.checkedMap);
+  const getSelectedIds = useCartStore((s) => s.getSelectedIds);
+  const updateSelectionMutation = useUpdateSelectionMutation();
+
+  if (!data) return null;
+
+  const selectedItems = data.items.filter(
+    (i) => checkedMap[i.id] && i.isAvailable,
   );
 
-  const subtotal = useCartStore((s) =>
-    s.items
-      .filter((i) => i.checked && i.isAvailable)
-      .reduce((sum, i) => sum + i.priceSnapshot * i.quantity, 0)
-  );
+  const selectedCount = selectedItems.length;
+
+  const subtotal = selectedItems.reduce((sum, i) => sum + i.subtotal, 0);
+
+  const handleCheckout = async () => {
+    const selectedIds = getSelectedIds();
+    if (!selectedIds) return;
+
+    await updateSelectionMutation.mutateAsync(selectedIds);
+
+    navigate(`/${PATH.CHECKOUT}`);
+  };
 
   return (
     <div className={styles.summary}>
@@ -25,7 +47,12 @@ export default function CartSummary() {
         <span>₫{subtotal.toLocaleString()}</span>
       </div>
 
-      <Button className={styles.checkout} disabled={!selectedCount}>
+      <Button
+        className={styles.checkout}
+        disabled={!selectedCount}
+        loading={updateSelectionMutation.isPending}
+        onClick={handleCheckout}
+      >
         Mua hàng
       </Button>
     </div>

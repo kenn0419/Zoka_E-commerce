@@ -9,13 +9,13 @@ import {
 import { Button, message, Spin } from "antd";
 import { useState } from "react";
 
-import { useCouponCreationMutation } from "../../../../../queries/coupon.query";
 import { useSellerStore } from "../../../../../store/seller.store";
 import { useProductsByShop } from "../../../../../queries/product.query";
-import { CouponScope } from "../../../../../constant/coupon.constant";
+import { useCouponShopCreationMutation } from "../../../../../queries/coupon.query";
+import { CouponScope } from "../../../../../utils/constant.util";
 
 export const CouponCreateModal = () => {
-  const createCoupon = useCouponCreationMutation();
+  const createCoupon = useCouponShopCreationMutation();
 
   const shopId = useSellerStore((state) => state.currentShopId!);
 
@@ -31,7 +31,7 @@ export const CouponCreateModal = () => {
     },
     {
       enabled: !!shopId,
-    }
+    },
   );
 
   return (

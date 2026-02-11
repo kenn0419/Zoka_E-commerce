@@ -9,9 +9,9 @@ import {
 import { Button, message, Spin } from "antd";
 import { useState } from "react";
 
-import { CouponScope } from "../../../../../constant/coupon.constant";
 import { useCouponAdminCreationMutation } from "../../../../../queries/coupon.query";
 import { useActiveCategoriesQuery } from "../../../../../queries/category.query";
+import { CouponScope } from "../../../../../utils/constant.util";
 
 export const CouponCreateModal = () => {
   const createCoupon = useCouponAdminCreationMutation();
@@ -27,7 +27,7 @@ export const CouponCreateModal = () => {
     },
     {
       enabled: !!search,
-    }
+    },
   );
 
   return (

@@ -23,9 +23,72 @@ export class CartItemRepository {
     });
   }
 
-  async updateQuantity(cartItemId: string, data: Prisma.CartItemUpdateInput) {
+  updateQuantity(cartItemId: string, data: Prisma.CartItemUpdateInput) {
     return this.prisma.cartItem.update({
       where: { id: cartItemId },
+      data,
+    });
+  }
+
+  getCartItemsByUser(userId: string) {
+    return this.prisma.cartItem.findMany({
+      where: {
+        isSelected: true,
+        cart: { userId },
+      },
+      include: {
+        product: {
+          include: {
+            shop: true,
+          },
+        },
+        variant: true,
+      },
+    });
+  }
+
+  async removeItemByIds(
+    userId: string,
+    cartItemIds: string[],
+    tx?: Prisma.TransactionClient,
+  ) {
+    const client = tx ?? this.prisma;
+
+    await client.cartItem.deleteMany({
+      where: {
+        id: { in: cartItemIds },
+        cart: {
+          userId,
+        },
+      },
+    });
+  }
+
+  async clearCartByUserId(userId: string, tx?: Prisma.TransactionClient) {
+    const client = tx ?? this.prisma;
+
+    await client.cartItem.deleteMany({
+      where: {
+        cart: {
+          userId,
+        },
+      },
+    });
+  }
+
+  async updateCartItem(
+    where: Prisma.CartItemWhereUniqueInput,
+    data: Prisma.CartItemUpdateInput,
+  ) {
+    return this.prisma.cartItem.update({ where, data });
+  }
+
+  async updateCartItems(
+    where: Prisma.CartItemWhereInput,
+    data: Prisma.CartItemUpdateInput,
+  ) {
+    return await this.prisma.cartItem.updateMany({
+      where,
       data,
     });
   }

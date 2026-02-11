@@ -1,9 +1,9 @@
 import { ProTable, type ProColumns } from "@ant-design/pro-components";
 import { Popconfirm } from "antd";
 import { useUserDeleteQuery } from "../../../../../queries/user.query";
-import { UserSort } from "../../../../../constant/user.constant";
 import UserStatusSwitcher from "../UserStatusSwitcher";
 import UserUpdateDrawer from "../UserUpdateDrawer";
+import { UserSort } from "../../../../../utils/constant.util";
 
 type Props = {
   data: IUserResponse[];
@@ -70,7 +70,7 @@ export const UserTable = ({
       onChange={(_, __, sorter) => {
         if (!Array.isArray(sorter) && sorter.field === "fullName") {
           onSortChange(
-            sorter.order === "ascend" ? UserSort.NAME_ASC : UserSort.NAME_DESC
+            sorter.order === "ascend" ? UserSort.NAME_ASC : UserSort.NAME_DESC,
           );
         }
       }}
