@@ -7,24 +7,19 @@ import PaymentMethodBlock from "./components/PaymentMethodBlock";
 import ShopOrderBlock from "./components/ShopOrderBlock";
 import { PATH } from "../../utils/path.util";
 import { useState, useMemo, useEffect } from "react";
-import { useCheckoutPreviewQuery } from "../../queries/checkout.query";
+import {
+  useCheckoutConfirmMutation,
+  useCheckoutPreviewQuery,
+} from "../../queries/checkout.query";
 import { useCartQuery } from "../../queries/cart.query";
-import { Spin } from "antd";
+import { message, Spin } from "antd";
 
 export default function CheckoutPage() {
   const navigate = useNavigate();
-
-  const { data: cart, isLoading: cartLoading } = useCartQuery();
-
   const [addressId, setAddressId] = useState<string | undefined>();
   const [paymentMethod, setPaymentMethod] = useState<"COD" | "MOMO">("COD");
   const [couponCode, setCouponCode] = useState<string | undefined>();
-
-  useEffect(() => {
-    if (!cartLoading && cart?.items && cart.items.length === 0) {
-      navigate(`/${PATH.CART}`);
-    }
-  }, [cart, cartLoading, navigate]);
+  const [shopNotes, setShopNotes] = useState<Record<string, string>>({});
 
   const previewParams = useMemo(
     () => ({
@@ -34,7 +29,48 @@ export default function CheckoutPage() {
     }),
     [addressId, paymentMethod, couponCode],
   );
+  const { data: cart, isLoading: cartLoading } = useCartQuery();
   const previewQuery = useCheckoutPreviewQuery(previewParams, !cartLoading);
+  const confirmMutation = useCheckoutConfirmMutation();
+
+  useEffect(() => {
+    if (!cartLoading && cart?.items && cart.items.length === 0) {
+      navigate(`/${PATH.CART}`);
+    }
+  }, [cart, cartLoading, navigate]);
+
+  const handleChangeNote = (shopId: string, value: string) => {
+    setShopNotes((prev) => ({
+      ...prev,
+      [shopId]: value,
+    }));
+  };
+
+  const handlePlaceOrder = async () => {
+    try {
+      const notesArray = Object.entries(shopNotes).map(([shopId, note]) => ({
+        shopId,
+        note,
+      }));
+      const res = await confirmMutation.mutateAsync({
+        paymentMethod,
+        couponCode,
+        notes: notesArray,
+      });
+
+      if (paymentMethod === "COD") {
+        message.success("Đặt hàng thành công.");
+        navigate(`/${PATH.ORDER_SUCESS}`);
+        return;
+      }
+
+      if (res.payUrl) {
+        window.location.href = res.payUrl;
+      }
+    } catch (error) {
+      message.error("Đặt hàng thất bại");
+    }
+  };
 
   if (cartLoading) {
     return <Spin fullscreen />;
@@ -53,7 +89,11 @@ export default function CheckoutPage() {
         <div className={styles.main}>
           <div className={styles.left}>
             <div className={styles.block}>
-              <ShopOrderBlock shops={previewQuery.data?.shops} />
+              <ShopOrderBlock
+                shops={previewQuery.data?.shops}
+                shopNotes={shopNotes}
+                onChangeNote={handleChangeNote}
+              />
             </div>
 
             <div className={styles.block}>
@@ -76,7 +116,8 @@ export default function CheckoutPage() {
             <div className={styles.block}>
               <CheckoutSummary
                 summary={previewQuery.data?.summary}
-                isLoading={previewQuery.isLoading}
+                isLoading={confirmMutation.isPending}
+                onPlaceOrder={handlePlaceOrder}
               />
             </div>
           </div>

@@ -6,4 +6,9 @@ export const orderApi = {
   ): Promise<IApiResponse<ICheckoutPreviewResponse>> => {
     return await instance.post(`/orders/checkout/preview`, data);
   },
+  checkoutConfirm: async (
+    data: ICheckoutConfirmRequest,
+  ): Promise<IApiResponse<ICheckoutConfirmResponse>> => {
+    return await instance.post(`/orders/checkout/confirm`, data);
+  },
 };

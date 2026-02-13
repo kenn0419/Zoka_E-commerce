@@ -1,24 +1,23 @@
+import { Type } from 'class-transformer';
 import {
   IsArray,
   IsEnum,
-  IsNotEmpty,
   IsOptional,
   IsString,
   ValidateNested,
 } from 'class-validator';
 import { PaymentMethod } from 'src/common/enums/payment.enum';
+import { CheckoutConfirmNoteDto } from './checkout-confirm-note.dto';
 
 export class CheckoutConfirmDto {
-  @IsArray()
-  @IsNotEmpty()
-  cartItemIds: string[];
-
   @IsEnum(PaymentMethod)
   paymentMethod: PaymentMethod;
 
   @IsOptional()
-  @IsString()
-  note?: string;
+  @IsArray()
+  @ValidateNested({ each: true })
+  @Type(() => CheckoutConfirmNoteDto)
+  shopNotes?: CheckoutConfirmNoteDto[];
 
   @IsOptional()
   @IsString()

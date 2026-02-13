@@ -8,4 +8,12 @@ export const orderService = {
 
     return res.data;
   },
+
+  async checkoutConfirm(
+    data: ICheckoutConfirmRequest,
+  ): Promise<ICheckoutConfirmResponse> {
+    const res = await orderApi.checkoutConfirm(data);
+
+    return res.data;
+  },
 };

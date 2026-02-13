@@ -76,7 +76,9 @@ export class OrderService {
   }
 
   async confirm(userId: string, dto: CheckoutConfirmDto) {
-    const cartItems = await this.cartItemRepo.getCartItemsByUser(userId);
+    const cartItems =
+      await this.cartItemRepo.getSelectedCartItemsByUser(userId);
+
     if (!cartItems.length) {
       throw new BadRequestException('Invalid cart items');
     }
@@ -91,6 +93,7 @@ export class OrderService {
       : null;
 
     const shopOrders = this.calculateShopOrders(cartItems, coupon);
+    const totalAmount = shopOrders.reduce((s, i) => s + i.total, 0);
 
     let payment: Payment | null = null;
     const orders: Order[] = [];
@@ -99,12 +102,16 @@ export class OrderService {
       await this.decrementStock(cartItems, tx);
 
       if (dto.paymentMethod !== PaymentMethod.COD) {
-        const totalAmount = shopOrders.reduce((s, i) => s + i.total, 0);
         const provider = mapMethodToProvider(dto.paymentMethod);
+
         payment = await this.paymentRepo.create(provider!, totalAmount, tx);
       }
 
       for (const shopOrder of shopOrders) {
+        const note =
+          dto.shopNotes?.find((n) => n.shopId === shopOrder.shopId)?.note ??
+          null;
+
         const order = await this.createOrderTx(
           userId,
           shopOrder,
@@ -112,6 +119,7 @@ export class OrderService {
           address,
           coupon,
           payment?.id ?? null,
+          note,
           tx,
         );
         orders.push(order);
@@ -121,7 +129,8 @@ export class OrderService {
         await this.couponRepo.markUsed(userId, coupon.id, tx);
       }
 
-      await this.cartItemRepo.removeItemByIds(userId, dto.cartItemIds, tx);
+      const cartItemIds = cartItems.map((i) => i.id);
+      await this.cartItemRepo.removeItemByIds(userId, cartItemIds, tx);
     });
 
     if (dto.paymentMethod === PaymentMethod.COD) {
@@ -158,7 +167,7 @@ export class OrderService {
     if (payment.status !== PaymentStatus.PENDING) {
       return;
     }
-
+    const couponId = payment.orders.find((o) => o.couponId)?.couponId;
     const hasExpiredOrder = payment.orders.some(
       (o) => o.status === OrderStatus.CANCELLED,
     );
@@ -181,6 +190,13 @@ export class OrderService {
             expiresAt: null,
           },
         });
+
+        if (couponId) {
+          await tx.coupon.update({
+            where: { id: couponId },
+            data: { usedCount: { increment: 1 } },
+          });
+        }
       } else {
         await tx.payment.update({
           where: { id: paymentId },
@@ -205,7 +221,6 @@ export class OrderService {
           }
         }
 
-        const couponId = payment.orders.find((o) => o.couponId)?.couponId;
         const buyerId = payment.orders[0]?.buyerId;
 
         if (couponId) {
@@ -216,7 +231,8 @@ export class OrderService {
   }
 
   private async loadAndValidateCartItems(userId: string) {
-    const cartItems = await this.cartItemRepo.getCartItemsByUser(userId);
+    const cartItems =
+      await this.cartItemRepo.getSelectedCartItemsByUser(userId);
 
     if (!cartItems.length) {
       throw new BadRequestException('Cart items not found');
@@ -370,6 +386,7 @@ export class OrderService {
     address: Address,
     coupon: Coupon | null,
     paymentId: string | null,
+    note: string | null,
     tx: Prisma.TransactionClient,
   ) {
     return this.orderRepo.createOrder(
@@ -386,6 +403,7 @@ export class OrderService {
         receiverPhone: address.receiverPhone,
         addressText: address.addressText,
         paymentMethod,
+        note,
         status: OrderStatus.PENDING,
         expiresAt:
           paymentMethod === PaymentMethod.COD

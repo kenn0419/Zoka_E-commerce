@@ -42,6 +42,6 @@ export class PaymentController {
       orderId: query.orderId,
       isSuccess: true,
     });
-    return res.redirect('http://localhost:5173/payment/success');
+    return res.redirect(process.env.ORDER_SUCCESS_URL);
   }
 }

@@ -1,4 +1,4 @@
-import { useQuery } from "@tanstack/react-query";
+import { useMutation, useQuery } from "@tanstack/react-query";
 import { orderService } from "../services/order.service";
 
 export const useCheckoutPreviewQuery = (
@@ -9,5 +9,11 @@ export const useCheckoutPreviewQuery = (
     queryKey: ["checkout-preview", { ...params }],
     queryFn: () => orderService.checkoutPreview(params),
     enabled,
+  });
+};
+
+export const useCheckoutConfirmMutation = () => {
+  return useMutation({
+    mutationFn: orderService.checkoutConfirm,
   });
 };

@@ -32,4 +32,5 @@ export const PATH = {
   CREATE_PRODUCT: "create-product",
   EDIT_PRODUCT: "edit-product",
   CHECKOUT: "checkout",
+  ORDER_SUCESS: "order-success",
 };

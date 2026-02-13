@@ -10,6 +10,7 @@ const ProductDetailPage = lazy(() => import("../pages/product/ProductDetail"));
 const ProductListPage = lazy(() => import("../pages/product/ProductList"));
 const ShopPage = lazy(() => import("../pages/shop/ShopPage"));
 const CheckoutPage = lazy(() => import("../pages/checkout"));
+const OrderSuccessPage = lazy(() => import("../pages/result/OrderSuccess"));
 
 export const PublicRoutes: RouteObject = {
   path: PATH.USER,
@@ -24,7 +25,10 @@ export const PublicRoutes: RouteObject = {
       path: `public/${PATH.SHOP}/:slug`,
       element: <ShopPage />,
     },
-
+    {
+      path: PATH.ORDER_SUCESS,
+      element: <OrderSuccessPage />,
+    },
     {
       element: (
         <ProtectedRoute roles={["user"]}>

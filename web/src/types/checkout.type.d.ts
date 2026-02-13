@@ -1,9 +1,20 @@
 type IPaymentMethod = COD | MOMO;
 
 interface ICheckoutPreviewRequest {
-  paymentMethod: string;
+  paymentMethod: IPaymentMethod;
   couponCode?: string;
   addressId?: string;
+}
+
+interface ICheckoutConfirmNoteRequest {
+  shopId: string;
+  note: string;
+}
+
+interface ICheckoutConfirmRequest {
+  paymentMethod: string;
+  notes?: ICheckoutConfirmNoteRequest[];
+  couponCode?: string;
 }
 
 interface ICheckoutPreviewItemResponse {
@@ -52,4 +63,10 @@ interface ICheckoutPreviewResponse {
   summary: ICheckoutPreviewSummaryResponse;
   address: IAddressResponse;
   coupons?: ICheckoutPreviewCouponResponse[];
+}
+
+interface ICheckoutConfirmResponse {
+  paymentId?: string;
+  orderIds: string[];
+  payUrl?: string;
 }

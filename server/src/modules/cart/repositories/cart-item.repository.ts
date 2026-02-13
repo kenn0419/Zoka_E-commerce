@@ -30,7 +30,7 @@ export class CartItemRepository {
     });
   }
 
-  getCartItemsByUser(userId: string) {
+  getSelectedCartItemsByUser(userId: string) {
     return this.prisma.cartItem.findMany({
       where: {
         isSelected: true,

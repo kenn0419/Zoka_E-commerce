@@ -14,10 +14,10 @@ import {
 import { OrderService } from './order.service';
 import { JwtSessionGuard } from 'src/common/guards/jwt-session.guard';
 import { Serialize } from 'src/common/decorators/serialize.decorator';
-import { CheckoutResponseDto } from './dto/checkout-response.dto';
 import { CheckoutPreviewDto } from './dto/checkout-preview.dto';
 import { CheckoutPreviewResponseDto } from './dto/checkout-preview-response.dto';
 import { CheckoutConfirmDto } from './dto/checkout-confirm.dto';
+import { CheckoutConfirmResponseDto } from './dto/checkout-confirm-response.dto';
 
 @Controller('orders')
 @UseGuards(JwtSessionGuard)
@@ -32,7 +32,7 @@ export class OrderController {
   }
 
   @Post('/checkout/confirm')
-  @Serialize(CheckoutResponseDto, 'Checkout confirm successfully!')
+  @Serialize(CheckoutConfirmResponseDto, 'Checkout confirm successfully!')
   checkoutConfirm(@Req() req, @Body() dto: CheckoutConfirmDto) {
     return this.orderService.confirm(req.user.sub, dto);
   }

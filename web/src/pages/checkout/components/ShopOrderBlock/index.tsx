@@ -1,11 +1,18 @@
+import { Input } from "antd";
 import OrderItemRow from "../OrderItemRow";
 import styles from "./ShopOrderBlock.module.scss";
 
 interface ShopOrderBlockProps {
   shops?: ICheckoutPreviewShopResponse[];
+  shopNotes: Record<string, string>;
+  onChangeNote: (shopId: string, note: string) => void;
 }
 
-export default function ShopOrderBlock({ shops }: ShopOrderBlockProps) {
+export default function ShopOrderBlock({
+  shops,
+  shopNotes,
+  onChangeNote,
+}: ShopOrderBlockProps) {
   return (
     <>
       {shops?.map((shop) => (
@@ -23,6 +30,14 @@ export default function ShopOrderBlock({ shops }: ShopOrderBlockProps) {
                 subtotal={shop.subtotal}
               />
             ))}
+            <div className={styles.noteRow}>
+              <span>Lời nhắn cho shop:</span>
+              <Input
+                placeholder="Nhập lời nhắn..."
+                value={shopNotes[shop.shopId] || ""}
+                onChange={(e) => onChangeNote(shop.shopId, e.target.value)}
+              />
+            </div>
           </div>
 
           <div className={styles.footer}>

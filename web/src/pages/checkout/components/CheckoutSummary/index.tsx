@@ -1,18 +1,17 @@
 import styles from "./CheckoutSummary.module.scss";
-import { Button, Spin } from "antd";
+import { Button } from "antd";
 
 interface CheckoutSummaryProps {
   summary?: ICheckoutPreviewSummaryResponse;
   isLoading: boolean;
+  onPlaceOrder: () => void;
 }
 
 export default function CheckoutSummary({
   summary,
   isLoading,
+  onPlaceOrder,
 }: CheckoutSummaryProps) {
-  if (isLoading) {
-    return <Spin fullscreen />;
-  }
   return (
     <div className={styles.wrapper}>
       <div className={styles.row}>
@@ -30,7 +29,13 @@ export default function CheckoutSummary({
         <strong>₫{summary?.total}</strong>
       </div>
 
-      <Button type="primary" block size="large">
+      <Button
+        type="primary"
+        block
+        size="large"
+        loading={isLoading}
+        onClick={onPlaceOrder}
+      >
         Đặt hàng
       </Button>
     </div>
