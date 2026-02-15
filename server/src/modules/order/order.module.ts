@@ -8,9 +8,10 @@ import { OrderPaymentListener } from './order-payment.listener';
 import { OrderCron } from './order.cron';
 import { CouponModule } from '../coupon/coupon.module';
 import { AddressModule } from '../address/address.module';
+import { ShopModule } from '../shop/shop.module';
 
 @Module({
-  imports: [PaymentModule, CartModule, CouponModule, AddressModule],
+  imports: [PaymentModule, CartModule, CouponModule, AddressModule, ShopModule],
   controllers: [OrderController],
   providers: [OrderService, OrderRepository, OrderPaymentListener, OrderCron],
   exports: [OrderService],

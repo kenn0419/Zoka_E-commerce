@@ -32,7 +32,9 @@ export default function Header() {
         },
       });
     } else if (key === "profile") {
-      navigate(`/${PATH.USER}/profile`);
+      navigate(`/${PATH.PROFILE}`);
+    } else if (key === "orders") {
+      navigate(`/${PATH.MANAGE_ORDER}`);
     } else {
       navigate(`/${PATH.ADMIN}`);
     }

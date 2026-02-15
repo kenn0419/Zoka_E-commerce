@@ -1,17 +1,15 @@
 import { useState } from "react";
 import { Input, Select } from "antd";
 import {
-  useChangeOrderStatusByShopMutation,
-  useShopOrdersQuery,
+  useAllOrdersQuery,
+  useChangeOrderStatusByAdminMutation,
 } from "../../../queries/order.query";
 import { ORDER_STATUS_LABEL } from "../../../utils/constant.util";
 import OrderTable from "../../../components/order/OrderTable";
 import { OrderStatusChangeModal } from "../../../components/order/OrderStatusModal";
-import { useSellerStore } from "../../../store/seller.store";
 
-export default function ShopOrderManagement() {
-  const shopId = useSellerStore((s) => s.currentShopId)!;
-  const changeStatusMutation = useChangeOrderStatusByShopMutation();
+export default function OrderManagement() {
+  const changeStatusMutation = useChangeOrderStatusByAdminMutation();
 
   const [page, setPage] = useState(1);
   const [limit, setLimit] = useState(10);
@@ -21,14 +19,14 @@ export default function ShopOrderManagement() {
   const [editingOrder, setEditingOrder] = useState<IOrderResponse | null>(null);
   const [editVisible, setEditVisible] = useState(false);
 
-  const { data, isLoading, refetch } = useShopOrdersQuery(shopId, {
+  const { data, isLoading, refetch } = useAllOrdersQuery({
     page,
     limit,
     search,
   });
 
-  const handleSave = async (code: string, status: IOrderStatus) => {
-    await changeStatusMutation.mutateAsync({ code, status });
+  const handleSave = async (id: string, status: IOrderStatus) => {
+    await changeStatusMutation.mutateAsync({ id, status });
     refetch();
   };
 

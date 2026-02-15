@@ -8,9 +8,11 @@ export enum OrderStatus {
   FAILED = 'FAILED',
 }
 
-export enum CouponDisabledReason {
-  MIN_ORDER = 'MIN_ORDER',
-  SCOPE_MISMATCH = 'SCOPE_MISMATCH',
-  EXPIRED = 'EXPIRED',
-  USAGE_LIMIT = 'USAGE_LIMIT',
+export enum OrderSort {
+  NEWEST = 'newest',
+  OLDEST = 'oldest',
+  PAID_AT_ASC = 'paid_at_asc',
+  PAID_AT_DESC = 'paid_at_desc',
+  TOTAL_PRICE_ASC = 'total_price_asc',
+  TOTAL_PRICE_DESC = 'total_price_desc',
 }

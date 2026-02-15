@@ -33,4 +33,5 @@ export const PATH = {
   EDIT_PRODUCT: "edit-product",
   CHECKOUT: "checkout",
   ORDER_SUCESS: "order-success",
+  PROFILE: "profile",
 };

@@ -16,4 +16,45 @@ export const orderService = {
 
     return res.data;
   },
+
+  async fetchMyOrders(
+    params: IOrderQueries,
+  ): Promise<IPaginatedResponse<IOrderResponse>> {
+    const res = await orderApi.fetchMyOrders(params);
+
+    return res.data;
+  },
+
+  async fetchShopOrders(
+    shopId: string,
+    params: IOrderQueries,
+  ): Promise<IPaginatedResponse<IOrderResponse>> {
+    const res = await orderApi.fetchShopOrders(shopId, params);
+
+    return res.data;
+  },
+
+  async fetchAllOrders(
+    params: IOrderQueries,
+  ): Promise<IPaginatedResponse<IOrderResponse>> {
+    const res = await orderApi.fetchAllOrders(params);
+
+    return res.data;
+  },
+
+  async changeOrderStatusByShop(
+    code: string,
+    status: IOrderStatus,
+  ): Promise<IOrderResponse> {
+    const res = await orderApi.changeOrderStatusByShop(code, status);
+    return res.data;
+  },
+
+  async changeOrderStatusByAdmin(
+    id: string,
+    status: IOrderStatus,
+  ): Promise<IOrderResponse> {
+    const res = await orderApi.changeOrderStatusByAdmin(id, status);
+    return res.data;
+  },
 };

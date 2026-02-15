@@ -32,7 +32,7 @@ export const ShopStatusChangeModal: React.FC<ShopStatusChangeModalProps> = ({
       initialValues={shop ?? {}}
       onFinish={async (values) => {
         try {
-          await onSave({ id: shop?.id, status: values.status });
+          await onSave({ id: shop?.id ?? "", status: values.status });
           message.success("Cập nhật trạng thái thành công!");
           onClose();
           return true;

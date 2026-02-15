@@ -7,6 +7,7 @@ import ProtectedRoute from "./guards/ProtectRoute";
 import AppLayout from "../components/layout/app/AppLayout";
 import ShopManagement from "../pages/admin/ShopManagement";
 import DiscountManagement from "../pages/admin/DiscountManagement";
+import OrderManagement from "../pages/admin/OrderManagement";
 
 export const AdminRoutes: RouteObject = {
   path: PATH.ADMIN,
@@ -23,6 +24,7 @@ export const AdminRoutes: RouteObject = {
         { path: PATH.MANAGE_USER, element: <UserManagement /> },
         { path: PATH.MANAGE_SHOP, element: <ShopManagement /> },
         { path: PATH.MANAGE_DISCOUNT, element: <DiscountManagement /> },
+        { path: PATH.MANAGE_ORDER, element: <OrderManagement /> },
       ],
     },
   ],

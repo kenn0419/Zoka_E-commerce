@@ -7,7 +7,12 @@ import {
   PaymentStatus,
   Prisma,
 } from 'generated/prisma';
-import { BadRequestException, Injectable } from '@nestjs/common';
+import {
+  BadRequestException,
+  ForbiddenException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import ms from 'ms';
 
 import { PrismaService } from 'src/infrastructure/prisma/prisma.service';
@@ -18,7 +23,7 @@ import { CartItemRepository } from '../cart/repositories/cart-item.repository';
 import { AddressRepository } from '../address/address.repository';
 import { CouponRepository } from '../coupon/repositories/coupon.repository';
 
-import { OrderStatus } from 'src/common/enums/order.enum';
+import { OrderSort, OrderStatus } from 'src/common/enums/order.enum';
 import {
   CouponScope,
   CouponStatus,
@@ -31,6 +36,11 @@ import { CheckoutPreviewDto } from './dto/checkout-preview.dto';
 import { CheckoutConfirmDto } from './dto/checkout-confirm.dto';
 import { CartItemWithProduct } from './types/cart-item-with-product.type';
 import { CalculatedShopOrder } from './types/calculated-shop-order.type';
+import { OrderQueryDto } from './dto/order-query.dto';
+import { paginatedResult } from 'src/common/utils/pagninated-result.util';
+import { buildOrderSort } from 'src/common/utils/order-sort.util';
+import { ShopRepository } from '../shop/shop.repository';
+import { generateOrderCode } from 'src/common/utils/generate-order-code.util';
 
 @Injectable()
 export class OrderService {
@@ -42,6 +52,7 @@ export class OrderService {
     private readonly cartItemRepo: CartItemRepository,
     private readonly couponRepo: CouponRepository,
     private readonly addressRepo: AddressRepository,
+    private readonly shopRepo: ShopRepository,
   ) {}
 
   async preview(userId: string, dto: CheckoutPreviewDto) {
@@ -230,6 +241,92 @@ export class OrderService {
     });
   }
 
+  async findAllMyOrders(userId: string, data: OrderQueryDto) {
+    const where: Prisma.OrderWhereInput = {
+      buyerId: userId,
+    };
+
+    const result = paginatedResult(
+      {
+        where,
+        page: data.page,
+        limit: data.limit,
+        orderBy: buildOrderSort(OrderSort.OLDEST),
+      },
+      (args) => this.orderRepo.listPaginatedOrders(args),
+    );
+
+    return result;
+  }
+
+  async findShopOrders(userId: string, shopId: string, query: OrderQueryDto) {
+    const shop = await this.shopRepo.findUnique({ id: shopId });
+    const isOwner = shop?.ownerId === userId;
+    if (!isOwner) {
+      throw new BadRequestException(`You don't have permission to access.`);
+    }
+
+    const where: Prisma.OrderWhereInput = {
+      shopId: shop.id,
+    };
+
+    const result = paginatedResult(
+      {
+        where,
+        page: query.page,
+        limit: query.page,
+        orderBy: buildOrderSort(query.sort),
+      },
+      (args) => this.orderRepo.listPaginatedOrders(args),
+    );
+
+    return result;
+  }
+
+  async findAllOrders(query: OrderQueryDto) {
+    const where: Prisma.OrderWhereInput = {};
+
+    const result = paginatedResult(
+      {
+        where,
+        page: query.page,
+        limit: query.page,
+        orderBy: buildOrderSort(query.sort),
+      },
+      (args) => this.orderRepo.listPaginatedOrders(args),
+    );
+
+    return result;
+  }
+
+  async changeOrderStatusByShop(
+    userId: string,
+    orderCode: string,
+    status: OrderStatus,
+  ) {
+    const order = await this.orderRepo.findUnique({ code: orderCode });
+    if (!order) {
+      throw new NotFoundException('Order not found');
+    }
+
+    if (order.shop.ownerId !== userId) {
+      throw new ForbiddenException(
+        'You do not have permission to change this order status',
+      );
+    }
+
+    return this.orderRepo.updateOrder(order.id, status);
+  }
+
+  async changeOrderStatusByAdmin(orderId: string, status: OrderStatus) {
+    const order = await this.orderRepo.findUnique({ id: orderId });
+    if (!order) {
+      throw new NotFoundException('Order not found');
+    }
+
+    return this.orderRepo.updateOrder(order.id, status);
+  }
+
   private async loadAndValidateCartItems(userId: string) {
     const cartItems =
       await this.cartItemRepo.getSelectedCartItemsByUser(userId);
@@ -391,6 +488,7 @@ export class OrderService {
   ) {
     return this.orderRepo.createOrder(
       {
+        code: generateOrderCode(),
         buyerId: userId,
         shopId: shopOrder.shopId,
         subtotal: shopOrder.subtotal,

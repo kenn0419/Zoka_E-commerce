@@ -27,3 +27,10 @@ export enum CounponSort {
   TYPE_ASC = 'type_asc',
   TYPE_DESC = 'type_desc',
 }
+
+export enum CouponDisabledReason {
+  MIN_ORDER = 'MIN_ORDER',
+  SCOPE_MISMATCH = 'SCOPE_MISMATCH',
+  EXPIRED = 'EXPIRED',
+  USAGE_LIMIT = 'USAGE_LIMIT',
+}

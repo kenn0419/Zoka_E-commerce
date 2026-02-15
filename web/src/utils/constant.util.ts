@@ -53,3 +53,13 @@ export const userStatus = {
   INACTIVE: "INACTIVE",
   ACTIVE: "ACTIVE",
 };
+
+export const ORDER_STATUS_LABEL: Record<IOrderStatus, string> = {
+  PENDING: "Chờ thanh toán",
+  PAID: "Đã thanh toán",
+  PROCESSING: "Đang xử lý",
+  SHIPPED: "Đang giao",
+  COMPLETED: "Hoàn thành",
+  CANCELLED: "Đã hủy",
+  FAILED: "Thanh toán lỗi",
+};

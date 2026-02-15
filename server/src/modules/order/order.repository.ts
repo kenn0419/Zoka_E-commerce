@@ -16,8 +16,11 @@ export class OrderRepository {
     return await client.order.create({ data, include: { items: true } });
   }
 
-  findById(orderId: string) {
-    return this.prisma.order.findUnique({ where: { id: orderId } });
+  findUnique(where: Prisma.OrderWhereUniqueInput) {
+    return this.prisma.order.findUnique({
+      where,
+      include: { items: true, shop: true },
+    });
   }
 
   updateOrder(
@@ -49,5 +52,33 @@ export class OrderRepository {
         paidAt: isSuccess ? new Date() : null,
       },
     });
+  }
+
+  async listPaginatedOrders(params: {
+    where: Prisma.OrderWhereInput;
+    limit: number;
+    page: number;
+    orderBy?: Prisma.OrderOrderByWithRelationInput;
+  }) {
+    const { where, limit, page, orderBy } = params;
+    const skip = (page - 1) * limit;
+
+    const [items, totalItems] = await this.prisma.$transaction([
+      this.prisma.order.findMany({
+        where,
+        skip,
+        take: limit,
+        orderBy,
+        include: {
+          shop: true,
+          buyer: true,
+          payment: true,
+          items: true,
+        },
+      }),
+      this.prisma.order.count({ where }),
+    ]);
+
+    return { items, totalItems };
   }
 }

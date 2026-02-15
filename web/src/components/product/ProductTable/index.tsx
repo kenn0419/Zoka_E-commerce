@@ -1,7 +1,7 @@
 import { Table, Tag, Image, Spin, Button, Rate } from "antd";
 import type { ColumnsType } from "antd/es/table";
 import { EditOutlined, InfoCircleOutlined } from "@ant-design/icons";
-import { ProductStatus } from "../../../constant/product.constant";
+import { ProductStatus } from "../../../utils/constant.util";
 
 interface ProductTableProps {
   data: IProductListItemResponse[];

@@ -1,6 +1,9 @@
 import { Expose } from 'class-transformer';
-import { CouponScope, CouponType } from 'src/common/enums/coupon.enum';
-import { CouponDisabledReason } from 'src/common/enums/order.enum';
+import {
+  CouponDisabledReason,
+  CouponScope,
+  CouponType,
+} from 'src/common/enums/coupon.enum';
 
 export class CheckoutPreviewCouponResponseDto {
   @Expose()

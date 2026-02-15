@@ -404,6 +404,7 @@ model CouponProduct {
 model Order {
   id String @id @default(uuid())
 
+  code    String @unique
   buyerId String
   shopId  String
 
