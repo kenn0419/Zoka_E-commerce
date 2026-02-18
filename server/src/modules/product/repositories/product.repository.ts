@@ -8,20 +8,23 @@ export class ProductRepository {
   constructor(private prisma: PrismaService) {}
 
   create(
-    tx: Prisma.TransactionClient | null = this.prisma,
     data: Prisma.ProductCreateInput,
+    tx: Prisma.TransactionClient | null = this.prisma,
   ) {
-    tx = tx !== null ? tx : this.prisma;
-    return tx.product.create({ data, include: { shop: true, category: true } });
+    const client = tx ?? this.prisma;
+    return client.product.create({
+      data,
+      include: { shop: true, category: true },
+    });
   }
 
   update(
-    tx: Prisma.TransactionClient | null = this.prisma,
     where: Prisma.ProductWhereUniqueInput,
     data: Prisma.ProductUpdateInput,
+    tx: Prisma.TransactionClient | null = this.prisma,
   ) {
-    tx = tx !== null ? tx : this.prisma;
-    return tx.product.update({ where, data });
+    const client = tx ?? this.prisma;
+    return client.product.update({ where, data });
   }
 
   findUnique(where: Prisma.ProductWhereUniqueInput) {
@@ -178,11 +181,11 @@ export class ProductRepository {
   }
 
   remove(
-    tx: Prisma.TransactionClient | null = this.prisma,
     where: Prisma.ProductWhereUniqueInput,
+    tx: Prisma.TransactionClient | null = this.prisma,
   ) {
-    tx = tx !== null ? tx : this.prisma;
-    return tx.product.update({
+    const client = tx ? tx : this.prisma;
+    return client.product.update({
       where,
       data: {
         status: ProductStatus.INACTIVE,

@@ -1,0 +1,119 @@
+.wrapper {
+  background: #fff;
+  padding: 24px;
+  margin-top: 24px;
+  border-radius: 8px;
+}
+
+.title {
+  font-size: 18px;
+  font-weight: 600;
+  margin-bottom: 16px;
+}
+
+.summary {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin-bottom: 20px;
+}
+
+.score {
+  display: flex;
+  align-items: baseline;
+}
+
+.scoreNumber {
+  font-size: 32px;
+  font-weight: 600;
+  color: #ee4d2d;
+}
+
+.scoreTotal {
+  font-size: 16px;
+  margin-left: 4px;
+}
+
+.total {
+  color: #888;
+}
+
+.filter {
+  display: flex;
+  gap: 12px;
+  margin-bottom: 24px;
+  flex-wrap: wrap;
+}
+
+.list {
+  border-top: 1px solid #f0f0f0;
+}
+
+.reviewItem {
+  padding: 20px 0;
+  border-bottom: 1px solid #f0f0f0;
+}
+
+.pagination {
+  margin-top: 24px;
+  text-align: center;
+}
+
+/* Review item styles */
+
+.reviewHeader {
+  display: flex;
+  gap: 12px;
+}
+
+.reviewInfo {
+  flex: 1;
+}
+
+.name {
+  font-weight: 500;
+  font-size: 15px;
+}
+
+.meta {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-top: 4px;
+}
+
+.date {
+  color: #999;
+  font-size: 13px;
+}
+
+.variant {
+  margin-top: 4px;
+  font-size: 13px;
+  color: #666;
+}
+
+.content {
+  margin-top: 12px;
+  font-size: 14px;
+  line-height: 1.6;
+}
+
+/* Reply box */
+
+.replyBox {
+  margin-top: 12px;
+  background: #f5f5f5;
+  padding: 12px 16px;
+  border-radius: 6px;
+}
+
+.replyTitle {
+  font-weight: 500;
+  margin-bottom: 6px;
+}
+
+.replyItem {
+  font-size: 14px;
+  color: #555;
+}

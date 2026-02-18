@@ -87,16 +87,19 @@ export class ProductService {
     }
 
     await this.prisma.$transaction(async (tx) => {
-      await this.productRepo.create(tx, {
-        id: productId,
-        shop: { connect: { id: shop.id } },
-        category: { connect: { id: category.id } },
-        name: data.name,
-        slug: SlugifyUtil.createSlug(data.name),
-        description: data.description,
-        thumbnail: thumbnail.url,
-        status: ProductStatus.PENDING,
-      });
+      await this.productRepo.create(
+        {
+          id: productId,
+          shop: { connect: { id: shop.id } },
+          category: { connect: { id: category.id } },
+          name: data.name,
+          slug: SlugifyUtil.createSlug(data.name),
+          description: data.description,
+          thumbnail: thumbnail.url,
+          status: ProductStatus.PENDING,
+        },
+        tx,
+      );
 
       await this.productVariantRepo.createMany(tx, variantRows);
 
@@ -349,7 +352,6 @@ export class ProductService {
       // Case 1 → Không có variants → chỉ update product
       if (!data.variants || data.variants.length === 0) {
         await this.productRepo.update(
-          tx,
           { id },
           {
             name: data.name,
@@ -359,6 +361,7 @@ export class ProductService {
               ? { connect: { id: data.categoryId } }
               : undefined,
           },
+          tx,
         );
         return { productId: existProduct?.id };
       }
@@ -425,7 +428,6 @@ export class ProductService {
        *  UPDATE PRODUCT FINAL
        * ======================= */
       await this.productRepo.update(
-        tx,
         { id },
         {
           name: data.name,
@@ -435,6 +437,7 @@ export class ProductService {
             ? { connect: { id: data.categoryId } }
             : undefined,
         },
+        tx,
       );
 
       return { productId: existProduct?.id };
@@ -443,7 +446,7 @@ export class ProductService {
 
   remove(slug: string) {
     return this.prisma.$transaction(
-      async (tx) => await this.productRepo.remove(tx, { slug }),
+      async (tx) => await this.productRepo.remove({ slug }, tx),
     );
   }
 

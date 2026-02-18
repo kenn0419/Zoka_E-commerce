@@ -8,13 +8,17 @@ import {
 } from 'class-validator';
 
 export class CreateCommentDto {
+  @IsString()
+  @IsNotEmpty()
+  orderItemId: string;
+
   @IsNumber()
   @IsNotEmpty()
-  @Min(0)
+  @Min(1)
   @Max(5)
   rating: number;
 
   @IsString()
   @IsOptional()
-  comment?: string;
+  content?: string;
 }

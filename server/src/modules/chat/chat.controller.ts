@@ -3,7 +3,10 @@ import { ChatService } from './chat.service';
 import { JwtSessionGuard } from 'src/common/guards/jwt-session.guard';
 import { SerializePaginated } from 'src/common/decorators/serialize.decorator';
 import { ConversationResponse } from './dto/conversation-response.dto';
-import { PaginatedQueryDto } from 'src/common/dto/paginated-query.dto';
+import {
+  CursorPaginatedQueryDto,
+  PaginatedQueryDto,
+} from 'src/common/dto/paginated-query.dto';
 import { MessageResponseDto } from './dto/message-response.dto';
 
 @Controller('chats')
@@ -16,15 +19,11 @@ export class ChatController {
     ConversationResponse,
     'Get all my conversations successfully!',
   )
-  findMyConversations(
-    @Req() req,
-    @Query('cursor') cursor: string,
-    @Query('limit') limit: string,
-  ) {
-    const take = Number(limit);
+  findMyConversations(@Req() req, @Query() query: CursorPaginatedQueryDto) {
+    const take = Number(query.limit);
     return this.chatService.findUserConversations(
       req.user.sub,
-      cursor,
+      query.cursor,
       Number.isNaN(take) ? 10 : take,
     );
   }

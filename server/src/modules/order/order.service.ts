@@ -18,7 +18,7 @@ import ms from 'ms';
 import { PrismaService } from 'src/infrastructure/prisma/prisma.service';
 import { PaymentService } from '../payment/payment.service';
 import { PaymentRepository } from '../payment/payment.repository';
-import { OrderRepository } from './order.repository';
+import { OrderRepository } from './repositories/order.repository';
 import { CartItemRepository } from '../cart/repositories/cart-item.repository';
 import { AddressRepository } from '../address/address.repository';
 import { CouponRepository } from '../coupon/repositories/coupon.repository';

@@ -79,7 +79,7 @@ export class UserService {
     search: string,
     page: number,
     limit: number,
-    sort: PaginatedSort,
+    sort?: PaginatedSort,
   ) {
     const where: Prisma.UserWhereInput = {
       ...(search && {

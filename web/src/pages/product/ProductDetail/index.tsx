@@ -13,6 +13,7 @@ import QuantitySelector from "../../../components/product/QuantitySelector";
 import { useProductDetailBySlugQuery } from "../../../queries/product.query";
 import { useDetailShopByProductSlugQuery } from "../../../queries/shop.query";
 import ShopHeader from "../../shop/ShopPage/components/ShopHeader";
+import ProductReviewSection from "../../../components/review/ProductReviewSection";
 
 const ProductDetailPage = () => {
   const { productSlug } = useParams<{ productSlug: string }>();
@@ -57,6 +58,10 @@ const ProductDetailPage = () => {
 
       <ProductDescription description={product.description} />
       <ShopHeader shop={shop!} isLoading={shopLoading} />
+      <ProductReviewSection
+        avgRating={product.avgRating}
+        productSlug={product.slug}
+      />
       <RelatedProducts categorySlug={product.category.slug} />
     </div>
   );
