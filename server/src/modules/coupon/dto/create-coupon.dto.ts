@@ -7,8 +7,7 @@ import {
   IsString,
   Min,
 } from 'class-validator';
-import { CouponScope, CouponType } from 'src/common/enums/coupon.enum';
-
+import { CouponScope, CouponType } from 'generated/prisma';
 export class CreateCouponDto {
   @IsOptional()
   @IsString()

@@ -6,10 +6,3 @@ export enum ShopSort {
   RATING_ASC = 'rating_asc',
   RATING_DESC = 'rating_desc',
 }
-
-export enum ShopStatus {
-  PENDING = 'PENDING',
-  ACTIVE = 'ACTIVE',
-  SUSPENDED = 'SUSPENDED',
-  REJECTED = 'REJECTED',
-}

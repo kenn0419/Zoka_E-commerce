@@ -9,6 +9,7 @@ const categorySortMap: Record<
   [CategorySort.NAME_ASC]: { name: 'asc' },
   [CategorySort.NAME_DESC]: { name: 'desc' },
   [CategorySort.NEWEST]: { createdAt: 'desc' },
+  [CategorySort.OLDEST]: { createdAt: 'asc' },
 };
 
 export const buildCategorySort = (sort?: CategorySort) =>

@@ -22,7 +22,7 @@ import {
   Serialize,
   SerializePaginated,
 } from 'src/common/decorators/serialize.decorator';
-import { CommentResponseDto } from './dto/comment-response.dto';
+import { CommentResponseDto } from './responses/comment.response.dto';
 import { CreateReplyCommentDto } from './dto/create-reply-comment.dto';
 import { CursorPaginatedQueryDto } from 'src/common/dto/paginated-query.dto';
 

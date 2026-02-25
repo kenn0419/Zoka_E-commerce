@@ -23,6 +23,9 @@ import { ScheduleModule } from '@nestjs/schedule';
 import { AddressModule } from './modules/address/address.module';
 import { PaymentModule } from './modules/payment/payment.module';
 import { CommentModule } from './modules/comment/comment.module';
+import { NotificationModule } from './modules/notification/notification.module';
+import { FlashSaleModule } from './modules/flash-sale/flash-sale.module';
+import { ShopFollowerModule } from './modules/shop-follower/shop-follower.module';
 
 @Module({
   imports: [
@@ -53,6 +56,11 @@ import { CommentModule } from './modules/comment/comment.module';
     AddressModule,
     PaymentModule,
     CommentModule,
+    FlashSaleModule,
+    NotificationModule,
+    NotificationModule,
+    FlashSaleModule,
+    ShopFollowerModule,
   ],
 })
 export class AppModule {}

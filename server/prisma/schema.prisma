@@ -1,7 +1,3 @@
-// ===========================================
-// ShopVerse Marketplace Data Model
-// ===========================================
-
 generator client {
   provider = "prisma-client-js"
   output   = "../generated/prisma"
@@ -58,17 +54,72 @@ enum ProductReviewReplyStatus {
   INACTIVE
 }
 
+enum FlashSaleStatus {
+  UPCOMING
+  ACTIVE
+  ENDED
+  CANCELLED
+}
+
+enum CategoryStatus {
+  PENDING
+  ACTIVE
+  INACTIVE
+  REJECTED
+}
+
+enum ShopStatus {
+  PENDING
+  ACTIVE
+  SUSPENDED
+  REJECTED
+}
+
+enum UserStatus {
+  PENDING
+  ACTIVE
+  INACTIVE
+  REJECTED
+  BLOCK
+}
+
+enum ProductStatus {
+  PENDING
+  ACTIVE
+  INACTIVE
+  REJECTED
+}
+
+enum CouponScope {
+  GLOBAL
+  SHOP
+  USER
+  PRODUCT
+  CATEGORY
+}
+
+enum CouponType {
+  FIXED
+  PERCENTAGE
+}
+
+enum CouponStatus {
+  ACTIVE
+  INACTIVE
+  EXPIRED
+}
+
 model User {
-  id             String   @id @default(uuid())
-  email          String   @unique
+  id             String     @id @default(uuid())
+  email          String     @unique
   hashedPassword String
   fullName       String
-  slug           String   @unique
-  phone          String   @unique
+  slug           String     @unique
+  phone          String     @unique
   avatarUrl      String?
-  status         String   @default("PENDING")
-  createdAt      DateTime @default(now())
-  updatedAt      DateTime @updatedAt
+  status         UserStatus @default(PENDING)
+  createdAt      DateTime   @default(now())
+  updatedAt      DateTime   @updatedAt
 
   sessions                UserSession[]
   roles                   UserRole[]
@@ -84,6 +135,7 @@ model User {
   notificationsAsSender   Notification[]       @relation("SenderNotifications")
   notificationsAsReceiver Notification[]       @relation("ReceiverNotifications")
   productReviewReplies    ProductReviewReply[]
+  followedShops           ShopFollower[]
 }
 
 model UserSession {
@@ -102,7 +154,8 @@ model UserSession {
   user User @relation(fields: [userId], references: [id])
 }
 
-// Roles & Permissions
+// ===================== ROLE && PERMISSION =====================
+
 model Role {
   id          String   @id @default(uuid())
   name        String   @unique
@@ -167,18 +220,37 @@ model Address {
   @@index([userId])
 }
 
+// ===================== CATEGORY =====================
+
+model Category {
+  id           String         @id @default(uuid())
+  name         String
+  slug         String         @unique
+  parentId     String?
+  description  String?
+  thumbnailUrl String
+  status       CategoryStatus @default(PENDING)
+  createdAt    DateTime       @default(now())
+  updatedAt    DateTime       @updatedAt
+
+  parent   Category?        @relation("CategoryParent", fields: [parentId], references: [id])
+  children Category[]       @relation("CategoryParent")
+  products Product[]
+  coupons  CouponCategory[]
+}
+
 // ===================== SHOP =====================
 
 model Shop {
-  id          String   @id @default(uuid())
+  id          String     @id @default(uuid())
   ownerId     String
   name        String
-  slug        String   @unique
+  slug        String     @unique
   description String?
   logoUrl     String?
-  status      String   @default("PENDING")
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  status      ShopStatus @default(PENDING)
+  createdAt   DateTime   @default(now())
+  updatedAt   DateTime   @updatedAt
 
   owner      User           @relation(fields: [ownerId], references: [id])
   products   Product[]
@@ -186,6 +258,7 @@ model Shop {
   flashSales FlashSale[]
   orders     Order[]
   coupons    Coupon[]
+  followers  ShopFollower[]
 }
 
 model ShopCategory {
@@ -200,42 +273,40 @@ model ShopCategory {
   shop     Shop      @relation(fields: [shopId], references: [id])
 }
 
-// ===================== PRODUCT =====================
+model ShopFollower {
+  shopId    String
+  userId    String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
-model Category {
-  id           String   @id @default(uuid())
-  name         String
-  slug         String   @unique
-  parentId     String?
-  description  String?
-  thumbnailUrl String
-  status       String   @default("PENDING")
-  createdAt    DateTime @default(now())
-  updatedAt    DateTime @updatedAt
+  shop Shop @relation(fields: [shopId], references: [id])
+  user User @relation(fields: [userId], references: [id])
 
-  parent   Category?        @relation("CategoryParent", fields: [parentId], references: [id])
-  children Category[]       @relation("CategoryParent")
-  products Product[]
-  coupons  CouponCategory[]
+  @@id([shopId, userId])
+  @@unique([shopId, userId])
+  @@index([shopId])
+  @@index([userId])
 }
 
+// ===================== PRODUCT =====================
+
 model Product {
-  id             String   @id @default(uuid())
+  id             String        @id @default(uuid())
   shopId         String
   categoryId     String
   shopCategoryId String?
   name           String
-  slug           String   @unique
+  slug           String        @unique
   description    String?
-  status         String   @default("PENDING")
+  status         ProductStatus @default(PENDING)
   thumbnail      String
   minPrice       Decimal?
   maxPrice       Decimal?
-  avgRating      Float?   @default(0)
-  reviewCount    Int      @default(0)
-  hasStock       Boolean  @default(true)
-  createdAt      DateTime @default(now())
-  updatedAt      DateTime @updatedAt
+  avgRating      Float?        @default(0)
+  reviewCount    Int           @default(0)
+  hasStock       Boolean       @default(true)
+  createdAt      DateTime      @default(now())
+  updatedAt      DateTime      @updatedAt
 
   shop           Shop             @relation(fields: [shopId], references: [id])
   category       Category         @relation(fields: [categoryId], references: [id])
@@ -246,6 +317,11 @@ model Product {
   reviews        ProductReview[]
   cartItems      CartItem[]
   couponProducts CouponProduct[]
+
+  @@index([shopId])
+  @@index([categoryId])
+  @@index([status])
+  @@index([shopId, status])
 }
 
 model ProductVariant {
@@ -258,9 +334,10 @@ model ProductVariant {
   createdAt DateTime       @default(now())
   updatedAt DateTime       @updatedAt
 
-  product   Product         @relation(fields: [productId], references: [id])
-  cartItems CartItem[]
-  reviews   ProductReview[]
+  product        Product         @relation(fields: [productId], references: [id])
+  cartItems      CartItem[]
+  reviews        ProductReview[]
+  flashSaleItems FlashSaleItem[]
 }
 
 model VariantImage {
@@ -303,56 +380,71 @@ model CartItem {
   cart    Cart            @relation(fields: [cartId], references: [id])
   product Product         @relation(fields: [productId], references: [id])
   variant ProductVariant? @relation(fields: [variantId], references: [id])
+
+  @@unique([cartId, variantId])
 }
 
 // ===================== FLASH SALE =====================
 
 model FlashSale {
-  id        String   @id @default(uuid())
-  shopId    String
-  name      String
-  startTime DateTime
-  endTime   DateTime
-  status    String   @default("PENDING")
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  id         String          @id @default(uuid())
+  shopId     String
+  name       String
+  startTime  DateTime
+  endTime    DateTime
+  status     FlashSaleStatus @default(UPCOMING)
+  maxPerUser Int?
+  createdAt  DateTime        @default(now())
+  updatedAt  DateTime        @updatedAt
 
   shop  Shop            @relation(fields: [shopId], references: [id])
   items FlashSaleItem[]
+
+  @@index([shopId])
+  @@index([status])
+  @@index([startTime, endTime])
+  @@index([shopId, status])
 }
 
 model FlashSaleItem {
-  flashSaleId String
-  productId   String
-  salePrice   Decimal
-  quantity    Int
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  id            String   @id @default(uuid())
+  flashSaleId   String
+  productId     String
+  variantId     String
+  originalPrice Decimal
+  salePrice     Decimal
+  quantity      Int
+  sold          Int      @default(0)
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
 
-  flashSale FlashSale @relation(fields: [flashSaleId], references: [id])
-  product   Product   @relation(fields: [productId], references: [id])
+  flashSale FlashSale      @relation(fields: [flashSaleId], references: [id])
+  product   Product        @relation(fields: [productId], references: [id])
+  variant   ProductVariant @relation(fields: [variantId], references: [id])
 
-  @@id([flashSaleId, productId])
+  @@unique([flashSaleId, variantId])
+  @@index([variantId])
+  @@index([flashSaleId])
 }
 
 // ===================== COUPON ====================
 
 model Coupon {
-  id          String    @id @default(uuid())
-  code        String    @unique
+  id          String       @id @default(uuid())
+  code        String       @unique
   description String?
   discount    Decimal
-  type        String
+  type        CouponType
   usageLimit  Int?
-  usedCount   Int       @default(0)
+  usedCount   Int          @default(0)
   minOrder    Decimal?
   maxDiscount Decimal?
-  scope       String    @default("GLOBAL")
+  scope       CouponScope  @default(GLOBAL)
   startAt     DateTime?
   endAt       DateTime?
-  status      String    @default("INACTIVE")
-  createdAt   DateTime  @default(now())
-  updatedAt   DateTime  @updatedAt
+  status      CouponStatus @default(INACTIVE)
+  createdAt   DateTime     @default(now())
+  updatedAt   DateTime     @updatedAt
 
   shopId String?
   shop   Shop?   @relation(fields: [shopId], references: [id])
@@ -441,6 +533,9 @@ model Order {
   @@index([buyerId])
   @@index([shopId])
   @@index([status])
+  @@index([shopId, status])
+  @@index([buyerId, status])
+  @@index([createdAt])
 }
 
 model OrderItem {
@@ -487,6 +582,8 @@ model Payment {
   updatedAt DateTime @updatedAt
 
   orders Order[]
+
+  @@unique([requestId])
 }
 
 // ===================== REVIEW =====================
@@ -579,10 +676,12 @@ model Notification {
   type       NotificationType
   createdAt  DateTime         @default(now())
   updatedAt  DateTime         @updatedAt
+  metadata   Json?
 
   sender   User @relation("SenderNotifications", fields: [senderId], references: [id])
   receiver User @relation("ReceiverNotifications", fields: [receiverId], references: [id])
 
   @@index([receiverId, isRead])
   @@index([receiverId, createdAt])
+  @@index([receiverId, type])
 }

@@ -35,8 +35,12 @@ export class ProductVariantRepository {
     return tx.productVariant.deleteMany({ where: { productId } });
   }
 
-  findUnique(where: Prisma.ProductVariantWhereUniqueInput) {
-    return this.prisma.productVariant.findUnique({
+  findUnique(
+    where: Prisma.ProductVariantWhereUniqueInput,
+    tx?: Prisma.TransactionClient,
+  ) {
+    const client = tx ?? this.prisma;
+    return client.productVariant.findUnique({
       where,
       include: { product: true, images: true },
     });

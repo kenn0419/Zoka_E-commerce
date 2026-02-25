@@ -20,7 +20,7 @@ import {
   Serialize,
   SerializePaginated,
 } from 'src/common/decorators/serialize.decorator';
-import { CategoryResponseDto } from './dto/category-response.dto';
+import { CategoryResponseDto } from './responses/category.response.dto';
 import { PositiveIntPipe } from 'src/common/pipes/positive-int.pipe';
 import { JwtSessionGuard } from 'src/common/guards/jwt-session.guard';
 import { Roles } from 'src/common/decorators/role.decorator';

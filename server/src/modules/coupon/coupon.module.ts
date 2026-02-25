@@ -1,8 +1,8 @@
 import { Module } from '@nestjs/common';
 import { CouponRepository } from './repositories/coupon.repository';
-import { AdminCouponController } from './controller/admin-coupon.controller';
-import { ShopCouponController } from './controller/shop-coupon.controller';
-import { UserCouponController } from './controller/user-coupon.controller';
+import { AdminCouponController } from './controllers/admin-coupon.controller';
+import { ShopCouponController } from './controllers/shop-coupon.controller';
+import { UserCouponController } from './controllers/user-coupon.controller';
 import { AdminCouponService } from './services/admin-coupon.service';
 import { ShopModule } from '../shop/shop.module';
 import { ShopCouponService } from './services/shop-coupon.service';

@@ -1,4 +1,4 @@
-import { ProductStatus } from '../enums/product.enum';
+import { ProductStatus } from 'generated/prisma';
 
 export class CartMapper {
   static toCartResponse(cart: any) {
@@ -12,23 +12,26 @@ export class CartMapper {
     };
   }
 
-  static toCartSummaryResponse(items: any) {
+  static toCartSummaryResponse(items: any[]) {
     const availableItems = items.filter((i) => i.isAvailable);
+
     return {
       totalItems: availableItems.length,
-      totalQuantity: items.reduce((sum, i) => sum + i.quantity, 0),
-      subtotal: items.reduce((sum, i) => sum + i.subtotal, 0),
+      totalQuantity: availableItems.reduce((sum, i) => sum + i.quantity, 0),
+      subtotal: availableItems.reduce((sum, i) => sum + i.subtotal, 0),
     };
   }
 
   static toCartItemResponses(cart: any) {
     return cart.items.map((item) => {
-      const price = Number(item.variant.price);
-      const stock = item.variant.stock;
+      const displayPrice = Number(item.displayPrice);
+      const availableStock = Number(item.availableStock);
 
       const isAvailable =
-        item.product.status === ProductStatus.ACTIVE && stock > 0;
-      const subtotal = Number(item.priceSnapshot) * item.quantity;
+        item.product.status === ProductStatus.ACTIVE && availableStock > 0;
+
+      const subtotal = displayPrice * item.quantity;
+
       return {
         id: item.id,
         productId: item.productId,
@@ -36,10 +39,11 @@ export class CartMapper {
         productName: item.productName,
         variantName: item.variantName,
         imageUrl: item.imageUrl,
-        priceSnapshot: price,
+        displayPrice,
         quantity: item.quantity,
-        stockSnapshot: item.stockSnapshot,
+        availableStock,
         isSelected: item.isSelected,
+        isFlashSale: item.isFlashSale ?? false,
         subtotal,
         isAvailable,
       };

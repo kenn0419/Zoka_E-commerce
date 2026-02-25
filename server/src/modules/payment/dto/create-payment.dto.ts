@@ -1,6 +1,6 @@
 import { Type } from 'class-transformer';
 import { IsEnum, IsNumber, IsString } from 'class-validator';
-import { PaymentMethod } from 'src/common/enums/payment.enum';
+import { PaymentMethod } from 'generated/prisma';
 
 export class CreatePaymentDto {
   @IsEnum(PaymentMethod)

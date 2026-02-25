@@ -5,10 +5,3 @@ export enum ProductSort {
   PRICE_DESC = 'price_desc',
   RATING_DESC = 'rating_desc',
 }
-
-export enum ProductStatus {
-  PENDING = 'PENDING',
-  ACTIVE = 'ACTIVE',
-  INACTIVE = 'INACTIVE',
-  REJECTED = 'REJECTED',
-}

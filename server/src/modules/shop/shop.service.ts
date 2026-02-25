@@ -13,11 +13,11 @@ import { UploadService } from 'src/infrastructure/upload/upload.service';
 import { ConfigService } from '@nestjs/config';
 import { Role } from 'src/common/enums/role.enum';
 import { SlugifyUtil } from 'src/common/utils/slugify.util';
-import { Prisma } from 'generated/prisma';
+import { Prisma, ShopStatus } from 'generated/prisma';
 import { buildSearchOr } from 'src/common/utils/build-search-or.util';
 import { paginatedResult } from 'src/common/utils/pagninated-result.util';
 import { buildShopSort } from 'src/common/utils/shop-sort.util';
-import { ShopSort, ShopStatus } from 'src/common/enums/shop.enum';
+import { ShopSort } from 'src/common/enums/shop.enum';
 
 @Injectable()
 export class ShopService {

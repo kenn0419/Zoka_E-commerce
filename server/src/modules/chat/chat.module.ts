@@ -5,7 +5,7 @@ import { MessageRepository } from './repositories/message.repository';
 import { ConversationRepository } from './repositories/conversation.repository';
 import { UserModule } from '../user/user.module';
 import { RbacModule } from '../rbac/rbac.module';
-import { ChatController } from './chat.controller';
+import { ChatController } from '../comment/chat.controller';
 
 @Module({
   imports: [UserModule, RbacModule],

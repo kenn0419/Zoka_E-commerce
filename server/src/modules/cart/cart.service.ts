@@ -8,76 +8,92 @@ import { CartRepository } from './repositories/cart.repository';
 import { ProductVariantRepository } from '../product/repositories/product-variant.repository';
 import { CartItemRepository } from './repositories/cart-item.repository';
 import { CartMapper } from 'src/common/mappers/cart.mapper';
-import { UpdateCartDto } from './dto/update-cart.dto';
+import { PrismaService } from 'src/infrastructure/prisma/prisma.service';
+import { FlashSaleStatus, Prisma } from 'generated/prisma';
 
 @Injectable()
 export class CartService {
   constructor(
-    private cartRepo: CartRepository,
-    private cartItemRepo: CartItemRepository,
-    private productVariantRepo: ProductVariantRepository,
+    private readonly prisma: PrismaService,
+    private readonly cartRepo: CartRepository,
+    private readonly cartItemRepo: CartItemRepository,
+    private readonly productVariantRepo: ProductVariantRepository,
   ) {}
-
-  private async getOrCreateCartEntity(userId: string) {
-    const cart = await this.cartRepo.getOrCreateCartByUser(userId);
-    return cart;
-  }
 
   async getUserCart(userId: string) {
     const cart = await this.getOrCreateCartEntity(userId);
-    return CartMapper.toCartResponse(cart);
+    const syncedItems = await this.resolveCartItemsRealtime(cart);
+
+    return CartMapper.toCartResponse({
+      ...cart,
+      items: syncedItems,
+    });
   }
 
   async getUserCartSummary(userId: string) {
     const cart = await this.getOrCreateCartEntity(userId);
-    const cartItems = CartMapper.toCartItemResponses(cart);
-    return CartMapper.toCartSummaryResponse(cartItems);
+    const syncedItems = await this.resolveCartItemsRealtime(cart);
+
+    return CartMapper.toCartSummaryResponse(syncedItems);
   }
 
   async addToCart(userId: string, data: AddCartDto) {
     const existVariant = await this.productVariantRepo.findUnique({
       id: data.variantId,
     });
+
     if (!existVariant) {
-      throw new NotFoundException('Product not found');
+      throw new NotFoundException('Product variant not found');
+    }
+
+    const { price, availableStock } = await this.resolveVariantRealtime(
+      data.variantId,
+      existVariant,
+    );
+
+    if (data.quantity > availableStock) {
+      throw new BadRequestException(
+        'Insufficient stock for the requested product variant',
+      );
     }
 
     const cart = await this.getOrCreateCartEntity(userId);
 
-    const existItem = cart?.items.find(
+    const existItem = cart.items.find(
       (item) =>
         item.productId === existVariant.productId &&
         item.variantId === data.variantId,
     );
+
     if (existItem) {
-      const currentQuantity = existItem?.quantity ?? 0;
-      if (currentQuantity + data.quantity > existVariant.stock) {
-        throw new NotFoundException(
+      const newQuantity = existItem.quantity + data.quantity;
+
+      if (newQuantity > availableStock) {
+        throw new BadRequestException(
           'Insufficient stock for the requested product variant',
         );
       }
-      const newQuantity = existItem.quantity + data.quantity;
+
       await this.cartItemRepo.updateQuantity(existItem.id, {
         quantity: newQuantity,
+        priceSnapshot: Prisma.Decimal(price),
+        stockSnapshot: availableStock,
       });
     } else {
-      const payload = {
+      await this.cartItemRepo.addItem({
         cartId: cart.id,
         productId: existVariant.productId,
         variantId: data.variantId,
         productName: existVariant.product.name,
         variantName: existVariant.name,
-        imageUrl: existVariant.images[0].imageUrl,
-        priceSnapshot: existVariant.price,
+        imageUrl: existVariant.images?.[0]?.imageUrl ?? null,
+        priceSnapshot: Prisma.Decimal(price),
         quantity: data.quantity,
-        stockSnapshot: existVariant.stock,
-      };
-
-      await this.cartItemRepo.addItem(payload);
+        stockSnapshot: availableStock,
+      });
     }
 
-    const updatedCart = await this.getOrCreateCartEntity(userId);
-    return CartMapper.toCartResponse(updatedCart);
+    return this.getUserCart(userId);
   }
 
   async updateItemQuantity(
@@ -88,49 +104,51 @@ export class CartService {
     if (quantity <= 0) {
       return this.removeFromCart(userId, cartItemId);
     }
+
     const cart = await this.getOrCreateCartEntity(userId);
+
     const item = cart.items.find((i) => i.id === cartItemId);
     if (!item) {
       throw new NotFoundException('Cart item not found.');
     }
 
-    const stock = item.variant?.stock;
-    const finalQty = Math.min(quantity, stock!);
+    const syncedItems = await this.resolveCartItemsRealtime(cart);
+    const syncedItem = syncedItems.find((i) => i.id === cartItemId)!;
+
+    const finalQty = Math.min(quantity, syncedItem.availableStock);
 
     await this.cartItemRepo.updateCartItem(
       { id: cartItemId },
       {
         quantity: finalQty,
-        priceSnapshot: item.variant?.price,
-        stockSnapshot: stock,
+        priceSnapshot: Prisma.Decimal(syncedItem.displayPrice),
+        stockSnapshot: syncedItem.availableStock,
       },
     );
 
-    const updatedCart = await this.getOrCreateCartEntity(userId);
-
-    return CartMapper.toCartResponse(updatedCart);
+    return this.getUserCart(userId);
   }
 
   async removeFromCart(userId: string, cartItemId: string) {
     const cart = await this.getOrCreateCartEntity(userId);
 
-    const item = cart.items.some((i) => i.id === cartItemId);
-    if (!item) {
+    const exists = cart.items.some((i) => i.id === cartItemId);
+    if (!exists) {
       throw new NotFoundException('Cart item not found');
     }
 
     await this.cartRepo.removeItem(cartItemId);
 
-    const updatedCart = await this.getOrCreateCartEntity(userId);
-
-    return CartMapper.toCartResponse(updatedCart);
+    return this.getUserCart(userId);
   }
 
   async clearUserCart(userId: string) {
     const cart = await this.getOrCreateCartEntity(userId);
+
     if (!cart) {
       throw new NotFoundException('Cart not found');
     }
+
     return this.cartRepo.clearCart(cart.id);
   }
 
@@ -147,5 +165,67 @@ export class CartService {
       },
       { isSelected: true },
     );
+
+    return this.getUserCart(userId);
+  }
+
+  private async resolveCartItemsRealtime(cart: any) {
+    if (!cart.items.length) return cart.items;
+
+    const variantIds = cart.items.map((i) => i.variantId);
+
+    const flashItems = await this.prisma.flashSaleItem.findMany({
+      where: {
+        variantId: { in: variantIds },
+        flashSale: { status: FlashSaleStatus.ACTIVE },
+      },
+    });
+
+    const flashMap = new Map<string, (typeof flashItems)[number]>();
+    flashItems.forEach((f) => flashMap.set(f.variantId, f));
+
+    return cart.items.map((item) => {
+      const flash = flashMap.get(item.variantId);
+
+      const price = flash
+        ? Number(flash.salePrice)
+        : Number(item.variant.price);
+
+      const availableStock = flash
+        ? flash.quantity - flash.sold
+        : item.variant.stock;
+
+      return {
+        ...item,
+        displayPrice: price,
+        availableStock,
+        isFlashSale: !!flash,
+      };
+    });
+  }
+
+  private async resolveVariantRealtime(variantId: string, variant: any) {
+    const flash = await this.prisma.flashSaleItem.findFirst({
+      where: {
+        variantId,
+        flashSale: { status: FlashSaleStatus.ACTIVE },
+      },
+    });
+
+    if (!flash) {
+      return {
+        price: Number(variant.price),
+        availableStock: variant.stock,
+      };
+    }
+
+    return {
+      price: Number(flash.salePrice),
+      availableStock: flash.quantity - flash.sold,
+    };
+  }
+
+  private async getOrCreateCartEntity(userId: string) {
+    return this.cartRepo.getOrCreateCartByUser(userId);
   }
 }

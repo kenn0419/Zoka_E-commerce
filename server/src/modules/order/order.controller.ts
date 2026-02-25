@@ -19,11 +19,10 @@ import {
   SerializePaginated,
 } from 'src/common/decorators/serialize.decorator';
 import { CheckoutPreviewDto } from './dto/checkout-preview.dto';
-import { CheckoutPreviewResponseDto } from './dto/checkout-preview-response.dto';
+import { CheckoutPreviewResponseDto } from './responses/checkout-preview.response.dto';
 import { CheckoutConfirmDto } from './dto/checkout-confirm.dto';
-import { CheckoutConfirmResponseDto } from './dto/checkout-confirm-response.dto';
-import { PaginatedQueryDto } from 'src/common/dto/paginated-query.dto';
-import { OrderResponseDto } from './dto/order-response.dto';
+import { CheckoutConfirmResponseDto } from './responses/checkout-confirm.response.dto';
+import { OrderResponseDto } from './responses/order.response.dto';
 import { RolesPermissionsGuard } from 'src/common/guards/rbac.guard';
 import { Roles } from 'src/common/decorators/role.decorator';
 import { Role } from 'src/common/enums/role.enum';

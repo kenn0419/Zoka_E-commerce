@@ -17,10 +17,10 @@ import * as bcrypt from 'bcrypt';
 import { CryptoUtil } from 'src/common/utils/crypto.util';
 import { VerifyEmailDto } from '../dto/verify-email.dto';
 import { SlugifyUtil } from 'src/common/utils/slugify.util';
-import { UserStatus } from 'src/common/enums/user.enum';
 import { UserMapper } from 'src/common/mappers/user.mapper';
 import { AuthRepository } from '../auth.repository';
 import { AddressRepository } from 'src/modules/address/address.repository';
+import { UserStatus } from 'generated/prisma';
 
 @Injectable()
 export class AuthService {

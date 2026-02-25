@@ -1,6 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { Prisma } from 'generated/prisma';
-import { ProductStatus } from 'src/common/enums/product.enum';
+import { Prisma, ProductStatus } from 'generated/prisma';
 import { PrismaService } from 'src/infrastructure/prisma/prisma.service';
 
 @Injectable()
@@ -148,7 +147,6 @@ export class ProductRepository {
     return this.prisma.product.findUnique({
       where,
       select: {
-        id: true,
         name: true,
         slug: true,
         thumbnail: true,
@@ -157,6 +155,7 @@ export class ProductRepository {
         minPrice: true,
         maxPrice: true,
         hasStock: true,
+        status: true,
         variants: {
           where: { stock: { gt: 0 } },
           select: {
@@ -164,13 +163,12 @@ export class ProductRepository {
             name: true,
             price: true,
             stock: true,
-            images: { select: { imageUrl: true } },
+            images: { select: { id: true, imageUrl: true } },
           },
         },
-        category: { select: { id: true, name: true, slug: true } },
+        category: { select: { name: true, slug: true } },
         shop: {
           select: {
-            id: true,
             name: true,
             slug: true,
             logoUrl: true,

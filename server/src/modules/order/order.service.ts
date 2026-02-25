@@ -1,6 +1,7 @@
 import {
   Address,
   Coupon,
+  FlashSaleStatus,
   Order,
   Payment,
   PaymentMethod,
@@ -24,11 +25,8 @@ import { AddressRepository } from '../address/address.repository';
 import { CouponRepository } from '../coupon/repositories/coupon.repository';
 
 import { OrderSort, OrderStatus } from 'src/common/enums/order.enum';
-import {
-  CouponScope,
-  CouponStatus,
-  CouponType,
-} from 'src/common/enums/coupon.enum';
+import { CouponScope, CouponStatus, CouponType } from 'generated/prisma';
+
 import { mapMethodToProvider } from 'src/common/mappers/map-method-to-provider';
 import { groupByMap } from 'src/common/utils/group-by.util';
 
@@ -87,8 +85,7 @@ export class OrderService {
   }
 
   async confirm(userId: string, dto: CheckoutConfirmDto) {
-    const cartItems =
-      await this.cartItemRepo.getSelectedCartItemsByUser(userId);
+    const cartItems = await this.loadAndValidateCartItems(userId);
 
     if (!cartItems.length) {
       throw new BadRequestException('Invalid cart items');
@@ -178,14 +175,12 @@ export class OrderService {
     if (payment.status !== PaymentStatus.PENDING) {
       return;
     }
-    const couponId = payment.orders.find((o) => o.couponId)?.couponId;
-    const hasExpiredOrder = payment.orders.some(
-      (o) => o.status === OrderStatus.CANCELLED,
-    );
 
-    if (hasExpiredOrder) {
-      return;
+    const couponId = payment.orders.find((o) => o.couponId)?.couponId;
+    if (!payment.orders.length) {
+      throw new BadRequestException('Payment has no orders');
     }
+    const buyerId = payment.orders[0]?.buyerId;
 
     await this.prisma.$transaction(async (tx) => {
       if (success) {
@@ -194,49 +189,74 @@ export class OrderService {
           data: { status: PaymentStatus.SUCCESS },
         });
 
-        await tx.order.updateMany({
-          where: { paymentId, status: OrderStatus.PENDING },
+        const updated = await tx.order.updateMany({
+          where: {
+            paymentId,
+            status: OrderStatus.PENDING,
+            expiresAt: { gt: new Date() },
+          },
           data: {
             status: OrderStatus.PAID,
             expiresAt: null,
           },
         });
+        if (updated.count === 0) {
+          throw new BadRequestException('Orders already expired');
+        }
+        return;
+      }
 
-        if (couponId) {
-          await tx.coupon.update({
-            where: { id: couponId },
-            data: { usedCount: { increment: 1 } },
+      await tx.payment.update({
+        where: { id: paymentId },
+        data: { status: PaymentStatus.FAILED },
+      });
+
+      const allItems = payment.orders.flatMap((o) => o.items);
+
+      const variantIds = [
+        ...new Set(
+          allItems.map((i) => i.variantId).filter((v): v is string => !!v),
+        ),
+      ];
+
+      const flashItems = await tx.flashSaleItem.findMany({
+        where: {
+          variantId: { in: variantIds },
+          flashSale: { status: FlashSaleStatus.ACTIVE },
+        },
+      });
+
+      const flashMap = new Map(flashItems.map((f) => [f.variantId, f]));
+
+      await tx.order.updateMany({
+        where: { paymentId },
+        data: { status: OrderStatus.CANCELLED },
+      });
+
+      for (const item of allItems) {
+        if (!item.variantId) continue;
+
+        const flash = flashMap.get(item.variantId);
+
+        if (flash) {
+          await tx.flashSaleItem.update({
+            where: { id: flash.id, sold: { gte: item.quantity } },
+            data: {
+              sold: { decrement: item.quantity },
+            },
+          });
+        } else {
+          await tx.productVariant.update({
+            where: { id: item.variantId },
+            data: {
+              stock: { increment: item.quantity },
+            },
           });
         }
-      } else {
-        await tx.payment.update({
-          where: { id: paymentId },
-          data: { status: PaymentStatus.FAILED },
-        });
+      }
 
-        for (const order of payment.orders) {
-          await tx.order.update({
-            where: { id: order.id },
-            data: { status: OrderStatus.CANCELLED },
-          });
-
-          for (const item of order.items) {
-            if (!item.variantId) continue;
-
-            await tx.productVariant.update({
-              where: { id: item.variantId },
-              data: {
-                stock: { increment: item.quantity },
-              },
-            });
-          }
-        }
-
-        const buyerId = payment.orders[0]?.buyerId;
-
-        if (couponId) {
-          await this.couponRepo.rollbackUsed(buyerId, couponId, tx);
-        }
+      if (couponId && buyerId) {
+        await this.couponRepo.rollbackUsed(buyerId, couponId, tx);
       }
     });
   }
@@ -274,7 +294,7 @@ export class OrderService {
       {
         where,
         page: query.page,
-        limit: query.page,
+        limit: query.limit,
         orderBy: buildOrderSort(query.sort),
       },
       (args) => this.orderRepo.listPaginatedOrders(args),
@@ -290,7 +310,7 @@ export class OrderService {
       {
         where,
         page: query.page,
-        limit: query.page,
+        limit: query.limit,
         orderBy: buildOrderSort(query.sort),
       },
       (args) => this.orderRepo.listPaginatedOrders(args),
@@ -335,8 +355,24 @@ export class OrderService {
       throw new BadRequestException('Cart items not found');
     }
 
+    const variantIds = cartItems.map((i) => i.variantId);
+    const flashItems = await this.prisma.flashSaleItem.findMany({
+      where: {
+        variantId: { in: variantIds },
+        flashSale: { status: FlashSaleStatus.ACTIVE },
+      },
+    });
+
+    const flashMap = new Map<string, (typeof flashItems)[number]>();
+    flashItems.forEach((i) => flashMap.set(i.variantId, i));
+
     for (const item of cartItems) {
-      if (item.quantity > item.stockSnapshot) {
+      const flashSale = flashMap.get(item.variantId);
+      const availableStock = flashSale
+        ? flashSale.quantity - flashSale.sold
+        : (item.variant?.stock ?? 0);
+
+      if (item.quantity > availableStock) {
         throw new BadRequestException(`Out of stock: ${item.productName}`);
       }
     }
@@ -426,7 +462,11 @@ export class OrderService {
       if (coupon?.scope === CouponScope.GLOBAL && remainingGlobalDiscount > 0) {
         const maxDiscountForShop = this.calculateDiscount(coupon, subtotal);
 
-        discount = Math.min(subtotal, maxDiscountForShop);
+        discount = Math.min(
+          subtotal,
+          maxDiscountForShop,
+          remainingGlobalDiscount,
+        );
         remainingGlobalDiscount -= discount;
       }
 
@@ -459,19 +499,50 @@ export class OrderService {
     cartItems: CartItemWithProduct[],
     tx: Prisma.TransactionClient,
   ) {
-    for (const item of cartItems) {
-      const { count } = await tx.productVariant.updateMany({
-        where: {
-          id: item.variantId,
-          stock: { gte: item.quantity },
-        },
-        data: {
-          stock: { decrement: item.quantity },
-        },
-      });
+    const variantIds = cartItems.map((i) => i.variantId);
 
-      if (count === 0) {
-        throw new BadRequestException(`Out of stock: ${item.productName}`);
+    const flashItems = await tx.flashSaleItem.findMany({
+      where: {
+        variantId: { in: variantIds },
+        flashSale: { status: FlashSaleStatus.ACTIVE },
+      },
+    });
+
+    const flashMap = new Map(flashItems.map((f) => [f.variantId, f]));
+
+    for (const item of cartItems) {
+      const flash = flashMap.get(item.variantId);
+
+      if (flash) {
+        const { count } = await tx.flashSaleItem.updateMany({
+          where: {
+            id: flash.id,
+            sold: { lte: flash.quantity - item.quantity },
+          },
+          data: {
+            sold: { increment: item.quantity },
+          },
+        });
+
+        if (count === 0) {
+          throw new BadRequestException(
+            `Flash sale out of stock: ${item.productName}`,
+          );
+        }
+      } else {
+        const { count } = await tx.productVariant.updateMany({
+          where: {
+            id: item.variantId,
+            stock: { gte: item.quantity },
+          },
+          data: {
+            stock: { decrement: item.quantity },
+          },
+        });
+
+        if (count === 0) {
+          throw new BadRequestException(`Out of stock: ${item.productName}`);
+        }
       }
     }
   }

@@ -5,11 +5,11 @@ import { PaymentModule } from 'src/modules/payment/payment.module';
 import { OrderRepository } from './repositories/order.repository';
 import { CartModule } from '../cart/cart.module';
 import { OrderPaymentListener } from './order-payment.listener';
-import { OrderCron } from './order.cron';
 import { CouponModule } from '../coupon/coupon.module';
 import { AddressModule } from '../address/address.module';
 import { ShopModule } from '../shop/shop.module';
 import { OrderItemRepository } from './repositories/order-item.repository';
+import { OrderScheduler } from './order.scheduler';
 
 @Module({
   imports: [PaymentModule, CartModule, CouponModule, AddressModule, ShopModule],
@@ -19,7 +19,7 @@ import { OrderItemRepository } from './repositories/order-item.repository';
     OrderRepository,
     OrderItemRepository,
     OrderPaymentListener,
-    OrderCron,
+    OrderScheduler,
   ],
   exports: [OrderService, OrderRepository, OrderItemRepository],
 })

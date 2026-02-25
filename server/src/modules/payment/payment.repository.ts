@@ -1,7 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from '../../infrastructure/prisma/prisma.service';
-import { PaymentStatus, Prisma } from 'generated/prisma';
-import { PaymentProvider } from 'src/common/enums/payment.enum';
+import { PaymentProvider, PaymentStatus, Prisma } from 'generated/prisma';
 
 @Injectable()
 export class PaymentRepository {

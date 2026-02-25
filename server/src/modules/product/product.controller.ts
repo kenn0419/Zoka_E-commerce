@@ -28,8 +28,8 @@ import {
 } from 'src/common/decorators/serialize.decorator';
 import { RolesPermissionsGuard } from 'src/common/guards/rbac.guard';
 import { ProductListQueryDto } from './dto/product-query.dto';
-import { ProductListResponseDto } from './dto/product-list-item-response.dto';
-import { ProductDetailResponseDto } from './dto/product-detail-response.dto';
+import { ProductListResponseDto } from './responses/product-list-item.response.dto';
+import { ProductDetailResponseDto } from './responses/product-detail.response.dto';
 import { ParseJsonPipe } from 'src/common/pipes/parse-json.pipe';
 import { plainToInstance } from 'class-transformer';
 import { validateSync } from 'class-validator';

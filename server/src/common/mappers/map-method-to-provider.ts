@@ -1,4 +1,4 @@
-import { PaymentMethod, PaymentProvider } from 'src/common/enums/payment.enum';
+import { PaymentMethod, PaymentProvider } from 'generated/prisma';
 
 export function mapMethodToProvider(
   method: PaymentMethod,

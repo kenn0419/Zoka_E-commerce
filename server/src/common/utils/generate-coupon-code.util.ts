@@ -1,5 +1,5 @@
+import { CouponScope, CouponType } from 'generated/prisma';
 import { customAlphabet } from 'nanoid';
-import { CouponScope, CouponType } from '../enums/coupon.enum';
 
 const ALPHABET = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
 const nanoid = customAlphabet(ALPHABET, 8);

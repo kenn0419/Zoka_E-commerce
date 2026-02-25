@@ -13,8 +13,8 @@ import { CartService } from './cart.service';
 import { JwtSessionGuard } from 'src/common/guards/jwt-session.guard';
 import { AddCartDto } from './dto/add-cart.dto';
 import { Serialize } from 'src/common/decorators/serialize.decorator';
-import { CartResponseDto } from './dto/cart-response.dto';
-import { CartSummaryResponseDto } from './dto/cart-summary-response.dto';
+import { CartResponseDto } from './responses/cart.response.dto';
+import { CartSummaryResponseDto } from './responses/cart-summary.response.dto';
 import { UpdateCartDto } from './dto/update-cart.dto';
 import { UpdateSelectionDto } from './dto/update-selection.dto';
 

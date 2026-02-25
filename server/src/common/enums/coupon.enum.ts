@@ -1,22 +1,3 @@
-export enum CouponScope {
-  GLOBAL = 'GLOBAL',
-  SHOP = 'SHOP',
-  USER = 'USER',
-  PRODUCT = 'PRODUCT',
-  CATEGORY = 'CATEGORY',
-}
-
-export enum CouponType {
-  FIXED = 'FIXED',
-  PERCENTAGE = 'PERCENTAGE',
-}
-
-export enum CouponStatus {
-  ACTIVE = 'ACTIVE',
-  INACTIVE = 'INACTIVE',
-  EXPIRED = 'EXPIRED',
-}
-
 export enum CounponSort {
   NEWEST = 'newest',
   OLDEST = 'oldest',

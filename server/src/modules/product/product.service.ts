@@ -10,7 +10,13 @@ import { CategoryRepository } from '../category/category.repository';
 import { ShopRepository } from '../shop/shop.repository';
 import { ConfigService } from '@nestjs/config';
 import { UploadService } from 'src/infrastructure/upload/upload.service';
-import { Prisma } from 'generated/prisma';
+import {
+  Prisma,
+  ShopStatus,
+  ProductStatus,
+  CategoryStatus,
+  FlashSaleStatus,
+} from 'generated/prisma';
 import { VariantImageRepository } from './repositories/variant-image.repository';
 import { ProductVariantRepository } from './repositories/product-variant.repository';
 import { PrismaService } from 'src/infrastructure/prisma/prisma.service';
@@ -19,9 +25,7 @@ import { buildProductSort } from 'src/common/utils/product-sort.util';
 import { buildSearchOr } from 'src/common/utils/build-search-or.util';
 import { paginatedResult } from 'src/common/utils/pagninated-result.util';
 import { buildProductFilter } from 'src/common/utils/build-product-filter.util';
-import { ProductSort, ProductStatus } from 'src/common/enums/product.enum';
-import { CategoryStatus } from 'src/common/enums/category.enum';
-import { ShopStatus } from 'src/common/enums/shop.enum';
+import { ProductSort } from 'src/common/enums/product.enum';
 
 @Injectable()
 export class ProductService {
@@ -320,7 +324,46 @@ export class ProductService {
     const product = await this.productRepo.findPublicDetail({ slug });
     if (!product) throw new NotFoundException('Product not found');
 
-    return product;
+    if (product.status !== ProductStatus.ACTIVE) {
+      throw new BadRequestException('Product is not active');
+    }
+
+    const variantIds = product.variants.map((v) => v.id);
+    const flashSales = await this.prisma.flashSaleItem.findMany({
+      where: {
+        variantId: { in: variantIds },
+        flashSale: { status: FlashSaleStatus.ACTIVE },
+      },
+    });
+
+    const flashSaleMap = new Map<string, (typeof flashSales)[number]>();
+    flashSaleMap.forEach((item) => flashSaleMap.set(item.variantId, item));
+
+    const variants = product.variants.map((variant) => {
+      const flashSale = flashSaleMap.get(variant.id);
+
+      if (!flashSale) {
+        return {
+          ...variant,
+          originalPrice: variant.price,
+          displayPrice: variant.price,
+          isFlashSale: false,
+          stock: variant.stock,
+        };
+      }
+
+      return {
+        ...variant,
+        originalPrice: variant.price,
+        displayPrice: flashSale.salePrice,
+        isFlashSale: true,
+        stock: flashSale.quantity - flashSale.sold,
+      };
+    });
+    return {
+      ...product,
+      variants,
+    };
   }
 
   async findById(id: string) {

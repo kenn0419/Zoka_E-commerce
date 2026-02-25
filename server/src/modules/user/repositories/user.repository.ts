@@ -1,6 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { Prisma, User } from 'generated/prisma';
-import { UserStatus } from 'src/common/enums/user.enum';
+import { Prisma, User, UserStatus } from 'generated/prisma';
 import { PrismaService } from 'src/infrastructure/prisma/prisma.service';
 
 @Injectable()
@@ -72,7 +71,7 @@ export class UserRepository {
 
   changeUserStatus(
     where: Prisma.UserWhereUniqueInput,
-    status: string,
+    status: UserStatus,
   ): Promise<User> {
     return this.prisma.user.update({
       data: {

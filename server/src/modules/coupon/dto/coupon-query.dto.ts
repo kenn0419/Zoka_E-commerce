@@ -1,6 +1,7 @@
 import { IsEnum, IsOptional } from 'class-validator';
+import { CouponScope } from 'generated/prisma';
 import { PaginatedQueryDto } from 'src/common/dto/paginated-query.dto';
-import { CounponSort, CouponScope } from 'src/common/enums/coupon.enum';
+import { CounponSort } from 'src/common/enums/coupon.enum';
 
 export class CouponQueryDto extends PaginatedQueryDto<CounponSort> {
   @IsOptional()

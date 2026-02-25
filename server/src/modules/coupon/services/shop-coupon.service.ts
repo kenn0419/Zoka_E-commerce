@@ -2,7 +2,12 @@ import { BadRequestException, Injectable } from '@nestjs/common';
 import { CouponRepository } from '../repositories/coupon.repository';
 import { CreateCouponDto } from '../dto/create-coupon.dto';
 import { ShopRepository } from 'src/modules/shop/shop.repository';
-import { Prisma } from 'generated/prisma';
+import {
+  Prisma,
+  CouponScope,
+  CouponStatus,
+  CouponType,
+} from 'generated/prisma';
 import { buildSearchOr } from 'src/common/utils/build-search-or.util';
 import { UpdateCouponDto } from '../dto/update-coupon.dto';
 import { buildCouponSort } from 'src/common/utils/coupon-sort.util';
@@ -11,12 +16,7 @@ import { ProductRepository } from 'src/modules/product/repositories/product.repo
 import { PrismaService } from 'src/infrastructure/prisma/prisma.service';
 import { paginatedResult } from 'src/common/utils/pagninated-result.util';
 import { CategoryRepository } from 'src/modules/category/category.repository';
-import {
-  CounponSort,
-  CouponScope,
-  CouponStatus,
-  CouponType,
-} from 'src/common/enums/coupon.enum';
+import { CounponSort } from 'src/common/enums/coupon.enum';
 
 @Injectable()
 export class ShopCouponService {
