@@ -459,7 +459,7 @@ model UserCoupon {
   userId    String
   couponId  String
   used      Boolean  @default(false)
-  usedAt    DateTime
+  usedAt    DateTime?
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 

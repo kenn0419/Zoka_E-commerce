@@ -1,20 +1,27 @@
+@use "../../../styles/abstracts/variables" as v;
+
 .wrapper {
   background: #f5f5f5;
   padding: 24px 0;
 }
 
-.main {
-  // max-width: 1200px;
-  margin: auto;
+.container {
   background: #fff;
   display: grid;
-  grid-template-columns: 450px 1fr;
+  grid-template-columns: 500px 1fr;
   gap: 32px;
   padding: 24px;
-}
+  border-radius: v.$radius-lg;
+  box-shadow: v.$shadow-soft;
+  min-height: 600px;
 
-.right {
-  display: flex;
-  flex-direction: column;
-  gap: 16px;
+  .left {
+    height: 100%;
+  }
+
+  .right {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+  }
 }

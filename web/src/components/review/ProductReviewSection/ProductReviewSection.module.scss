@@ -1,8 +1,10 @@
+@use "../../../styles/abstracts/variables" as v;
+
 .wrapper {
   background: #fff;
   padding: 24px;
   margin-top: 24px;
-  border-radius: 8px;
+  border-radius: v.$radius-lg;
 }
 
 .title {

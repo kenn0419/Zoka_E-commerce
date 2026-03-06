@@ -1,0 +1,103 @@
+@use "../../../../styles/abstracts/variables" as v;
+
+.footer {
+  margin-top: 80px;
+  background: v.$bg-dark;
+  color: #ccc;
+  font-size: 14px;
+}
+
+.top {
+  padding: 60px 0;
+}
+
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 16px;
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 50px;
+}
+
+.column {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+
+  h4 {
+    color: #fff;
+    font-weight: 600;
+    margin-bottom: 10px;
+  }
+
+  a {
+    color: #bbb;
+    transition: 0.2s;
+
+    &:hover {
+      color: #1677ff;
+    }
+  }
+
+  p {
+    color: #999;
+    line-height: 1.6;
+  }
+}
+
+.logo {
+  height: 45px;
+  margin-bottom: 15px;
+}
+
+.description {
+  justify-content: center;
+}
+
+.social {
+  display: flex;
+  gap: 14px;
+  font-size: 22px;
+  cursor: pointer;
+
+  svg {
+    transition: 0.2s;
+
+    &:hover {
+      color: #1677ff;
+      transform: scale(1.1);
+    }
+  }
+}
+
+.payment {
+  border-top: 1px solid #222;
+  padding: 25px 0;
+
+  .container {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+}
+
+.paymentIcons {
+  display: flex;
+  gap: 16px;
+
+  div {
+    background: #222;
+    padding: 8px 16px;
+    border-radius: 6px;
+    font-size: 13px;
+  }
+}
+
+.bottom {
+  text-align: center;
+  padding: 20px 0;
+  background: v.$bg-dark;
+  font-size: 13px;
+  color: #777;
+}

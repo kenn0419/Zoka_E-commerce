@@ -1,9 +1,12 @@
+@use "../../../../../styles/abstracts/variables" as v;
+
 .wrapper {
   display: flex;
   background: #fff;
   padding: 20px;
-  border-radius: 4px;
+  border-radius: v.$radius-lg;
   margin: 16px 0;
+  box-shadow: v.$shadow-glow;
 }
 
 .left {
@@ -20,6 +23,8 @@
 
   .avatar {
     cursor: pointer;
+    width: 100px;
+    height: 100px;
   }
 }
 

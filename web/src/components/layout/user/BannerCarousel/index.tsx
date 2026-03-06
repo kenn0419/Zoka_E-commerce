@@ -1,20 +1,51 @@
-import { Carousel } from "antd";
-import styles from "./BannerCarousel.module.scss";
+import { Button, Carousel } from "antd";
+import styles from "./HeroBanner.module.scss";
 
-const banners = [
-  "https://via.placeholder.com/1200x300?text=Banner+1",
-  "https://via.placeholder.com/1200x300?text=Banner+2",
-  "https://via.placeholder.com/1200x300?text=Banner+3",
-];
-
-export default function BannerCarousel() {
+export default function HeroBanner() {
   return (
-    <Carousel autoplay className={styles.carousel}>
-      {banners.map((src, index) => (
-        <div key={index} className={styles.slide}>
-          <img src={src} alt={`banner-${index}`} />
+    <div className={styles.heroWrapper}>
+      <Carousel autoplay dots className={styles.carousel}>
+        <div>
+          <div
+            className={styles.slide}
+            style={{
+              backgroundImage:
+                "url(https://images.unsplash.com/photo-1519389950473-47ba0277781c)",
+            }}
+          >
+            <div className={styles.overlay}>
+              <span className={styles.badge}>New Arrival</span>
+              <h1>
+                Step into the <span>Future</span>
+              </h1>
+              <Button type="primary" size="large">
+                Explore Now
+              </Button>
+            </div>
+          </div>
         </div>
-      ))}
-    </Carousel>
+
+        {/* Slide 2 */}
+        <div>
+          <div
+            className={styles.slide}
+            style={{
+              backgroundImage:
+                "url(https://images.unsplash.com/photo-1492724441997-5dc865305da7)",
+            }}
+          >
+            <div className={styles.overlay}>
+              <span className={styles.badge}>Mega Sale</span>
+              <h1>
+                Upgrade Your <span>Setup</span>
+              </h1>
+              <Button type="primary" size="large">
+                Shop Deals
+              </Button>
+            </div>
+          </div>
+        </div>
+      </Carousel>
+    </div>
   );
 }

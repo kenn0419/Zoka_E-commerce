@@ -1,19 +1,21 @@
 import { Switch, message } from "antd";
-import {
-  useCouponActiveMutation,
-  useCouponDeActiveMutation,
-} from "../../../../../queries/coupon.query";
 import { useSellerStore } from "../../../../../store/seller.store";
+import {
+  useCouponShopActiveMutation,
+  useCouponShopDeActiveMutation,
+} from "../../../../../queries/coupon.query";
 
-type Props = {
+interface CouponStatusSwitcherProps {
   coupon: ICouponResponse;
-};
+}
 
-export default function CouponStatusSwitcher({ coupon }: Props) {
+export default function CouponStatusSwitcher({
+  coupon,
+}: CouponStatusSwitcherProps) {
   const shopId = useSellerStore((state) => state.currentShopId!);
   const isActive = coupon.status === "ACTIVE";
-  const activeShopCoupon = useCouponActiveMutation();
-  const deActiveCoupon = useCouponDeActiveMutation();
+  const activeShopCoupon = useCouponShopActiveMutation();
+  const deActiveCoupon = useCouponShopDeActiveMutation();
 
   return (
     <Switch

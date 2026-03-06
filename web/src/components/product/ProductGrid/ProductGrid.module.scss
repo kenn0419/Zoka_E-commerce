@@ -1,10 +1,9 @@
 @use "../../../styles/abstracts/variables" as v;
 
 .productList {
-  width: 100%;
   background: #fff;
   padding: 16px;
-  border-radius: v.$border-radius;
+  border-radius: v.$radius-md;
 }
 
 .title {

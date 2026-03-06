@@ -1,6 +1,5 @@
-// components/Gallery/index.tsx
+import { Image } from "antd";
 import styles from "./ProductGallery.module.scss";
-import type { IVariantImage } from "../../../types/variant-image.type";
 import { useState } from "react";
 
 interface ProductGalleryProps {
@@ -10,7 +9,7 @@ export default function ProductGallery({ images }: ProductGalleryProps) {
   const [activeImage, setActiveImage] = useState(0);
   return (
     <div className={styles.gallery}>
-      <img src={images[activeImage].imageUrl} className={styles.mainImage} />
+      <Image src={images[activeImage].imageUrl} className={styles.mainImage} />
 
       <div className={styles.thumbList}>
         {images.map((img, i) => (

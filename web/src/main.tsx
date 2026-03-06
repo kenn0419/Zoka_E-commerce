@@ -20,8 +20,8 @@ createRoot(document.getElementById("root")!).render(
   <ConfigProvider
     theme={{
       token: {
-        colorPrimary: "#1677ff",
-        borderRadius: 6,
+        colorPrimary: "#2D1B69",
+        borderRadius: 12,
         fontFamily: "Inter, sans-serif",
       },
     }}
@@ -30,5 +30,5 @@ createRoot(document.getElementById("root")!).render(
     <QueryClientProvider client={queryClient}>
       <App />
     </QueryClientProvider>
-  </ConfigProvider>
+  </ConfigProvider>,
 );

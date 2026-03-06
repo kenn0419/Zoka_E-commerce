@@ -1,10 +1,10 @@
-import { Button, Pagination, Rate, Spin } from "antd";
+import { Button, Pagination, Rate, Skeleton } from "antd";
 import { useState } from "react";
 import { useReviewsQuery } from "../../../queries/review.query";
 import styles from "./ProductReviewSection.module.scss";
 import ReviewItem from "../ReviewItem";
 
-interface Props {
+interface ProductReviewSectionProps {
   avgRating?: number;
   productSlug: string;
 }
@@ -21,7 +21,7 @@ const ratingOptions = [
 export default function ProductReviewSection({
   productSlug,
   avgRating,
-}: Props) {
+}: ProductReviewSectionProps) {
   const [ratingFilter, setRatingFilter] = useState<number | undefined>();
   const [page, setPage] = useState(1);
   const limit = 5;
@@ -41,7 +41,7 @@ export default function ProductReviewSection({
     setRatingFilter(value);
   };
 
-  if (isLoading) return <Spin />;
+  if (isLoading) return <Skeleton active />;
 
   const averageRating = avgRating ?? 0;
   const totalReviews = data?.meta?.totalItems ?? 0;

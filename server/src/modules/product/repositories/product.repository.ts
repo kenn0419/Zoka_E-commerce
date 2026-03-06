@@ -147,6 +147,7 @@ export class ProductRepository {
     return this.prisma.product.findUnique({
       where,
       select: {
+        id: true,
         name: true,
         slug: true,
         thumbnail: true,

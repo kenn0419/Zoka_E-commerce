@@ -34,11 +34,18 @@ const ProductDetailPage = () => {
 
   return (
     <div className={styles.wrapper}>
-      <div className={styles.main}>
-        <ProductGallery images={variant.images} />
+      <div className={styles.container}>
+        <div className={styles.left}>
+          <ProductGallery images={variant.images} />
+        </div>
 
         <div className={styles.right}>
-          <ProductInfo product={product} price={variant.price} />
+          <ProductInfo
+            product={product}
+            originalPrice={variant.originalPrice}
+            displayPrice={variant.displayPrice}
+            isFlashSale={variant.isFlashSale}
+          />
 
           <VariantSelector
             variants={product.variants}
@@ -56,8 +63,8 @@ const ProductDetailPage = () => {
         </div>
       </div>
 
-      <ProductDescription description={product.description} />
       <ShopHeader shop={shop!} isLoading={shopLoading} />
+      <ProductDescription description={product.description} />
       <ProductReviewSection
         avgRating={product.avgRating}
         productSlug={product.slug}

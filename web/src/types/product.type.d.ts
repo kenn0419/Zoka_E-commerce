@@ -20,6 +20,7 @@ interface IProductDetailResponse {
   minPrice: number;
   maxPrice: number;
   hasStock: boolean;
+  sold: number;
   variants: IProductVariantResponse[];
   category: ICategoryResponse;
   shop: IShopResponse;

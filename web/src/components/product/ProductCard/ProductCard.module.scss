@@ -2,21 +2,68 @@
 @use "../../../styles/abstracts/mixin" as m;
 
 .card {
-  border-radius: v.$border-radius;
+  border-radius: v.$radius-lg;
   transition: transform 0.2s;
-  height: 300px;
+  height: 280px;
   &:hover {
     transform: translateY(-4px);
   }
+
+  :global {
+    .ant-card-body {
+      padding: 5px 10px;
+    }
+
+    .ant-card-cover img {
+      width: 100%;
+      height: 180px;
+      object-fit: cover;
+    }
+  }
 }
 
-.name {
-  font-size: 14px;
+.cardBody {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+.title {
+  color: v.$color-accent;
+  font-size: medium;
+  font-weight: 650;
   margin-bottom: 8px;
-  @include m.text-ellipsis(2);
+  display: -webkit-box;
+  -webkit-line-clamp: 1;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .price {
-  color: v.$primary-color;
+  color: v.$color-primary;
   font-weight: 600;
+}
+
+.rating {
+  display: flex;
+  align-items: end;
+  gap: 5px;
+
+  span {
+    font-size: 11px;
+    color: v.$color-primary;
+    font-weight: 600;
+  }
+
+  :global {
+    .ant-rate-star-half,
+    .ant-rate-star-full {
+      color: #00ffc2;
+    }
+
+    .ant-rate-star {
+      margin-inline-end: 5px !important;
+    }
+  }
 }

@@ -4,7 +4,7 @@
 .flashSale {
   background: #fff;
   padding: 16px;
-  border-radius: v.$border-radius;
+  border-radius: v.$radius-md;
 }
 
 .header {
@@ -13,7 +13,7 @@
   margin-bottom: 16px;
 
   h3 {
-    color: v.$primary-color;
+    color: v.$color-primary;
     font-weight: 600;
   }
 }
@@ -29,7 +29,7 @@
 .item {
   background: #fff;
   padding: 12px;
-  border-radius: v.$border-radius;
+  border-radius: v.$radius-md;
   cursor: pointer;
 
   img {
@@ -46,7 +46,7 @@
 }
 
 .price {
-  color: v.$primary-color;
+  color: v.$color-primary;
   font-weight: 600;
   margin: 4px 0;
 }

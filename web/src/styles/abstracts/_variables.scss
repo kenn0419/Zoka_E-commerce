@@ -1,8 +1,20 @@
-$primary-color: #ee4d2d;
-$text-color: #333;
-$text-white: #fff;
-$bg-gray: #f5f5f5;
-$font-size-base: 16px;
-$font-weight-bold: 600;
-$padding-base: 24px;
-$border-radius: 4px;
+$color-primary: #2d1b69;
+$color-secondary: #00ffc2;
+$color-accent: #1677ff;
+
+$bg-light: #f5f3ff;
+$bg-dark: #0f0a1f;
+
+$text-primary: #1f2937;
+$text-secondary: #64748b;
+
+$radius-sm: 6px;
+$radius-md: 12px;
+$radius-lg: 28px;
+
+$shadow-soft: 0 4px 12px rgba(0, 0, 0, 0.08);
+$shadow-glow: 0 0 20px rgba(0, 255, 194, 0.4);
+
+$width-destop: 1400px;
+$width-tablet: 800px;
+$width-mobile: 500px;

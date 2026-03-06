@@ -12,7 +12,7 @@ import { Role } from "../../../utils/constant.util";
 
 const { Text } = Typography;
 
-export default function Signin() {
+export default function SigninPage() {
   const navigate = useNavigate();
   const { user } = useAuthStore();
   const signinMutation = useSigninMutation();

@@ -1,3 +1,5 @@
+@use "../../../styles/abstracts/variables" as v;
+
 .variant {
   display: flex;
   flex-direction: column;
@@ -22,12 +24,12 @@
   cursor: pointer;
 
   &:hover {
-    border-color: #ee4d2d;
-    color: #ee4d2d;
+    border-color: v.$color-primary;
+    color: v.$color-primary;
   }
 }
 
 .active {
-  border-color: #ee4d2d;
-  color: #ee4d2d;
+  border-color: v.$color-primary;
+  color: v.$color-primary;
 }

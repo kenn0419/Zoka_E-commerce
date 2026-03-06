@@ -335,9 +335,12 @@ export class ProductService {
         flashSale: { status: FlashSaleStatus.ACTIVE },
       },
     });
-
+    const sold = await this.prisma.orderItem.aggregate({
+      _sum: { quantity: true },
+      where: { productId: product.id },
+    });
     const flashSaleMap = new Map<string, (typeof flashSales)[number]>();
-    flashSaleMap.forEach((item) => flashSaleMap.set(item.variantId, item));
+    flashSales.forEach((item) => flashSaleMap.set(item.variantId, item));
 
     const variants = product.variants.map((variant) => {
       const flashSale = flashSaleMap.get(variant.id);
@@ -349,6 +352,7 @@ export class ProductService {
           displayPrice: variant.price,
           isFlashSale: false,
           stock: variant.stock,
+          sold: sold._sum.quantity ?? 0,
         };
       }
 
@@ -358,10 +362,12 @@ export class ProductService {
         displayPrice: flashSale.salePrice,
         isFlashSale: true,
         stock: flashSale.quantity - flashSale.sold,
+        sold: sold._sum.quantity ?? 0,
       };
     });
     return {
       ...product,
+      sold: sold._sum.quantity ?? 0,
       variants,
     };
   }

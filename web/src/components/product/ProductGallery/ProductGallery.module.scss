@@ -1,11 +1,14 @@
+@use "../../../styles/abstracts/variables" as v;
+
 .gallery {
   display: flex;
   flex-direction: column;
 }
 
 .mainImage {
-  width: 100%;
-  border: 1px solid #eee;
+  min-height: 100%;
+  object-fit: cover;
+  border-radius: v.$radius-md;
 }
 
 .thumbList {
@@ -20,11 +23,11 @@
     cursor: pointer;
 
     &:hover {
-      border-color: #ee4d2d;
+      border-color: v.$color-primary;
     }
   }
 }
 
 .active {
-  border-color: #ee4d2d !important;
+  border-color: v.$color-primary !important;
 }

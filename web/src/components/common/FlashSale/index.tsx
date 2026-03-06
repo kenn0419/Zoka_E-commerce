@@ -1,16 +1,15 @@
 import { Row, Col, Progress } from "antd";
 import { useEffect, useState } from "react";
 import styles from "./FlashSale.module.scss";
-import type { IProductResponse } from "../../../types/product.type";
 
-const flashSaleProducts: IProductResponse[] = Array.from({ length: 6 }).map(
-  (_, i) => ({
-    id: i,
-    name: `Flash Sale ${i + 1}`,
-    price: 99000 + i * 20000,
-    imageUrl: "https://via.placeholder.com/200",
-  })
-);
+const flashSaleProducts: IProductDetailResponse[] = Array.from({
+  length: 6,
+}).map((_, i) => ({
+  id: i,
+  name: `Flash Sale ${i + 1}`,
+  price: 99000 + i * 20000,
+  imageUrl: "https://via.placeholder.com/200",
+}));
 
 const FLASH_SALE_END_TIME = new Date().getTime() + 2 * 60 * 60 * 1000;
 

@@ -9,6 +9,7 @@ import { RbacModule } from '../rbac/rbac.module';
 import { ConfigModule } from '@nestjs/config';
 import { ShopModule } from '../shop/shop.module';
 import { VariantImageRepository } from './repositories/variant-image.repository';
+import { OrderModule } from '../order/order.module';
 
 @Module({
   imports: [

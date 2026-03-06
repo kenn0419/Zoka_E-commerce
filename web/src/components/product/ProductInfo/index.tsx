@@ -1,21 +1,38 @@
+import { Rate } from "antd";
 import styles from "./ProductInfo.module.scss";
-import type { IProductDetailResponse } from "../../../types/product.type";
 
 interface ProductInfoProps {
   product: IProductDetailResponse;
-  price: number;
+  originalPrice: number;
+  displayPrice: number;
+  isFlashSale: boolean;
 }
 
-export default function ProductInfo({ product, price }: ProductInfoProps) {
+export default function ProductInfo({
+  product,
+  originalPrice,
+  displayPrice,
+  isFlashSale,
+}: ProductInfoProps) {
   return (
     <div className={styles.info}>
       <h1 className={styles.name}>{product.name}</h1>
-
-      <div className={styles.meta}>
-        ⭐ {product.avgRating} | Đã bán {1}
+      <div className={styles.rating}>
+        <Rate value={product.avgRating} />
+        <span>{`(${product.avgRating})`}</span>
       </div>
 
-      <div className={styles.price}>₫{price.toLocaleString()}</div>
+      <div className={styles.price}>
+        {isFlashSale && (
+          <span className={styles.old}>{originalPrice.toLocaleString()}</span>
+        )}
+        <span className={styles.new}>{displayPrice.toLocaleString()}</span>
+        {isFlashSale && (
+          <span className={styles.rateDifference}>
+            {Math.round((displayPrice / originalPrice) * 100)}% savings
+          </span>
+        )}
+      </div>
     </div>
   );
 }

@@ -1,7 +1,7 @@
 import { faker } from '@faker-js/faker';
 import * as bcrypt from 'bcrypt';
 import { SlugifyUtil } from '../../src/common/utils/slugify.util';
-import { PrismaClient } from '../../generated/prisma';
+import { PrismaClient, UserStatus } from '../../generated/prisma';
 
 export async function seedUsers(prisma: PrismaClient) {
   console.log('→ Seeding users...');
@@ -25,8 +25,7 @@ export async function seedUsers(prisma: PrismaClient) {
       slug: SlugifyUtil.createSlug('admin'),
       phone: '076259919',
       hashedPassword: bcrypt.hashSync('123123az', 10),
-      address: '',
-      status: 'ACTIVE',
+      status: UserStatus.ACTIVE,
       avatarUrl: faker.image.avatar(),
     },
   });
@@ -55,8 +54,7 @@ export async function seedUsers(prisma: PrismaClient) {
     slug: string;
     phone: string;
     hashedPassword: string;
-    address: string;
-    status: string;
+    status: UserStatus;
     avatarUrl: string;
   }[] = [];
 
@@ -74,8 +72,7 @@ export async function seedUsers(prisma: PrismaClient) {
       slug,
       phone,
       hashedPassword: bcrypt.hashSync('123123az', 10),
-      address: faker.location.streetAddress(),
-      status: 'ACTIVE',
+      status: UserStatus.ACTIVE,
       avatarUrl: faker.image.avatar(),
     });
   }

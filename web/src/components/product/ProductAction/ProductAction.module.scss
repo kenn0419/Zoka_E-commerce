@@ -1,7 +1,4 @@
-.action {
-  // display: flex;
-  gap: 12px;
-}
+@use "../../../styles/abstracts/variables" as v;
 
 .cart,
 .buy {
@@ -13,12 +10,12 @@
 
 .cart {
   flex: 1;
-  border-color: #ee4d2d;
-  color: #ee4d2d;
+  border-color: v.$color-primary;
+  color: v.$color-primary;
   margin-right: 20px;
 }
 
 .buy {
   flex: 1;
-  background: #ee4d2d;
+  background: v.$color-primary;
 }

@@ -1,0 +1,119 @@
+.card {
+  position: relative;
+  height: 480px;
+  border-radius: 20px;
+  overflow: hidden;
+  cursor: pointer;
+  box-shadow: 0 25px 60px rgba(0, 0, 0, 0.08);
+}
+
+.background {
+  position: absolute;
+  inset: 0;
+  background-size: cover;
+  background-position: center;
+  transition: transform 0.7s ease;
+}
+
+.card:hover .background {
+  transform: scale(1.1);
+}
+
+.gradientOverlay {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    to top,
+    rgba(76, 29, 149, 0.95),
+    rgba(76, 29, 149, 0.3),
+    transparent
+  );
+}
+
+.content {
+  position: absolute;
+  bottom: 0;
+  padding: 32px;
+  z-index: 2;
+  transition: transform 0.4s ease;
+
+  h3 {
+    color: #fff;
+    font-size: 28px;
+    font-weight: 800;
+  }
+
+  p {
+    color: #ddd;
+    font-size: 14px;
+    opacity: 0;
+    transition: opacity 0.3s;
+  }
+}
+
+.card:hover .content {
+  transform: translateY(-10px);
+}
+
+.card:hover .content p {
+  opacity: 1;
+}
+
+.tagRow {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: #13ec80;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 2px;
+  margin-bottom: 8px;
+}
+
+.subOverlay {
+  position: absolute;
+  inset: 0;
+  backdrop-filter: blur(14px);
+  background: rgba(255, 255, 255, 0.08);
+  opacity: 0;
+  transform: translateY(10px);
+  transition: all 0.4s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.card:hover .subOverlay {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.subContent {
+  text-align: center;
+  color: #fff;
+
+  ul {
+    list-style: none;
+    padding: 0;
+    margin: 20px 0;
+
+    li {
+      margin: 10px 0;
+
+      a {
+        color: #fff;
+        font-weight: 600;
+        transition: 0.2s;
+
+        &:hover {
+          color: #13ec80;
+        }
+      }
+    }
+  }
+}
+
+.bigIcon {
+  font-size: 40px;
+  color: #13ec80;
+}

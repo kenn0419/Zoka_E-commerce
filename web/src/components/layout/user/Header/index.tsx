@@ -7,97 +7,109 @@ import {
 } from "@ant-design/icons";
 import styles from "./Header.module.scss";
 import { useAuthStore } from "../../../../store/auth.store";
-import logo from "../../../../assets/images/logo-zoka-ecommerce.png";
 import { Link, useNavigate } from "react-router-dom";
 import { PATH } from "../../../../utils/path.util";
 import SearchBar from "../../../common/SearchBar";
 import { useLogoutMutation } from "../../../../queries/auth.query";
 import { useCartSummaryQuery } from "../../../../queries/cart.query";
+import { useMemo, useCallback } from "react";
 
 export default function Header() {
   const { user } = useAuthStore();
-  const { data: summary } = useCartSummaryQuery(!!user);
   const navigate = useNavigate();
   const logoutMutation = useLogoutMutation();
+  const { data: summary } = useCartSummaryQuery(!!user);
 
-  const handleMenuClick = ({ key }: { key: string }) => {
-    if (key === "logout") {
-      logoutMutation.mutate(undefined, {
-        onSuccess: () => {
-          message.success("Đã đăng xuất");
-          navigate(`/${PATH.USER}`);
-        },
-        onError: () => {
-          message.error("Đăng xuất thất bại");
-        },
-      });
-    } else if (key === "profile") {
-      navigate(`/${PATH.PROFILE}`);
-    } else if (key === "orders") {
-      navigate(`/${PATH.MANAGE_ORDER}`);
-    } else {
-      navigate(`/${PATH.ADMIN}`);
-    }
+  const isAdmin = user?.roles?.some((role) => role.name === "admin");
+
+  const handleLogout = useCallback(() => {
+    logoutMutation.mutate(undefined, {
+      onSuccess: () => {
+        message.success("Đã đăng xuất");
+        navigate("/");
+      },
+    });
+  }, [logoutMutation, navigate]);
+
+  const handleMenuClick = useCallback(
+    ({ key }: { key: string }) => {
+      const routeMap: Record<string, string | (() => void)> = {
+        profile: `/${PATH.PROFILE}`,
+        orders: `/${PATH.MANAGE_ORDER}`,
+        admin: `/${PATH.ADMIN}`,
+        logout: handleLogout,
+      };
+
+      const action = routeMap[key];
+      if (typeof action === "function") action();
+      else if (action) navigate(action);
+    },
+    [navigate, handleLogout],
+  );
+
+  const menuItems = useMemo(
+    () => [
+      { key: "profile", label: "Tài khoản" },
+      ...(isAdmin ? [{ key: "admin", label: "Quản lý hệ thống" }] : []),
+      { key: "orders", label: "Đơn hàng của tôi" },
+      { key: "logout", label: "Đăng xuất" },
+    ],
+    [isAdmin],
+  );
+
+  const handleClickLogo = () => {
+    navigate(`/${PATH.USER}`);
   };
-
-  const items = [
-    { key: "profile", label: "Tài khoản" },
-    ...(user?.roles?.some((item) => item.name === "admin")
-      ? [{ key: "admin", label: "Quản lý hệ thống" }]
-      : []),
-    { key: "orders", label: "Đơn hàng của tôi" },
-    { key: "logout", label: "Đăng xuất" },
-  ];
 
   return (
     <Layout.Header className={styles.header}>
-      <Link to={`/${PATH.USER}`} className={styles.logo}>
-        <img src={logo} />
-      </Link>
+      <div className={styles.container}>
+        <div onClick={handleClickLogo} className={styles.logo}>
+          <div className={styles.icon}>🚀</div>
+          <h1>Zoka</h1>
+        </div>
 
-      <SearchBar />
+        <div className={styles.searchWrapper}>
+          <SearchBar />
+        </div>
 
-      <div className={styles.actions}>
-        {user ? (
-          <>
-            <Badge count={summary?.totalItems ?? 0}>
-              <Link to={`/${PATH.CART}`}>
-                <ShoppingCartOutlined className={styles.icon} />
+        <div className={styles.actions}>
+          {user ? (
+            <>
+              <Badge count={summary?.totalItems ?? 0} size="small">
+                <Link to={`/${PATH.CART}`}>
+                  <ShoppingCartOutlined className={styles.icon} />
+                </Link>
+              </Badge>
+
+              <Link to={`/${PATH.SELLER}`}>
+                <ShopOutlined className={styles.icon} />
               </Link>
-            </Badge>
-            <Link to={`/${PATH.SELLER}`}>
-              <ShopOutlined className={styles.icon} />
-            </Link>
-            <Badge count={1}>
-              <Link to={`/${PATH.CART}`}>
+
+              <Badge count={1} size="small">
                 <BellOutlined className={styles.icon} />
+              </Badge>
+
+              <Dropdown
+                menu={{ items: menuItems, onClick: handleMenuClick }}
+                trigger={["click"]}
+                placement="bottomRight"
+              >
+                <UserOutlined className={styles.icon} />
+              </Dropdown>
+            </>
+          ) : (
+            <div className={styles.authActions}>
+              <Link
+                className={styles.signInBtn}
+                to={`/${PATH.AUTH}/${PATH.SIGNIN}`}
+              >
+                <span>Đăng nhập</span>
               </Link>
-            </Badge>
-            <Dropdown
-              menu={{
-                items,
-                onClick: handleMenuClick,
-              }}
-            >
-              <UserOutlined className={styles.icon} />
-            </Dropdown>
-          </>
-        ) : (
-          <>
-            <Link
-              to={`/${PATH.AUTH}/${PATH.SIGNIN}`}
-              className={styles.authLink}
-            >
-              Đăng nhập
-            </Link>
-            <Link
-              to={`/${PATH.AUTH}/${PATH.SIGNUP}`}
-              className={styles.authLink}
-            >
-              Đăng ký
-            </Link>
-          </>
-        )}
+              <Link to={`/${PATH.AUTH}/${PATH.SIGNUP}`}>Đăng ký</Link>
+            </div>
+          )}
+        </div>
       </div>
     </Layout.Header>
   );

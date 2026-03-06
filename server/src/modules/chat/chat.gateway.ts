@@ -9,7 +9,6 @@ import { Server, Socket } from 'socket.io';
 import { UseGuards } from '@nestjs/common';
 import { ChatService } from './chat.service';
 import { SendMessageDto } from './dto/send-message.dto';
-import { WsJwtSessionGuard } from 'src/common/guards/ws-jwt.guard';
 
 // @UseGuards(WsJwtSessionGuard)
 @WebSocketGateway({
@@ -27,10 +26,10 @@ export class ChatGateway {
   }
 
   handleConnection(client: Socket) {
-    // if (!client.data?.userId) {
-    //   client.disconnect();
-    //   return;
-    // }
+    if (!client.data?.userId) {
+      client.disconnect();
+      return;
+    }
 
     console.log('User connected:', client.data.userId);
   }
