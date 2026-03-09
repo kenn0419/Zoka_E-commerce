@@ -1,8 +1,8 @@
 import { Navigate } from "react-router-dom";
 import { PATH } from "../../utils/path.util";
-import { includeRole } from "../../utils/checkRole.util";
 import { useMeQuery } from "../../queries/auth.query";
 import LoadingFallback from "../../components/common/LoadingFallback";
+import { includeRole } from "../../utils/helper.util";
 
 interface ProtectedRouteProps {
   roles: Array<"user" | "shop" | "admin">;

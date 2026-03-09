@@ -2,8 +2,8 @@ import { Navigate } from "react-router-dom";
 import { type JSX } from "react";
 import { PATH } from "../../utils/path.util";
 import { useAuthStore } from "../../store/auth.store";
-import { includeRole } from "../../utils/checkRole.util";
 import { Role } from "../../utils/constant.util";
+import { includeRole } from "../../utils/helper.util";
 
 interface AuthorizeEntryProps {
   children: JSX.Element;

@@ -38,6 +38,23 @@ export class MailService {
     return info;
   }
 
+  async sendForgotPasswordEmail(
+    to: string,
+    subject: string,
+    verifyToken: string,
+  ) {
+    const template = await this.loadAndCompile('forgot_password.html');
+    const html = template({ verifyToken });
+    const info = await this.transporter.sendMail({
+      from: process.env.MAIL_FROM_ADDRESS,
+      to,
+      subject,
+      html,
+    });
+    this.logger.log(`Sent email ${info.messageId} => ${to}`);
+    return info;
+  }
+
   private async loadTemplate(name: string): Promise<string> {
     const p = join(
       process.cwd(),

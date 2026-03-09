@@ -17,6 +17,12 @@ interface IAuthVerifyEmailRequest {
   token: string;
 }
 
+interface IAuthResetPasswordRequest {
+  email: string;
+  otp: string;
+  newPassword: string;
+}
+
 interface IAuthResponse {
   accessToken: string;
   refreshToken: string;

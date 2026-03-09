@@ -2,7 +2,6 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useAuthStore } from "../store/auth.store";
 import { authService } from "../services/auth.service";
 import { useEffect } from "react";
-import { useCartStore } from "../store/cart.store";
 import { useSellerStore } from "../store/seller.store";
 import { message } from "antd";
 
@@ -61,17 +60,38 @@ export const useResendVerifyMutation = () =>
 export const useLogoutMutation = () => {
   const queryClient = useQueryClient();
   const resetAuth = useAuthStore((s) => s.reset);
-  const clearCart = useCartStore((s) => s.clearCart);
   const clearCurrentShop = useSellerStore((s) => s.clearCurrentShopId);
 
   return useMutation({
     mutationFn: authService.logout,
     onSuccess: () => {
       resetAuth();
-      clearCart();
       clearCurrentShop();
-
       queryClient.clear();
     },
+  });
+};
+
+export const useSendOtpMutation = () => {
+  return useMutation({
+    mutationFn: authService.forgotPassword,
+    onSuccess: () => {
+      message.success("Verification code sent!");
+    },
+    onError: (err: any) => {
+      message.error(err?.response?.data?.message || "Send OTP failed");
+    },
+  });
+};
+
+export const useResendOtpMutation = () => {
+  return useMutation({
+    mutationFn: authService.resendForgotPasswordOtp,
+  });
+};
+
+export const useResetPasswordMutation = () => {
+  return useMutation({
+    mutationFn: authService.resetPassword,
   });
 };

@@ -17,6 +17,7 @@ export const PATH = {
   SIGNUP: "signup",
   VERIFY_ACCOUNT: "verify-account",
   FORGOT_PASSWORD: "forgot-password",
+  RESET_PASSWORD: "reset-password",
   ERROR: "error",
   UNAUTHORIZED: "unauthorized",
   NOT_FOUND: "not-found",

@@ -7,6 +7,8 @@ import AuthorizeEntry from "./guards/AuthorizeEntry";
 const SigninPage = lazy(() => import("../pages/auth/Signin"));
 const SignupPage = lazy(() => import("../pages/auth/Signup"));
 const VerifyAccountPage = lazy(() => import("../pages/auth/VerifyAccount"));
+const ForgotPasswordPage = lazy(() => import("../pages/auth/ForgotPassword"));
+const ResetPasswordPage = lazy(() => import("../pages/auth/ResetPassword"));
 
 export const AuthRoutes: RouteObject = {
   path: PATH.AUTH,
@@ -19,5 +21,7 @@ export const AuthRoutes: RouteObject = {
     { path: PATH.SIGNIN, element: <SigninPage /> },
     { path: PATH.SIGNUP, element: <SignupPage /> },
     { path: PATH.VERIFY_ACCOUNT, element: <VerifyAccountPage /> },
+    { path: PATH.FORGOT_PASSWORD, element: <ForgotPasswordPage /> },
+    { path: PATH.RESET_PASSWORD, element: <ResetPasswordPage /> },
   ],
 };

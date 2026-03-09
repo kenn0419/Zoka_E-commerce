@@ -4,11 +4,11 @@ import { PATH } from "../../../utils/path.util";
 import { useAuthStore } from "../../../store/auth.store";
 import AuthCard from "../../../components/auth/AuthCard";
 import PageHeader from "../../../components/auth/PageHeader";
-import layout from "./../../../layouts/AuthLayout/AuthLayout.module.scss";
+import styles from "./Signin.module.scss";
 import { useSigninMutation } from "../../../queries/auth.query";
 import { useEffect } from "react";
-import { includeRole } from "../../../utils/checkRole.util";
 import { Role } from "../../../utils/constant.util";
+import { includeRole } from "../../../utils/helper.util";
 
 const { Text } = Typography;
 
@@ -53,6 +53,11 @@ export default function SigninPage() {
           <Input.Password size="large" placeholder="••••••••" />
         </Form.Item>
 
+        <div className={styles.forgotPasswordLink}>
+          <Link to={`/${PATH.AUTH}/${PATH.FORGOT_PASSWORD}`}>
+            Quên mật khẩu?
+          </Link>
+        </div>
         <Button
           type="primary"
           htmlType="submit"
@@ -64,7 +69,7 @@ export default function SigninPage() {
         </Button>
       </Form>
 
-      <div className={layout.footer}>
+      <div className={styles.footer}>
         <Text>Chưa có tài khoản? </Text>
         <Link to={`/${PATH.AUTH}/${PATH.SIGNUP}`}>Đăng ký ngay</Link>
       </div>

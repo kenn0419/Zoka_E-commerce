@@ -16,7 +16,7 @@ export const authApi = {
   },
 
   verifyAccount: async (
-    data: IAuthVerifyEmailRequest
+    data: IAuthVerifyEmailRequest,
   ): Promise<IApiResponse<IAuthResponse>> => {
     return await instance.post("/auth/verify-email", data);
   },
@@ -31,5 +31,21 @@ export const authApi = {
 
   logout: async (): Promise<IApiResponse<null>> => {
     return await instance.post("/auth/logout");
+  },
+
+  forgotPassword: async (email: string): Promise<IApiResponse<null>> => {
+    return await instance.post("/auth/forgot-password", { email });
+  },
+
+  resendForgotPasswordOtp: async (
+    email: string,
+  ): Promise<IApiResponse<null>> => {
+    return await instance.post("/auth/resend-forgot-password", { email });
+  },
+
+  resetPassword: async (
+    data: IAuthResetPasswordRequest,
+  ): Promise<IApiResponse<null>> => {
+    return await instance.patch("/auth/reset-password", data);
   },
 };

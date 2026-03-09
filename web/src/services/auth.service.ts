@@ -29,9 +29,19 @@ export const authService = {
     await authApi.resendVerifyEmail(email);
   },
 
+  async forgotPassword(email: string) {
+    await authApi.forgotPassword(email);
+  },
+
+  async resendForgotPasswordOtp(email: string) {
+    await authApi.resendForgotPasswordOtp(email);
+  },
+
+  async resetPassword(data: IAuthResetPasswordRequest) {
+    await authApi.resetPassword(data);
+  },
+
   async logout() {
     await authApi.logout();
-
-    return true;
   },
 };

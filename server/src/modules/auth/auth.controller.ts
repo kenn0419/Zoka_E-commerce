@@ -4,6 +4,7 @@ import {
   Get,
   HttpCode,
   HttpStatus,
+  Patch,
   Post,
   Req,
   Res,
@@ -14,14 +15,14 @@ import { SignupDto } from './dto/signup.dto';
 import { VerifyEmailDto } from './dto/verify-email.dto';
 import { Serialize } from 'src/common/decorators/serialize.decorator';
 import { UserResponseDto } from '../user/dto/user-response.dto';
-import { AuthResponseDto } from './dto/auth-response.dto';
 import { SigninDto } from './dto/signin.dto';
 import { JwtSessionGuard } from '../../common/guards/jwt-session.guard';
 import { RefreshTokenDto } from './dto/refresh-token.dto';
 import type { Request, Response } from 'express';
 import { sendTokenToCookie } from 'src/common/utils/send-token-to-cookie.util';
 import ms from 'ms';
-import { ResendDto } from './dto/resend.dto';
+import { AuthResponseDto } from './responses/auth.response.dto';
+import { ResetPasswordDto } from './dto/reset-password.dto';
 
 @Controller('auth')
 export class AuthController {
@@ -41,11 +42,36 @@ export class AuthController {
     return this.authService.verifyAccount(data);
   }
 
-  @Post('/resend-email')
+  @Post('/resend-verify-email')
   @HttpCode(HttpStatus.OK)
   @Serialize(null, 'Resend verify email successfully!')
-  resendVerifyEmail(@Body() data: ResendDto) {
-    return this.authService.resendVerificationEmail(data.email);
+  resendVerifyEmail(@Body('email') email: string) {
+    return this.authService.resendVerificationEmail(email);
+  }
+
+  @Post('/forgot-password')
+  @HttpCode(HttpStatus.OK)
+  @Serialize(null, 'Sent code to your email.')
+  forgotPassword(@Body('email') email: string) {
+    return this.authService.forgotPassword(email);
+  }
+
+  @Post('/resend-forgot-password')
+  @HttpCode(HttpStatus.OK)
+  @Serialize(null, 'Resend code to your email.')
+  resendForgotPassword(@Body('email') email: string) {
+    return this.authService.resendForgotPasswordOtp(email);
+  }
+
+  @Patch('/reset-password')
+  @HttpCode(HttpStatus.OK)
+  @Serialize(null, 'Reset password successfully.')
+  resetPassword(@Body() data: ResetPasswordDto) {
+    return this.authService.resetPassword(
+      data.email,
+      data.otp,
+      data.newPassword,
+    );
   }
 
   @Post('/signin')
@@ -97,26 +123,6 @@ export class AuthController {
     return this.authService.getCurrent(req.user.sub);
   }
 
-  @Post('/logout')
-  @UseGuards(JwtSessionGuard)
-  @HttpCode(HttpStatus.OK)
-  @Serialize(null, 'Logout successfully!')
-  async logout(@Req() req, @Res({ passthrough: true }) res: Response) {
-    await this.authService.logout(req.user.sessionId);
-    res.clearCookie('accessToken', {
-      secure: true,
-      sameSite: 'strict',
-    });
-
-    res.clearCookie('refreshToken', {
-      secure: true,
-      sameSite: 'strict',
-      path: '/api/v1/auth/refresh',
-    });
-
-    return null;
-  }
-
   @Post('/refresh')
   @HttpCode(HttpStatus.OK)
   @Serialize(AuthResponseDto, 'Refresh token successfully!')
@@ -154,11 +160,31 @@ export class AuthController {
     return result;
   }
 
+  @Post('/logout')
+  @UseGuards(JwtSessionGuard)
+  @HttpCode(HttpStatus.OK)
+  @Serialize(null, 'Logout successfully!')
+  async logout(@Req() req, @Res({ passthrough: true }) res: Response) {
+    await this.authService.logout(req.user.sessionId);
+    res.clearCookie('accessToken', {
+      secure: true,
+      sameSite: 'strict',
+    });
+
+    res.clearCookie('refreshToken', {
+      secure: true,
+      sameSite: 'strict',
+      path: '/api/v1/auth/refresh',
+    });
+
+    return null;
+  }
+
   @Post('logout-all')
   @UseGuards(JwtSessionGuard)
   @HttpCode(HttpStatus.OK)
   @Serialize(null, 'Logout all device successfully!')
-  async logoutAll(@Req() req, @Res() res: Response) {
+  async logoutAll(@Req() req, @Res({ passthrough: true }) res: Response) {
     await this.authService.logoutAll(req.user.sub);
 
     res.clearCookie('accessToken', {

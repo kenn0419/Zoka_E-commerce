@@ -31,3 +31,16 @@ export function getStatusColor(status: string) {
       return "default";
   }
 }
+
+export const includeRole = (user: any, role: string) => {
+  return user?.roles?.some((item: any) => item.name === role);
+};
+
+export const formatTime = (seconds: number) => {
+  const minutes = Math.floor(seconds / 60);
+  const secs = seconds % 60;
+
+  return `${minutes.toString().padStart(2, "0")}:${secs
+    .toString()
+    .padStart(2, "0")}`;
+};
