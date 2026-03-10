@@ -1,4 +1,5 @@
 import { Expose, Transform, Type } from 'class-transformer';
+import { UserGender } from 'generated/prisma';
 import { RoleResponseDto } from 'src/modules/rbac/dto/role-response.dto';
 
 export class UserResponseDto {
@@ -22,6 +23,12 @@ export class UserResponseDto {
 
   @Expose()
   avatarUrl: string;
+
+  @Expose()
+  gender: UserGender;
+
+  @Expose()
+  birthday: Date;
 
   @Expose()
   status: string;

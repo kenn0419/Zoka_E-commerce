@@ -1,8 +1,8 @@
 import { Layout } from "antd";
 import { Outlet } from "react-router-dom";
-import Sidebar from "../../components/layout/admin/Sidebar";
+import Sidebar from "../../components/layout/AdminLayout/Sidebar";
 import styles from "./AdminLayout.module.scss";
-import Header from "../../components/layout/admin/Header";
+import Header from "../../components/layout/AdminLayout/Header";
 
 const { Content } = Layout;
 

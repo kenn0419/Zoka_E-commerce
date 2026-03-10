@@ -1,0 +1,62 @@
+.card {
+  border-radius: 12px;
+  position: relative;
+  transition: all 0.2s;
+  cursor: pointer;
+  &:hover {
+    border-color: #2beead;
+  }
+}
+
+.default {
+  border: 2px solid #2beead;
+}
+
+.defaultTag {
+  position: absolute;
+  top: 16px;
+  right: 16px;
+}
+
+.header {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+}
+
+.icon {
+  width: 40px;
+  height: 40px;
+  background: rgba(43, 238, 173, 0.15);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 8px;
+  font-size: 18px;
+  color: #2beead;
+}
+
+.info h3 {
+  font-size: 16px;
+  font-weight: 600;
+}
+
+.info p {
+  font-size: 13px;
+  color: #888;
+}
+
+.address {
+  margin-top: 16px;
+  padding-top: 12px;
+  border-top: 1px solid #eee;
+  font-size: 14px;
+  line-height: 1.6;
+}
+
+.footer {
+  margin-top: 16px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}

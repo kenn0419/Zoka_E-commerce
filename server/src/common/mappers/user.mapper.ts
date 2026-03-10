@@ -8,6 +8,8 @@ export class UserMapper {
       phone: user.phone,
       address: user.address,
       avatarUrl: user.avatarUrl,
+      gender: user.gender,
+      birthday: user.birthday,
       status: user.status,
       roles: (user.roles ?? []).map((ur: any) => {
         const role = ur.role ?? ur;

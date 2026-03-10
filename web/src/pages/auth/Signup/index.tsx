@@ -37,6 +37,21 @@ const fields = [
     type: "text",
   },
   {
+    label: "Gender",
+    name: "gender",
+    type: "select",
+    options: [
+      { label: "Male", value: "MALE" },
+      { label: "Female", value: "FEMALE" },
+      { label: "Other", value: "OTHER" },
+    ],
+  },
+  {
+    label: "Birthday",
+    name: "birthday",
+    type: "date",
+  },
+  {
     label: "Mật khẩu",
     name: "password",
     placeholder: "••••••••",
@@ -65,7 +80,7 @@ export default function Signup() {
       },
       onError: (err: any) => {
         message.error(
-          err.response?.data?.message || "Đã xảy ra lỗi. Vui lòng thử lại!"
+          err.response?.data?.message || "Đã xảy ra lỗi. Vui lòng thử lại!",
         );
       },
     });

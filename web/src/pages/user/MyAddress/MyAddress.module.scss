@@ -1,0 +1,53 @@
+.container {
+  padding: 24px;
+  max-width: 1000px;
+  margin: auto;
+}
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  margin-bottom: 32px;
+
+  h1 {
+    font-size: 28px;
+    font-weight: 700;
+  }
+
+  p {
+    color: #777;
+  }
+}
+
+.addCard {
+  height: 200px;
+  border: 2px dashed #ddd;
+  border-radius: 12px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+  transition: 0.2s;
+
+  &:hover {
+    border-color: #2beead;
+    background: rgba(43, 238, 173, 0.05);
+  }
+
+  svg {
+    font-size: 28px;
+  }
+
+  h3 {
+    font-size: 16px;
+    font-weight: 600;
+  }
+
+  p {
+    font-size: 13px;
+    color: #777;
+  }
+}

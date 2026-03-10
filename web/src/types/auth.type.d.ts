@@ -10,6 +10,8 @@ interface IAuthSignupRequest {
   confirmPassword: string;
   phone: string;
   address: string;
+  birthday: string;
+  gender: string;
 }
 
 interface IAuthVerifyEmailRequest {

@@ -1,4 +1,13 @@
-import { IsEmail, IsNotEmpty, IsPhoneNumber, MinLength } from 'class-validator';
+import {
+  IsDateString,
+  IsEmail,
+  IsEnum,
+  IsNotEmpty,
+  IsOptional,
+  IsPhoneNumber,
+  MinLength,
+} from 'class-validator';
+import { UserGender } from 'generated/prisma';
 
 export class UpdateUserDto {
   @IsNotEmpty()
@@ -20,4 +29,12 @@ export class UpdateUserDto {
     message: 'Address must be greater than or equal to 10 characters',
   })
   address: string;
+
+  @IsOptional()
+  @IsEnum(UserGender)
+  gender: UserGender;
+
+  @IsNotEmpty()
+  @IsDateString()
+  birthday: string;
 }

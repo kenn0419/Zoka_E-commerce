@@ -17,7 +17,7 @@ export default function AuthorizeEntry({ children }: AuthorizeEntryProps) {
       return <Navigate to={`/${PATH.ADMIN}`} replace />;
     if (includeRole(user, Role.SHOP))
       return <Navigate to={`/${PATH.SELLER}`} replace />;
-    return <Navigate to={`/${PATH.USER}`} replace />;
+    return <Navigate to={`/${PATH.HOME}`} replace />;
   }
 
   return children;

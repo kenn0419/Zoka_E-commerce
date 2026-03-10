@@ -32,7 +32,7 @@ export default function SigninPage() {
     } else if (includeRole(user, Role.SHOP)) {
       navigate(`/${PATH.SELLER}`, { replace: true });
     } else {
-      navigate(`/${PATH.USER}`, { replace: true });
+      navigate(`/${PATH.HOME}`, { replace: true });
     }
   }, [user, navigate]);
 

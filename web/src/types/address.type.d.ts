@@ -4,6 +4,7 @@ interface IAddressResponse {
   receiverName: string;
   receiverPhone: string;
   addressText: string;
+  isDefault: boolean;
 }
 
 interface IAddressCreationRequest {

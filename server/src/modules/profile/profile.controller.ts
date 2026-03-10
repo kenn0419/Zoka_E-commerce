@@ -31,6 +31,7 @@ export class ProfileController {
   }
 
   @Patch()
+  @Serialize(UserResponseDto, 'Change password successfully!')
   updateProfile(@Req() req, @Body() updateProfileDto: UpdateProfileDto) {
     return this.profileService.updateProfile(req.user.sub, updateProfileDto);
   }

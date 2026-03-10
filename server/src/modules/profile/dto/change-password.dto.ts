@@ -3,13 +3,19 @@ import { IsNotEmpty, MinLength } from 'class-validator';
 export class ChangePasswordDto {
   @IsNotEmpty()
   @MinLength(8, {
-    message: 'Password must be greater than or equals to 8 characters',
+    message: 'Current password must be greater than or equals to 8 characters',
   })
-  oldPassword: string;
+  currentPassword: string;
 
   @IsNotEmpty()
   @MinLength(8, {
-    message: 'Password must be greater than or equals to 8 characters',
+    message: 'New password must be greater than or equals to 8 characters',
   })
   newPassword: string;
+
+  @IsNotEmpty()
+  @MinLength(8, {
+    message: 'Confirm password must be greater than or equals to 8 characters',
+  })
+  newConfirmPassword: string;
 }

@@ -6,6 +6,8 @@ interface IUserResponse {
   phone: string;
   address: string;
   avatarUrl: string;
+  birthday: string;
+  gender: string;
   status: string;
   roles?: IRoleResponse[];
 }

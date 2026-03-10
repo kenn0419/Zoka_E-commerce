@@ -2,8 +2,8 @@ import { Layout } from "antd";
 import { Outlet } from "react-router-dom";
 import styles from "./ShopLayout.module.scss";
 
-import Sidebar from "../../components/layout/shop/Sidebar";
-import Header from "../../components/layout/shop/Header";
+import Sidebar from "../../components/layout/ShopLayout/Sidebar";
+import Header from "../../components/layout/ShopLayout/Header";
 
 const { Sider, Content } = Layout;
 

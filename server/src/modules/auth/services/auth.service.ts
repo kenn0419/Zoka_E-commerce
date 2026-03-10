@@ -20,7 +20,7 @@ import { VerifyEmailDto } from '../dto/verify-email.dto';
 import { SlugifyUtil } from 'src/common/utils/slugify.util';
 import { UserMapper } from 'src/common/mappers/user.mapper';
 import { AddressRepository } from 'src/modules/address/address.repository';
-import { UserStatus } from 'generated/prisma';
+import { UserGender, UserStatus } from 'generated/prisma';
 import { Role } from 'src/common/enums/role.enum';
 
 @Injectable()
@@ -47,7 +47,6 @@ export class AuthService {
   ) {}
 
   async signup(dto: SignupDto) {
-    console.log(dto);
     if (dto.password !== dto.confirmPassword) {
       throw new BadRequestException('Password confirmation mismatch');
     }
@@ -166,6 +165,7 @@ export class AuthService {
       await this.redis.set(key, JSON.stringify(data), this.EMAIL_TTL);
       throw new BadRequestException('Invalid OTP');
     }
+    const defaultAvatar = this.config.get<string>('DEFAULT_AVATAR_URL');
 
     const user = await this.userRepo.create({
       fullName: data.fullName,
@@ -173,7 +173,10 @@ export class AuthService {
       phone: data.phone,
       hashedPassword: data.hashedPassword,
       slug: SlugifyUtil.createSlug(data.fullName),
+      birthday: data.birthday,
+      gender: data.gender ?? UserGender.OTHER,
       status: UserStatus.ACTIVE,
+      avatarUrl: defaultAvatar,
     });
 
     await this.addressRepo.createAddress(
@@ -181,6 +184,7 @@ export class AuthService {
       data.address,
       data.fullName,
       data.phone,
+      true,
     );
 
     await this.rbacService.assignRole(user.id, Role.USER);

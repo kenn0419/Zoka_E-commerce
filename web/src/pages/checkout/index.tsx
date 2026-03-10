@@ -35,7 +35,7 @@ export default function CheckoutPage() {
 
   useEffect(() => {
     if (!cartLoading && cart?.items && cart.items.length === 0) {
-      navigate(`/${PATH.CART}`);
+      navigate(`/${PATH.USER}/${PATH.CART}`);
     }
   }, [cart, cartLoading, navigate]);
 

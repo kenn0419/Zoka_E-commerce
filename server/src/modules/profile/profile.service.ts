@@ -21,8 +21,11 @@ export class ProfileService {
     return this.userRepo.findUnique({ id });
   }
 
-  async updateProfile(id: string, updateProfileDto: UpdateProfileDto) {
-    return await this.userRepo.updateUser({ id }, updateProfileDto);
+  async updateProfile(id: string, data: UpdateProfileDto) {
+    return await this.userRepo.updateUser(
+      { id },
+      { ...data, birthday: new Date(data.birthday) },
+    );
   }
 
   async changePassword(id: string, data: ChangePasswordDto) {
@@ -32,11 +35,18 @@ export class ProfileService {
     }
 
     const isMatch = await bcrypt.compare(
-      data.oldPassword,
+      data.currentPassword,
       exisedUser.hashedPassword,
     );
     if (!isMatch) {
-      throw new BadRequestException('Password is incorrect');
+      throw new BadRequestException('Current password is incorrect');
+    }
+
+    const isConfirmMatch = data.newConfirmPassword === data.newPassword;
+    if (!isConfirmMatch) {
+      throw new BadRequestException(
+        'Confirm password must be match to new password',
+      );
     }
 
     const hashedPassword = await bcrypt.hash(

@@ -32,7 +32,7 @@ export default function CartSummary() {
 
     await updateSelectionMutation.mutateAsync(selectedIds);
 
-    navigate(`/${PATH.CHECKOUT}`);
+    navigate(`/${PATH.USER}/${PATH.CHECKOUT}`);
   };
 
   return (

@@ -1,4 +1,11 @@
-import { IsOptional, IsPhoneNumber, IsString } from 'class-validator';
+import {
+  IsDateString,
+  IsEnum,
+  IsOptional,
+  IsPhoneNumber,
+  IsString,
+} from 'class-validator';
+import { UserGender } from 'generated/prisma';
 
 export class UpdateProfileDto {
   @IsOptional()
@@ -12,4 +19,12 @@ export class UpdateProfileDto {
   @IsOptional()
   @IsString()
   address?: string;
+
+  @IsOptional()
+  @IsEnum(UserGender)
+  gender: UserGender;
+
+  @IsOptional()
+  @IsDateString()
+  birthday: string;
 }

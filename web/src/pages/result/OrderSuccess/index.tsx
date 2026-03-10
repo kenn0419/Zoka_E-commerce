@@ -27,7 +27,7 @@ export default function OrderSuccessPage() {
             Xem đơn hàng
           </Button>
 
-          <Button size="large" onClick={() => navigate(`/${PATH.USER}`)}>
+          <Button size="large" onClick={() => navigate(`/${PATH.HOME}`)}>
             Tiếp tục mua sắm
           </Button>
         </div>

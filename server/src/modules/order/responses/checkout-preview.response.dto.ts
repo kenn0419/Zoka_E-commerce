@@ -1,7 +1,7 @@
 import { Expose, Type } from 'class-transformer';
 import { ValidateNested } from 'class-validator';
 
-import { AddressResponseDto } from 'src/modules/address/dto/address-repsonse.dto';
+import { AddressResponseDto } from 'src/modules/address/responses/address.repsonse.dto';
 import { CheckoutPreviewShopResponseDto } from './checkout-preview-shop-response.dto';
 import { CheckoutPreviewSummaryResponseDto } from './checkout-preview-summary.response.dto';
 import { CheckoutPreviewCouponResponseDto } from './checkout-preview-coupon.response.dto';

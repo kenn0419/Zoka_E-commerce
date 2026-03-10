@@ -1,0 +1,25 @@
+.sidebar {
+  border-radius: 8px;
+  padding: 16px;
+  height: fit-content;
+}
+
+.menu {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  background-color: transparent !important;
+  border: none !important;
+
+  a {
+    padding: 10px;
+    border-radius: 6px;
+    color: #555;
+  }
+
+  a.active {
+    background: #fff4ee;
+    color: #f46a25;
+    font-weight: 600;
+  }
+}

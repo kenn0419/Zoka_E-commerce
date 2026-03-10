@@ -1,0 +1,41 @@
+@use "../../../styles/abstracts/variables" as v;
+
+.discountCard {
+  display: flex;
+  border-radius: 12px;
+  overflow: hidden;
+  background: #fff;
+  border: 1px solid #eee;
+}
+
+.left {
+  width: 120px;
+  background: v.$color-secondary;
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: bold;
+}
+
+.right {
+  background-color: v.$bg-light;
+  flex: 1;
+  padding: 16px;
+}
+
+.header {
+  display: flex;
+  justify-content: space-between;
+}
+
+.footer {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 10px;
+}
+
+.actions {
+  display: flex;
+  gap: 8px;
+}

@@ -14,7 +14,7 @@ import { CreateAddressDto } from './dto/create-address.dto';
 import { UpdateAddressDto } from './dto/update-address.dto';
 import { JwtSessionGuard } from 'src/common/guards/jwt-session.guard';
 import { Serialize } from 'src/common/decorators/serialize.decorator';
-import { AddressResponseDto } from './dto/address-repsonse.dto';
+import { AddressResponseDto } from './responses/address.repsonse.dto';
 
 @Controller('addresses')
 @UseGuards(JwtSessionGuard)

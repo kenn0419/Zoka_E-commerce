@@ -1,14 +1,16 @@
 import { createBrowserRouter } from "react-router-dom";
-import { AdminRoutes } from "./admin.routes";
-import { AuthRoutes } from "./auth.routes";
+import { AdminRoutes } from "./admin.route";
+import { AuthRoutes } from "./auth.route";
 import NotFound from "../pages/error/NotFound";
-import { ErrorRoutes } from "./error.routes";
-import { ShopRoutes } from "./shop.routes";
-import { SellerRoutes } from "./seller.routes";
-import { PublicRoutes } from "./public.routes";
+import { ErrorRoutes } from "./error.route";
+import { ShopRoutes } from "./shop.route";
+import { SellerRoutes } from "./seller.route";
+import { PublicRoutes } from "./public.route";
+import { UserRoutes } from "./user.route";
 
 export const router = createBrowserRouter([
   PublicRoutes,
+  UserRoutes,
   ShopRoutes,
   SellerRoutes,
   AdminRoutes,

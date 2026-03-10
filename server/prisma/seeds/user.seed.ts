@@ -1,7 +1,7 @@
 import { faker } from '@faker-js/faker';
 import * as bcrypt from 'bcrypt';
 import { SlugifyUtil } from '../../src/common/utils/slugify.util';
-import { PrismaClient, UserStatus } from '../../generated/prisma';
+import { PrismaClient, UserGender, UserStatus } from '../../generated/prisma';
 
 export async function seedUsers(prisma: PrismaClient) {
   console.log('→ Seeding users...');
@@ -25,6 +25,8 @@ export async function seedUsers(prisma: PrismaClient) {
       slug: SlugifyUtil.createSlug('admin'),
       phone: '076259919',
       hashedPassword: bcrypt.hashSync('123123az', 10),
+      birthday: new Date('2026-03-10'),
+      gender: UserGender.OTHER,
       status: UserStatus.ACTIVE,
       avatarUrl: faker.image.avatar(),
     },
@@ -53,7 +55,9 @@ export async function seedUsers(prisma: PrismaClient) {
     email: string;
     slug: string;
     phone: string;
+    birthday: Date;
     hashedPassword: string;
+    gender: UserGender;
     status: UserStatus;
     avatarUrl: string;
   }[] = [];
@@ -62,6 +66,7 @@ export async function seedUsers(prisma: PrismaClient) {
     const fullName = faker.person.fullName();
     const email = faker.internet.email().toLowerCase();
     const phone = faker.phone.number({ style: 'national' });
+    const birthday = faker.date.birthdate();
     const slug = SlugifyUtil.createSlug(fullName);
 
     const userId = crypto.randomUUID();
@@ -72,6 +77,8 @@ export async function seedUsers(prisma: PrismaClient) {
       slug,
       phone,
       hashedPassword: bcrypt.hashSync('123123az', 10),
+      birthday,
+      gender: UserGender.MALE,
       status: UserStatus.ACTIVE,
       avatarUrl: faker.image.avatar(),
     });
