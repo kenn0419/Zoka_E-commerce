@@ -1,6 +1,5 @@
 import { useNavigate, useSearchParams } from "react-router-dom";
 import ProductTable from "../../../components/product/ProductTable";
-import Pagination from "../../../components/common/Pagination";
 import ProductSort from "../../../components/product/ProductSort";
 import { useProductsByShop } from "../../../queries/product.query";
 import { useSellerStore } from "../../../store/seller.store";
@@ -12,6 +11,7 @@ import { Button } from "antd";
 import { PATH } from "../../../utils/path.util";
 import { useState } from "react";
 import ProductDetailDrawer from "../../../components/product/ProductDetailDrawer";
+import Pagination from "../../../components/common/Pagination";
 
 export default function ProductManagementPage() {
   const navigate = useNavigate();
@@ -24,7 +24,7 @@ export default function ProductManagementPage() {
   const search = searchParams.get("search") ?? "";
 
   const [selectedProductId, setSelectedProductId] = useState<string | null>(
-    null
+    null,
   );
   const [openDetail, setOpenDetail] = useState(false);
 
@@ -41,7 +41,7 @@ export default function ProductManagementPage() {
 
   const handleEditProduct = (productId: string) => {
     navigate(
-      `/${PATH.SELLER}/${currentShopId}/${PATH.EDIT_PRODUCT}/${productId}`
+      `/${PATH.SELLER}/${currentShopId}/${PATH.EDIT_PRODUCT}/${productId}`,
     );
   };
 

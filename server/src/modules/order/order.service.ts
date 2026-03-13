@@ -445,6 +445,7 @@ export class OrderService {
     }
 
     for (const [shopId, items] of shopMap.entries()) {
+      console.log(items[0]);
       const subtotal = items.reduce(
         (s, i) => s + Number(i.priceSnapshot) * i.quantity,
         0,
@@ -475,6 +476,7 @@ export class OrderService {
 
       result.push({
         shopId,
+        shopName: items[0].product.shop.name,
         items,
         subtotal,
         shippingFee,

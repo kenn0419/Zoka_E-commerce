@@ -35,3 +35,28 @@ export const useCreateReviewMutation = () => {
     },
   });
 };
+
+export const useAdminReviewsQuery = (params: IReviewQueries) => {
+  return useQuery({
+    queryKey: ["reviews", "admin", params],
+    queryFn: () => reviewService.fetchAdminReviews(params),
+  });
+};
+
+export const useAdminDeleteReviewMutation = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (reviewId: string) => reviewService.deleteReviewByAdmin(reviewId),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["reviews", "admin"] });
+    },
+  });
+};
+
+export const useShopReviewsQuery = (shopId: string, params: IReviewQueries) => {
+  return useQuery({
+    queryKey: ["reviews", "shop", shopId, params],
+    queryFn: () => reviewService.fetchShopReviews(shopId, params),
+    enabled: !!shopId,
+  });
+};

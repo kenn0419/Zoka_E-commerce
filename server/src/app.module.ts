@@ -26,6 +26,7 @@ import { CommentModule } from './modules/comment/comment.module';
 import { NotificationModule } from './modules/notification/notification.module';
 import { FlashSaleModule } from './modules/flash-sale/flash-sale.module';
 import { ShopFollowerModule } from './modules/shop-follower/shop-follower.module';
+import { StatisticsModule } from './modules/statistics/statistics.module';
 
 @Module({
   imports: [
@@ -61,6 +62,7 @@ import { ShopFollowerModule } from './modules/shop-follower/shop-follower.module
     NotificationModule,
     FlashSaleModule,
     ShopFollowerModule,
+    StatisticsModule,
   ],
 })
 export class AppModule {}

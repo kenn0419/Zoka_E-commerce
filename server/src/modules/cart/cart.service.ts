@@ -22,12 +22,15 @@ export class CartService {
 
   async getUserCart(userId: string) {
     const cart = await this.getOrCreateCartEntity(userId);
+    console.log(cart);
     const syncedItems = await this.resolveCartItemsRealtime(cart);
 
-    return CartMapper.toCartResponse({
+    const res = CartMapper.toCartResponse({
       ...cart,
       items: syncedItems,
     });
+
+    return res;
   }
 
   async getUserCartSummary(userId: string) {

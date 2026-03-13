@@ -10,13 +10,12 @@ interface ICartItemResponse {
   productName: string;
   variantName: string;
   imageUrl: string;
-  priceSnapshot: number;
+  displayPrice: number;
   quantity: number;
-  stockSnapshot: number;
+  availableStock: number;
   subtotal: number;
   isAvailable: boolean;
   isSelected: boolean;
-  checked?: boolean;
 }
 
 interface ICartResponse {

@@ -1,28 +1,45 @@
-import { Card } from "antd";
+import { Card, Space, Spin } from "antd";
 import { Line } from "@ant-design/charts";
-
-const revenueData = [
-  { month: "Jan", value: 12000000 },
-  { month: "Feb", value: 18000000 },
-  { month: "Mar", value: 24000000 },
-  { month: "Apr", value: 20000000 },
-  { month: "May", value: 32000000 },
-  { month: "Jun", value: 38000000 },
-];
+import { useAdminRevenueQuery } from "../../../../../queries/statistics.query";
+import dayjs from "dayjs";
+import { PATH } from "../../../../../utils/path.util";
+import { Link } from "react-router-dom";
 
 const RevenueChart = () => {
+  const { data, isLoading } = useAdminRevenueQuery({ period: 'day' });
+
+  const chartData = data?.map((item) => ({
+    date: dayjs(item.date).format('DD/MM'),
+    revenue: item.revenue,
+  })) || [];
+
   const config = {
-    data: revenueData,
-    xField: "month",
-    yField: "value",
+    data: chartData,
+    xField: "date",
+    yField: "revenue",
     smooth: true,
     color: "#fa541c",
     point: { size: 5 },
+    tooltip: {
+      formatter: (datum: any) => {
+        return { name: 'Doanh thu', value: new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(datum.revenue) };
+      },
+    },
   };
 
   return (
-    <Card title="Doanh thu 6 tháng gần nhất" style={{ borderRadius: 12 }}>
-      <Line {...config} />
+    <Card 
+      title="Doanh thu hôm nay (Theo ngày)" 
+      style={{ borderRadius: 12 }}
+      extra={<a href={`/admin/${PATH.REVENUE_REPORT}`}>Xem chi tiết</a>}
+    >
+      {isLoading ? (
+        <div style={{ height: 300, display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+          <Spin />
+        </div>
+      ) : (
+        <Line {...config} height={300} />
+      )}
     </Card>
   );
 };

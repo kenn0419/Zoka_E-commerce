@@ -1,6 +1,6 @@
 import { CloseOutlined } from "@ant-design/icons";
 import styles from "./DiscountModal.module.scss";
-import { Button } from "antd";
+import { Button, Empty } from "antd";
 import clsx from "clsx";
 
 interface Props {
@@ -27,36 +27,40 @@ export default function DiscountModal({
         </div>
 
         <div className={styles.list}>
-          {discounts.map((coupon) => {
-            const isSelected = selectedCouponCode === coupon.code;
+          {discounts.length > 0 ? (
+            discounts.map((coupon) => {
+              const isSelected = selectedCouponCode === coupon.code;
 
-            return (
-              <div
-                key={coupon.id}
-                className={clsx(styles.item, {
-                  [styles.disabled]: !coupon.isEligible,
-                  [styles.selected]: isSelected,
-                })}
-                onClick={() => {
-                  if (!coupon.isEligible) return;
-                  onApply(coupon.code);
-                }}
-              >
-                <div className={styles.left}>
-                  <strong>{coupon.code}</strong>
-                  <p>{coupon.description}</p>
+              return (
+                <div
+                  key={coupon.id}
+                  className={clsx(styles.item, {
+                    [styles.disabled]: !coupon.isEligible,
+                    [styles.selected]: isSelected,
+                  })}
+                  onClick={() => {
+                    if (!coupon.isEligible) return;
+                    onApply(coupon.code);
+                  }}
+                >
+                  <div className={styles.left}>
+                    <strong>{coupon.code}</strong>
+                    <p>{coupon.description}</p>
 
-                  {!coupon.isEligible && (
-                    <small>{renderReason(coupon.disabledReason)}</small>
-                  )}
+                    {!coupon.isEligible && (
+                      <small>{renderReason(coupon.disabledReason)}</small>
+                    )}
+                  </div>
+
+                  <div className={styles.right}>
+                    -₫{coupon.discountValue.toLocaleString()}
+                  </div>
                 </div>
-
-                <div className={styles.right}>
-                  -₫{coupon.discountValue.toLocaleString()}
-                </div>
-              </div>
-            );
-          })}
+              );
+            })
+          ) : (
+            <Empty />
+          )}
         </div>
       </div>
     </div>

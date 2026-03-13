@@ -27,21 +27,26 @@ export default function AddressBlock({
   return (
     <div className={styles.wrapper}>
       <div className={styles.title}>Địa chỉ nhận hàng</div>
-      {address ? (
-        <div className={styles.content}>
-          <strong>{address.receiverName}</strong> | {address.receiverPhone}
-          <div>{address.addressText}</div>
-        </div>
-      ) : (
-        <div className={styles.wrapper}>
-          <div className={styles.title}>Địa chỉ nhận hàng</div>
-          <button onClick={handleClickCreateAddress}>+ Thêm địa chỉ mới</button>
-        </div>
-      )}
-
-      <button className={styles.change} onClick={handleClickChangeAddress}>
-        Thay đổi
-      </button>
+      <div className={styles.address}>
+        {address ? (
+          <div className={styles.content}>
+            <strong>
+              {address.receiverName} {address.receiverPhone}
+            </strong>
+            <div className={styles.addressText}>{address.addressText}</div>
+          </div>
+        ) : (
+          <>
+            <div className={styles.title}>Địa chỉ nhận hàng</div>
+            <button onClick={handleClickCreateAddress}>
+              + Thêm địa chỉ mới
+            </button>
+          </>
+        )}
+        <button className={styles.change} onClick={handleClickChangeAddress}>
+          Thay đổi
+        </button>
+      </div>
 
       <SelectAddressModal
         open={openSelect}

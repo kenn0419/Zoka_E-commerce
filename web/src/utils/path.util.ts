@@ -38,4 +38,5 @@ export const PATH = {
   ORDER_SUCESS: "order-success",
   PROFILE: "profile",
   CATEGORIES: "categories",
+  REVENUE_REPORT: "revenue-report",
 };

@@ -1,6 +1,6 @@
 export enum CategorySort {
-  NAME_ASC = 'NAME_ASC',
-  NAME_DESC = 'NAME_DESC',
-  NEWEST = 'NEWEST',
-  OLDEST = 'OLDEST',
+  NAME_ASC = 'name_asc',
+  NAME_DESC = 'name_desc',
+  NEWEST = 'newest',
+  OLDEST = 'oldest',
 }

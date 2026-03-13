@@ -13,6 +13,7 @@ import SearchBar from "../../../common/SearchBar";
 import { useLogoutMutation } from "../../../../queries/auth.query";
 import { useCartSummaryQuery } from "../../../../queries/cart.query";
 import { useMemo, useCallback } from "react";
+import logo from "../../../../assets/images/logo.png";
 
 export default function Header() {
   const { user } = useAuthStore();
@@ -63,8 +64,9 @@ export default function Header() {
     <Layout.Header className={styles.header}>
       <div className={styles.container}>
         <div onClick={handleClickLogo} className={styles.logo}>
-          <div className={styles.icon}>🚀</div>
-          <h1>Zoka</h1>
+          {/* <div className={styles.icon}>🚀</div>
+          <h1>Zoka</h1> */}
+          <img src={logo} />
         </div>
 
         <div className={styles.searchWrapper}>

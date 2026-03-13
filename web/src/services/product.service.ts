@@ -1,6 +1,14 @@
 import { productApi } from "../apis/product.api";
 
 export const productService = {
+  async fetchAdminProducts(
+    params: IProductFilterQueries,
+  ): Promise<IPaginatedResponse<IProductListItemResponse>> {
+    const res = await productApi.fetchAdminProducts({ ...params });
+
+    return res.data;
+  },
+
   async fetchActiveProducts(
     params: IProductFilterQueries,
   ): Promise<IPaginatedResponse<IProductListItemResponse>> {
@@ -82,17 +90,32 @@ export const productService = {
   ): Promise<IProductListItemResponse> {
     const formData = new FormData();
 
+    const variantFiles: File[] = [];
+
+    const variants = data.variants.map((variant) => {
+      const imageIndexes: number[] = [];
+
+      variant.images?.forEach((img: any) => {
+        const index = variantFiles.length;
+
+        variantFiles.push(img.originFileObj);
+        imageIndexes.push(index);
+      });
+
+      return {
+        name: variant.name,
+        stock: variant.stock,
+        price: variant.price,
+        images: imageIndexes,
+      };
+    });
+
     const payload = {
       name: data.name,
       categoryId: data.categoryId,
       shopId: data.shopId,
       description: data.description ?? "",
-      variants: data.variants.map((item) => ({
-        name: item.name,
-        stock: item.stock,
-        price: item.price,
-        images: item.images,
-      })),
+      variants,
     };
 
     formData.append("data", JSON.stringify(payload));
@@ -101,11 +124,9 @@ export const productService = {
       formData.append("thumbnail", data.thumbnail);
     }
 
-    if (data.variantFiles) {
-      data.variantFiles.forEach((file) => {
-        formData.append("variantImages", file);
-      });
-    }
+    variantFiles.forEach((file) => {
+      formData.append("variantImages", file);
+    });
 
     const res = await productApi.createProduct(formData);
 

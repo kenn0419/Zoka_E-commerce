@@ -8,7 +8,7 @@ const UserManagement = () => {
   const [page, setPage] = useState(1);
   const [limit, setLimit] = useState(10);
   const [search, setSearch] = useState("");
-  const [sort, setSort] = useState<IUserSort>("OLDEST");
+  const [sort, setSort] = useState<IUserSort>("oldest");
 
   const { data, isLoading } = useAllUsersQuery({
     page,

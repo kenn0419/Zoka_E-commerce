@@ -13,6 +13,7 @@ import { UploadService } from 'src/infrastructure/upload/upload.service';
 import { ConfigService } from '@nestjs/config/dist/config.service';
 import { Prisma, ProductReviewStatus } from 'generated/prisma';
 import { ProductRepository } from '../product/repositories/product.repository';
+import { ShopRepository } from '../shop/shop.repository';
 import { CommentQueryDto } from './dto/comment-query.dto';
 import { paginatedResult } from 'src/common/utils/pagninated-result.util';
 import { buildCommentSort } from 'src/common/utils/comment-sort.util';
@@ -28,6 +29,7 @@ export class CommentService {
     private readonly commentRepo: CommentRepository,
     private readonly commentReplyRepo: CommentReplyRepository,
     private readonly productRepo: ProductRepository,
+    private readonly shopRepo: ShopRepository,
     private readonly orderItemRepo: OrderItemRepository,
   ) {}
 
@@ -97,6 +99,49 @@ export class CommentService {
     );
 
     return result;
+  }
+  
+  async findAllForAdmin(query: CommentQueryDto) {
+    const where: Prisma.ProductReviewWhereInput = {
+      ...(query.rating ? { rating: query.rating } : {}),
+    };
+
+    return paginatedResult(
+      {
+        where,
+        limit: query.limit,
+        page: query.page,
+        orderBy: buildCommentSort(query.sort),
+      },
+      (args) => this.commentRepo.listPaginatedComments(args),
+    );
+  }
+
+  async findAllForShop(userId: string, shopId: string, query: CommentQueryDto) {
+    const shop = await this.shopRepo.findUnique({ id: shopId });
+    if (!shop) {
+      throw new NotFoundException('Shop not found');
+    }
+    if (shop.ownerId !== userId) {
+      throw new ForbiddenException(
+        'You are not allowed to view reviews for this shop',
+      );
+    }
+
+    const where: Prisma.ProductReviewWhereInput = {
+      product: { shopId },
+      ...(query.rating ? { rating: query.rating } : {}),
+    };
+
+    return paginatedResult(
+      {
+        where,
+        limit: query.limit,
+        page: query.page,
+        orderBy: buildCommentSort(query.sort),
+      },
+      (args) => this.commentRepo.listPaginatedComments(args),
+    );
   }
 
   async findAllReplies(reviewId: string, query: CursorPaginatedQueryDto) {

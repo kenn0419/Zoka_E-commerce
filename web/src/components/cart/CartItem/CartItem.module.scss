@@ -1,3 +1,5 @@
+@use "../../../styles/abstracts/variables" as v;
+
 .cartItem {
   display: grid;
   grid-template-columns: 40px 80px 1fr 120px 120px 140px 60px;
@@ -42,13 +44,13 @@
 }
 
 .subtotal {
-  color: #ee4d2d; // màu cam Shopee
+  color: v.$color-primary;
   font-weight: 600;
   font-size: 14px;
 }
 
 .remove {
-  color: #ee4d2d;
+  color: v.$color-primary;
   background: none;
   border: none;
   cursor: pointer;

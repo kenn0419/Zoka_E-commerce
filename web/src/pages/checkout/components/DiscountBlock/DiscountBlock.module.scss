@@ -1,3 +1,5 @@
+@use "../../../../styles/abstracts/variables" as v;
+
 .wrapper {
   background: #fff;
   border: 1px solid #f0f0f0;
@@ -22,7 +24,7 @@
 .icon {
   width: 24px;
   height: 24px;
-  background: #ee4d2d;
+  background: v.$color-primary;
   border-radius: 4px;
 }
 
@@ -32,7 +34,7 @@
 
 .selected {
   background: #fff1ee;
-  color: #ee4d2d;
+  color: v.$color-primary;
   padding: 4px 10px;
   border-radius: 16px;
   font-size: 13px;
@@ -42,7 +44,7 @@
 .actionBtn {
   background: none;
   border: none;
-  color: #ee4d2d;
+  color: v.$color-secondary;
   font-weight: 500;
   cursor: pointer;
   padding: 0;

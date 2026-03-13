@@ -18,6 +18,7 @@ export class MessageRepository {
         content: true,
         createdAt: true,
         sender: true,
+        conversationId: true,
       },
     });
   }

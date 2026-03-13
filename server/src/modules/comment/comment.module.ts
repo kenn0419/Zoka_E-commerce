@@ -5,10 +5,11 @@ import { OrderModule } from '../order/order.module';
 import { CommentRepository } from './repositories/comment.repository';
 import { UploadModule } from 'src/infrastructure/upload/upload.module';
 import { ProductModule } from '../product/product.module';
+import { ShopModule } from '../shop/shop.module';
 import { CommentReplyRepository } from './repositories/comment-reply.repository';
 
 @Module({
-  imports: [OrderModule, UploadModule, ProductModule],
+  imports: [OrderModule, UploadModule, ProductModule, ShopModule],
   controllers: [CommentController],
   providers: [CommentService, CommentRepository, CommentReplyRepository],
 })

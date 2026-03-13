@@ -50,3 +50,10 @@ interface IProductVariantCreaionRequest {
   stock: number;
   images: string[];
 }
+
+type IProductSort =
+  | "newest"
+  | "oldest"
+  | "price_asc"
+  | "price_desc"
+  | "rating_desc";

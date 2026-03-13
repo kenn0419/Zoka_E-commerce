@@ -1,7 +1,6 @@
 import { useState } from "react";
 import styles from "./DiscountBlock.module.scss";
-import DiscountModal from "../../../../components/discounts/DiscountModal";
-
+import DiscountModal from "../../../../components/discount/DiscountModal";
 interface DiscountBlockProps {
   selectedCouponCode?: string;
   onApplyCoupon: (code?: string) => void;

@@ -23,6 +23,7 @@ export class CartRepository {
                 name: true,
                 slug: true,
                 status: true,
+                shop: true,
               },
             },
             variant: {

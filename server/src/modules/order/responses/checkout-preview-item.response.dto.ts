@@ -17,7 +17,7 @@ export class CheckoutPreviewItemResponseDto {
   imageUrl: string;
 
   @Expose()
-  price: number;
+  priceSnapshot: number;
 
   @Expose()
   quantity: number;

@@ -25,10 +25,33 @@ import {
 import { CommentResponseDto } from './responses/comment.response.dto';
 import { CreateReplyCommentDto } from './dto/create-reply-comment.dto';
 import { CursorPaginatedQueryDto } from 'src/common/dto/paginated-query.dto';
+import { Roles } from 'src/common/decorators/role.decorator';
+import { Role } from 'src/common/enums/role.enum';
+import { RolesPermissionsGuard } from 'src/common/guards/rbac.guard';
 
 @Controller('comments')
 export class CommentController {
   constructor(private readonly commentService: CommentService) {}
+
+  @Get('admin')
+  @Roles(Role.ADMIN)
+  @UseGuards(JwtSessionGuard, RolesPermissionsGuard)
+  @SerializePaginated(CommentResponseDto, 'Admin reviews retrieved successfully.')
+  findAllForAdmin(@Query() query: CommentQueryDto) {
+    return this.commentService.findAllForAdmin(query);
+  }
+
+  @Get('shop/:shopId')
+  @Roles(Role.SHOP)
+  @UseGuards(JwtSessionGuard, RolesPermissionsGuard)
+  @SerializePaginated(CommentResponseDto, 'Shop reviews retrieved successfully.')
+  findAllForShop(
+    @Param('shopId') shopId: string,
+    @Req() req,
+    @Query() query: CommentQueryDto,
+  ) {
+    return this.commentService.findAllForShop(req.user.sub, shopId, query);
+  }
 
   @Post()
   @UseInterceptors(FilesInterceptor('images', 5))

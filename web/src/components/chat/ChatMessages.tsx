@@ -2,6 +2,8 @@ import { useEffect, useRef } from "react";
 import { useMessages } from "../../queries/message.query";
 import { Socket } from "socket.io-client";
 
+import { useQueryClient } from "@tanstack/react-query";
+
 export default function ChatMessages({
   socket,
   conversationId,
@@ -9,21 +11,20 @@ export default function ChatMessages({
   socket: Socket;
   conversationId: string;
 }) {
+  const queryClient = useQueryClient();
   const { data, fetchNextPage, hasNextPage, isFetchingNextPage } =
     useMessages(conversationId);
 
-  const messages = data?.pages.flatMap((p) => p.items) ?? [];
+  const messages = data?.pages.slice().reverse().flatMap((p) => p.items) ?? [];
   const containerRef = useRef<HTMLDivElement>(null);
 
   // ✅ JOIN ROOM
   useEffect(() => {
     if (!conversationId) return;
 
-    console.log("📤 join_conversation", conversationId);
     socket.emit("join_conversation", conversationId);
 
     return () => {
-      console.log("🚪 leave_conversation", conversationId);
       socket.emit("leave_conversation", conversationId);
     };
   }, [conversationId, socket]);
@@ -33,8 +34,24 @@ export default function ChatMessages({
     const onNewMessage = (msg: any) => {
       if (msg.conversationId !== conversationId) return;
 
-      // TODO: append message to react-query cache
       console.log("📩 realtime message", msg);
+      
+      queryClient.setQueryData(["messages", conversationId], (old: any) => {
+        if (!old || !old.pages || old.pages.length === 0) return old;
+
+        // Clone the pages to avoid mutating the cache directly
+        const newPages = [...old.pages];
+        
+        // Push the new message to the END of the FIRST page (newest message at bottom)
+        const firstPage = { ...newPages[0] };
+        firstPage.items = [...firstPage.items, msg];
+        newPages[0] = firstPage;
+
+        return {
+          ...old,
+          pages: newPages,
+        };
+      });
     };
 
     socket.on("new_message", onNewMessage);

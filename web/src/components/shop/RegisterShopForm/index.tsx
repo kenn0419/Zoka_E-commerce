@@ -21,8 +21,10 @@ export default function RegisterShopForm() {
         logo: logoFile ?? undefined,
       });
 
-      setCurrentShopId(res.id);
-      message.success("Đăng ký shop thành công!");
+      if (res.id) {
+        setCurrentShopId(res.id);
+      }
+      message.success("Đăng ký shop thành công. Vui lòng đợi admin duyệt!");
     } catch (err: any) {
       message.error(err.response?.data?.message || "Đăng ký thất bại");
     }
@@ -48,7 +50,7 @@ export default function RegisterShopForm() {
           maxCount={1}
           beforeUpload={(file) => {
             setLogoFile(file);
-            return false; // chặn auto upload
+            return false;
           }}
         >
           <Button icon={<UploadOutlined />}>Chọn ảnh</Button>

@@ -14,7 +14,6 @@ export class WsJwtSessionGuard implements CanActivate {
 
   async canActivate(ctx: ExecutionContext): Promise<boolean> {
     const client = ctx.switchToWs().getClient<Socket>();
-    console.log(client);
     const cookies = client.handshake.headers.cookie;
     if (!cookies) {
       throw new UnauthorizedException('Missing cookies');

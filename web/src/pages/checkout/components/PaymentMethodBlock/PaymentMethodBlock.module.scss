@@ -1,3 +1,5 @@
+@use "../../../../styles/abstracts/variables" as v;
+
 .wrapper {
   background: #fff;
   padding: 16px;
@@ -30,11 +32,11 @@
 }
 
 .card:hover {
-  border-color: #ee4d2d;
+  border-color: v.$color-primary;
 }
 
 .selected {
-  border: 1px solid #ee4d2d;
+  border: 1px solid v.$color-primary;
   background: #fff3f0;
 }
 
@@ -54,13 +56,13 @@
 }
 
 .selected .radio {
-  border-color: #ee4d2d;
+  border-color: v.$color-primary;
 }
 
 .dot {
   width: 8px;
   height: 8px;
-  background: #ee4d2d;
+  background: v.$color-primary;
   border-radius: 50%;
 }
 

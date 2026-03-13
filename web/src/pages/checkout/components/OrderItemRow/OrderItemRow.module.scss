@@ -1,10 +1,28 @@
+@use "../../../../styles/abstracts/variables" as v;
+
 .row {
   display: grid;
-  grid-template-columns: 60px 1fr 60px 120px;
+  grid-template-columns: 150px 1fr 100px 115px 150px;
   align-items: center;
   margin-bottom: 12px;
-}
 
-.price {
-  text-align: right;
+  .productThubnail {
+    width: 100px;
+    height: 100px;
+    border-radius: v.$radius-sm;
+  }
+
+  .info {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+  }
+
+  .price {
+    text-align: left;
+  }
+
+  .subtotal {
+    text-align: right;
+  }
 }

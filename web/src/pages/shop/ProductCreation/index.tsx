@@ -6,7 +6,6 @@ import SubmitBar from "./components/SubmitBar";
 import { useState } from "react";
 import { useSellerStore } from "../../../store/seller.store";
 import { useProductCreationMutation } from "../../../queries/product.query";
-import type { IProductVariantCreaionRequest } from "../../../types/product.type";
 import Variants from "./components/Variants";
 import { useNavigate } from "react-router-dom";
 import { PATH } from "../../../utils/path.util";
@@ -17,8 +16,6 @@ export default function CreateProductPage() {
   const { currentShopId } = useSellerStore();
 
   const [thumbnail, setThumbnail] = useState<File | null>(null);
-  const [variantFiles, setVariantFiles] = useState<File[]>([]);
-  const [variants, setVariants] = useState<IProductVariantCreaionRequest[]>([]);
 
   const { mutateAsync, isPending } = useProductCreationMutation();
 
@@ -28,21 +25,16 @@ export default function CreateProductPage() {
         ...data,
         shopId: currentShopId,
         thumbnail,
-        variantFiles,
-        variants,
       };
 
       await mutateAsync(payload);
 
       form.resetFields();
-
       setThumbnail(null);
-      setVariantFiles([]);
-      setVariants([]);
 
       navigate(`/${PATH.SELLER}/${currentShopId}/${PATH.MANAGE_PRODUCT}`);
     } catch (error: any) {
-      message.error(error.response.data.message ?? "Tạo sản phẩm thất bại");
+      message.error(error.response?.data?.message ?? "Tạo sản phẩm thất bại");
     }
   };
 
@@ -54,13 +46,11 @@ export default function CreateProductPage() {
       className={styles.container}
     >
       <BasicInfo />
+
       <ProductImages thumbnail={thumbnail} setThumbnail={setThumbnail} />
-      <Variants
-        variants={variants}
-        setVariants={setVariants}
-        variantFiles={variantFiles}
-        setVariantFiles={setVariantFiles}
-      />
+
+      <Variants />
+
       <SubmitBar loading={isPending} />
     </Form>
   );

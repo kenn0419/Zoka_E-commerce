@@ -26,4 +26,4 @@ interface IUserUpdateRequest extends Partial<IUserCreationRequest> {
   id: string;
 }
 
-type IUserSort = "OLDEST" | "NEWEST" | "NAME_ASC" | "NAME_DESC";
+type IUserSort = "oldest" | "newest" | "name_asc" | "name_desc";

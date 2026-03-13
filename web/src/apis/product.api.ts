@@ -1,6 +1,22 @@
 import instance from "./axios-customize";
 
 export const productApi = {
+  fetchAdminProducts: async ({
+    page = 1,
+    limit = 12,
+    search,
+    sort = "oldest",
+    minPrice,
+    maxPrice,
+    rating,
+  }: IProductFilterQueries): Promise<
+    IApiResponse<IPaginatedResponse<IProductListItemResponse>>
+  > => {
+    return await instance.get(`/products`, {
+      params: { page, limit, search, sort, minPrice, maxPrice, rating },
+    });
+  },
+
   fetchActiveProducts: async ({
     page = 1,
     limit = 12,

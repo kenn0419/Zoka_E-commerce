@@ -1,80 +1,59 @@
 import { Card, Input, InputNumber, Upload, Button, Form } from "antd";
-import { UploadOutlined } from "@ant-design/icons";
-import type { IProductVariantCreaionRequest } from "../../../../../types/product.type";
+import { UploadOutlined, DeleteOutlined } from "@ant-design/icons";
 
 interface Props {
-  variant: IProductVariantCreaionRequest;
-  variants: IProductVariantCreaionRequest[];
-  setVariants: (v: IProductVariantCreaionRequest[]) => void;
-  variantFiles: File[];
-  setVariantFiles: (f: File[]) => void;
+  field: any;
+  remove: (index: number) => void;
 }
 
-export default function VariantItem({
-  variant,
-  variants,
-  setVariants,
-  variantFiles,
-  setVariantFiles,
-}: Props) {
-  const update = (key: keyof IProductVariantCreaionRequest, value: any) => {
-    setVariants(
-      variants.map((v) => (v.id === variant.id ? { ...v, [key]: value } : v))
-    );
-  };
-
-  const uploadImage = (file: File) => {
-    const index = variantFiles.length;
-
-    setVariantFiles([...variantFiles, file]);
-    update("images", [...variant.images, index]);
-
-    return false;
-  };
-
+export default function VariantItem({ field, remove }: Props) {
   return (
-    <Card>
+    <Card
+      style={{ marginBottom: 16 }}
+      extra={
+        <Button
+          danger
+          icon={<DeleteOutlined />}
+          onClick={() => remove(field.name)}
+        >
+          Xóa
+        </Button>
+      }
+    >
       <Form.Item
         label="Tên phân loại"
-        name="variant.name"
+        name={[field.name, "name"]}
         rules={[{ required: true, message: "Nhập tên phân loại" }]}
       >
-        <Input
-          placeholder="Màu đỏ..."
-          value={variant.name}
-          onChange={(e) => update("name", e.target.value)}
-        />
+        <Input placeholder="Màu đỏ / Size M" />
       </Form.Item>
 
       <Form.Item
-        label="Giá phân loại"
-        name="variant.price"
-        rules={[{ required: true, message: "Nhập giá phân loại" }]}
+        label="Giá"
+        name={[field.name, "price"]}
+        rules={[{ required: true, message: "Nhập giá" }]}
       >
-        <InputNumber
-          placeholder="24000"
-          value={variant.price}
-          onChange={(v) => update("price", v)}
-          style={{ width: "100%", marginTop: 8 }}
-        />
+        <InputNumber style={{ width: "100%" }} />
       </Form.Item>
 
       <Form.Item
         label="Số lượng"
-        name="variant.stock"
-        rules={[{ required: true, message: "Nhập số lượng phân loại" }]}
+        name={[field.name, "stock"]}
+        rules={[{ required: true, message: "Nhập số lượng" }]}
       >
-        <InputNumber
-          placeholder="Kho"
-          value={variant.stock}
-          onChange={(v) => update("stock", v)}
-          style={{ width: "100%", marginTop: 8 }}
-        />
+        <InputNumber style={{ width: "100%" }} />
       </Form.Item>
 
-      <Upload beforeUpload={uploadImage} multiple>
-        <Button icon={<UploadOutlined />}>Ảnh phân loại</Button>
-      </Upload>
+      <Form.Item
+        label="Ảnh phân loại"
+        name={[field.name, "images"]}
+        valuePropName="fileList"
+        getValueFromEvent={(e) => e.fileList}
+      >
+        <Upload beforeUpload={() => false} multiple>
+          <Button icon={<UploadOutlined />}>Upload ảnh</Button>
+        </Upload>
+      </Form.Item>
     </Card>
   );
 }

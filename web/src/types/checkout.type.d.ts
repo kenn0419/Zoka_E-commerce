@@ -23,7 +23,7 @@ interface ICheckoutPreviewItemResponse {
   variantId?: string;
   variantName?: string;
   imageUrl: string;
-  price: number;
+  priceSnapshot: number;
   quantity: number;
   subtotal: number;
 }

@@ -31,8 +31,25 @@ export const reviewApi = {
     reviewId: string,
     content: string,
   ): Promise<IApiResponse<IReviewResponse>> => {
-    return await instance.post(`/reviews/${reviewId}/reply`, {
+    return await instance.post(`/comments/${reviewId}/reply`, {
       content,
     });
+  },
+
+  fetchAdminReviews: async (
+    params: IReviewQueries,
+  ): Promise<IApiResponse<IPaginatedResponse<IReviewResponse>>> => {
+    return await instance.get(`/comments/admin`, { params });
+  },
+
+  deleteReviewByAdmin: async (reviewId: string): Promise<IApiResponse<any>> => {
+    return await instance.delete(`/comments/${reviewId}`);
+  },
+
+  fetchShopReviews: async (
+    shopId: string,
+    params: IReviewQueries,
+  ): Promise<IApiResponse<IPaginatedResponse<IReviewResponse>>> => {
+    return await instance.get(`/comments/shop/${shopId}`, { params });
   },
 };

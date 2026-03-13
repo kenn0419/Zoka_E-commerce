@@ -69,6 +69,7 @@ export class CommentRepository {
         orderBy,
         include: {
           buyer: true,
+          product: true,
           variant: true,
           _count: {
             select: { replies: true },

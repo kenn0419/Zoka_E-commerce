@@ -1,13 +1,13 @@
 import { Controller, Get, Param, Query, Req, UseGuards } from '@nestjs/common';
-import { ChatService } from '../chat/chat.service';
+import { ChatService } from './chat.service';
 import { JwtSessionGuard } from 'src/common/guards/jwt-session.guard';
 import { SerializePaginated } from 'src/common/decorators/serialize.decorator';
-import { ConversationResponse } from '../chat/responses/conversation.response.dto';
+import { ConversationResponse } from './responses/conversation.response.dto';
 import {
   CursorPaginatedQueryDto,
   PaginatedQueryDto,
 } from 'src/common/dto/paginated-query.dto';
-import { MessageResponseDto } from '../chat/responses/message.response.dto';
+import { MessageResponseDto } from './responses/message.response.dto';
 
 @Controller('chats')
 export class ChatController {

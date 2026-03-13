@@ -157,7 +157,6 @@ export class ShopService {
     const existShop = await this.shopRepo.findUnique(where, select);
 
     if (!existShop || existShop.status !== ShopStatus.ACTIVE) {
-      console.log(existShop);
       throw new BadRequestException('Shop is approved yet.');
     }
 

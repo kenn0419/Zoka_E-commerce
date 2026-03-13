@@ -34,7 +34,8 @@ const Sidebar = () => {
       path.includes(PATH.MANAGE_PRODUCT) ||
       path.includes(PATH.MANAGE_CATEGORY) ||
       path.includes(PATH.MANAGE_ORDER) ||
-      path.includes(PATH.MANAGE_REVIEW)
+      path.includes(PATH.MANAGE_REVIEW) ||
+      path.includes(PATH.REVENUE_REPORT)
     ) {
       setOpenKeys(["business"]);
       return;
@@ -52,6 +53,7 @@ const Sidebar = () => {
     if (path.includes(PATH.MANAGE_CATEGORY)) return ["categories"];
     if (path.includes(PATH.MANAGE_ORDER)) return ["orders"];
     if (path.includes(PATH.MANAGE_REVIEW)) return ["reviews"];
+    if (path.includes(PATH.REVENUE_REPORT)) return ["revenue-report"];
 
     return ["dashboard"];
   })();
@@ -133,6 +135,12 @@ const Sidebar = () => {
           key: "reviews",
           label: (
             <Link to={`/${PATH.ADMIN}/${PATH.MANAGE_REVIEW}`}>Đánh giá</Link>
+          ),
+        },
+        {
+          key: "revenue-report",
+          label: (
+            <Link to={`/${PATH.ADMIN}/${PATH.REVENUE_REPORT}`}>Báo cáo doanh thu</Link>
           ),
         },
       ],

@@ -112,10 +112,11 @@ export class ChatService {
 
     const hasNextPage = messages.length > limit;
     const items = hasNextPage ? messages.slice(0, limit) : messages;
+    const nextCursor = items.length > 0 ? items[items.length - 1].id : null;
 
     return {
       items: items.reverse(),
-      nextCursor: items.at(-1)?.id ?? null,
+      nextCursor,
       hasNextPage,
     };
   }

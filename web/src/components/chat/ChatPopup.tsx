@@ -24,7 +24,7 @@ export default function ChatPopup() {
     if (!socket) return;
 
     const onNewMessage = (msg: any) => {
-      // update conversation list
+      // 1. Update conversations list cache
       queryClient.setQueryData(["conversations"], (old: any) => {
         if (!old) return old;
 
@@ -40,7 +40,7 @@ export default function ChatPopup() {
                     unreadCount:
                       activeConversationId === msg.conversationId
                         ? 0
-                        : c.unreadCount + 1,
+                        : (c.unreadCount || 0) + 1,
                     lastMessage: msg,
                   }
                 : c,
@@ -49,15 +49,7 @@ export default function ChatPopup() {
         };
       });
 
-      // append message realtime
-      queryClient.setQueryData(["messages", msg.conversationId], (old: any) => {
-        if (!old) return old;
-
-        const lastPage = old.pages[old.pages.length - 1];
-        lastPage.items.push(msg);
-        return { ...old };
-      });
-
+      // 2. Play notification sound if not active conversation
       if (activeConversationId !== msg.conversationId) {
         new Audio(notificationSound).play();
       }

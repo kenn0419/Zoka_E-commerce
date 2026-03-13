@@ -15,7 +15,11 @@ export default function Pagination({ page, limit, total, onChange }: Props) {
       total={total}
       onChange={onChange}
       showSizeChanger={false}
-      style={{ marginTop: 16, textAlign: "right" }}
+      style={{
+        marginTop: 16,
+        display: "flex",
+        justifyContent: "end",
+      }}
     />
   );
 }

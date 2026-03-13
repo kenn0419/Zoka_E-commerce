@@ -1,8 +1,14 @@
 import { Card, Form, Input, Select } from "antd";
 import { useActiveCategoriesQuery } from "../../../../../queries/category.query";
+import { useState } from "react";
 
 export default function BasicInfo() {
-  const { data, isLoading } = useActiveCategoriesQuery();
+  const [searchCategory, setSearchCategory] = useState("");
+  const { data, isLoading } = useActiveCategoriesQuery({
+    page: 1,
+    limit: 10,
+    search: searchCategory,
+  });
   return (
     <Card title="Thông tin cơ bản" style={{ marginBottom: 16 }}>
       <Form.Item
@@ -21,6 +27,9 @@ export default function BasicInfo() {
         <Select
           loading={isLoading}
           placeholder="Chọn danh mục"
+          filterOption={false}
+          showSearch
+          onSearch={(value) => setSearchCategory(value)}
           options={data?.items.map((c) => ({
             label: c.name,
             value: c.id,

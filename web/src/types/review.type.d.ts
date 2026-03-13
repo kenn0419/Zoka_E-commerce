@@ -18,7 +18,9 @@ interface IReviewResponse {
   comment?: string;
   imageUrls: string[];
   buyer: IUserResponse;
+  product: IProductListItemResponse;
   variant: IProductVariantResponse;
+  status: string;
   replyCount?: number;
-  createdAt: Date;
+  createdAt: string;
 }

@@ -5,10 +5,11 @@ import { MessageRepository } from './repositories/message.repository';
 import { ConversationRepository } from './repositories/conversation.repository';
 import { UserModule } from '../user/user.module';
 import { RbacModule } from '../rbac/rbac.module';
-import { ChatController } from '../comment/chat.controller';
+import { ChatController } from './chat.controller';
+import { AuthCoreModule } from '../../common/auth/auth-core.module';
 
 @Module({
-  imports: [UserModule, RbacModule],
+  imports: [UserModule, RbacModule, AuthCoreModule],
   controllers: [ChatController],
   providers: [
     ChatGateway,

@@ -32,4 +32,21 @@ export const reviewService = {
     const res = await reviewApi.replyReview(reviewId, content);
     return res.data;
   },
+  async fetchAdminReviews(
+    params: IReviewQueries,
+  ): Promise<IPaginatedResponse<IReviewResponse>> {
+    const res = await reviewApi.fetchAdminReviews(params);
+    return res.data;
+  },
+  async deleteReviewByAdmin(reviewId: string): Promise<any> {
+    const res = await reviewApi.deleteReviewByAdmin(reviewId);
+    return res.data;
+  },
+  async fetchShopReviews(
+    shopId: string,
+    params: IReviewQueries,
+  ): Promise<IPaginatedResponse<IReviewResponse>> {
+    const res = await reviewApi.fetchShopReviews(shopId, params);
+    return res.data;
+  },
 };

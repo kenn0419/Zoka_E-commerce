@@ -13,9 +13,13 @@ const OrderManagementPage = lazy(() => import("../pages/shop/OrderManagement"));
 const FinanceManagementPage = lazy(
   () => import("../pages/shop/FinanceManagement"),
 );
+const ProductReviewManagementPage = lazy(
+  () => import("../pages/shop/ProductReview"),
+);
 const DiscountManagementPage = lazy(
   () => import("../pages/shop/DiscountManagement"),
 );
+const RevenueReportPage = lazy(() => import("../pages/shop/RevenueReport"));
 
 export const ShopRoutes: RouteObject = {
   path: `/${PATH.SELLER}/:shopId`,
@@ -32,7 +36,9 @@ export const ShopRoutes: RouteObject = {
         { path: PATH.MANAGE_ORDER, element: <OrderManagementPage /> },
         { path: PATH.MANAGE_FINANCE, element: <FinanceManagementPage /> },
         { path: PATH.CREATE_PRODUCT, element: <ProductCreationPage /> },
+        { path: PATH.MANAGE_REVIEW, element: <ProductReviewManagementPage /> },
         { path: PATH.MANAGE_DISCOUNT, element: <DiscountManagementPage /> },
+        { path: PATH.REVENUE_REPORT, element: <RevenueReportPage /> },
       ],
     },
   ],

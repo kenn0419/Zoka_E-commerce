@@ -3,7 +3,7 @@ import { io, Socket } from "socket.io-client";
 let socket: Socket | null = null;
 
 export function connectSocket() {
-  const BE_URL = import.meta.env.VITE_API_URL;
+  const BE_URL = import.meta.env.VITE_API_URL.replace('/api/v1', '');
   if (!socket) {
     socket = io(BE_URL + "/chat", {
       transports: ["websocket"],

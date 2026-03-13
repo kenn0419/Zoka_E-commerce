@@ -1,4 +1,4 @@
-import { Checkbox, InputNumber, Popconfirm } from "antd";
+import { Button, Checkbox, InputNumber, Popconfirm } from "antd";
 import styles from "./CartItem.module.scss";
 import { useCartStore } from "../../../store/cart.store";
 import {
@@ -34,11 +34,11 @@ export default function CartItem({ item }: ICartItemProps) {
         <div className={styles.variant}>{item.variantName}</div>
       </div>
 
-      <div className={styles.price}>₫{item.priceSnapshot.toLocaleString()}</div>
+      <div className={styles.price}>₫{item.displayPrice.toLocaleString()}</div>
 
       <InputNumber
         min={1}
-        max={item.stockSnapshot}
+        max={item.availableStock}
         value={item.quantity}
         size="small"
         disabled={!item.isAvailable}
@@ -53,14 +53,14 @@ export default function CartItem({ item }: ICartItemProps) {
       />
 
       <div className={styles.subtotal}>
-        ₫{(item.priceSnapshot * item.quantity).toLocaleString()}
+        ₫{(item.displayPrice * item.quantity).toLocaleString()}
       </div>
 
       <Popconfirm
         title="Xóa sản phẩm này?"
         onConfirm={() => removeMutation.mutate(item.id)}
       >
-        <button className={styles.remove}>Xóa</button>
+        <Button className={styles.remove}>Xóa</Button>
       </Popconfirm>
     </div>
   );

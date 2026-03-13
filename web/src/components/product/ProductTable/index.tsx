@@ -90,11 +90,6 @@ export default function ProductTable({
   if (loading) return <Spin />;
 
   return (
-    <Table
-      rowKey="id"
-      dataSource={data}
-      columns={columns}
-      pagination={{ pageSize: 10 }}
-    />
+    <Table rowKey="id" dataSource={data} columns={columns} pagination={false} />
   );
 }

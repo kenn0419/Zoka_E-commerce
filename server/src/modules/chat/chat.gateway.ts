@@ -9,6 +9,8 @@ import { Server, Socket } from 'socket.io';
 import { UseGuards } from '@nestjs/common';
 import { ChatService } from './chat.service';
 import { SendMessageDto } from './dto/send-message.dto';
+import { AuthCoreService } from '../../common/auth/auth-core.service';
+import * as cookie from 'cookie';
 
 // @UseGuards(WsJwtSessionGuard)
 @WebSocketGateway({
@@ -19,19 +21,34 @@ export class ChatGateway {
   @WebSocketServer()
   server: Server;
 
-  constructor(private readonly chatService: ChatService) {}
+  constructor(
+    private readonly chatService: ChatService,
+    private readonly authCoreService: AuthCoreService,
+  ) {}
 
   afterInit() {
     console.log('🔥 ChatGateway init');
   }
 
-  handleConnection(client: Socket) {
-    if (!client.data?.userId) {
-      client.disconnect();
-      return;
-    }
+  async handleConnection(client: Socket) {
+    try {
+      const cookies = client.handshake.headers.cookie;
+      if (!cookies) throw new Error('Missing cookies');
 
-    console.log('User connected:', client.data.userId);
+      const parsed = cookie.parse(cookies);
+      const token = parsed.accessToken;
+      if (!token) throw new Error('Missing access token');
+
+      const payload = await this.authCoreService.verifyAccessToken(token);
+
+      client.data.user = payload;
+      client.data.userId = payload.sub;
+
+      console.log('User connected:', client.data.userId);
+    } catch (err) {
+      console.log('WS Auth error:', err.message);
+      client.disconnect();
+    }
   }
 
   @SubscribeMessage('join_conversation')
@@ -39,10 +56,6 @@ export class ChatGateway {
     @ConnectedSocket() client: Socket,
     @MessageBody() conversationId: string,
   ) {
-    console.log('📥 join_conversation', {
-      userId: client.data.userId,
-      conversationId,
-    });
     const userId = client.data.userId;
 
     const canJoin = await this.chatService.canJoinConversation(

@@ -1,3 +1,5 @@
+@use "../../../../styles/abstracts/variables" as v;
+
 .wrapper {
   background: #fff;
   padding: 16px;
@@ -13,6 +15,6 @@
   display: flex;
   justify-content: space-between;
   font-size: 18px;
-  color: #ee4d2d;
+  color: v.$color-primary;
   margin: 16px 0;
 }

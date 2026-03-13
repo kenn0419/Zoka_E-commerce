@@ -6,6 +6,7 @@ import {
   DollarOutlined,
   BarChartOutlined,
   GiftOutlined,
+  EditOutlined,
 } from "@ant-design/icons";
 import { useNavigate, useLocation } from "react-router-dom";
 import styles from "./Sidebar.module.scss";
@@ -42,6 +43,16 @@ export default function Sidebar() {
       key: `/${PATH.SELLER}/${currentShopId}/${PATH.MANAGE_FINANCE}`,
       icon: <DollarOutlined />,
       label: "Tài chính",
+    },
+    {
+      key: `/${PATH.SELLER}/${currentShopId}/${PATH.REVENUE_REPORT}`,
+      icon: <BarChartOutlined />,
+      label: "Báo cáo doanh thu",
+    },
+    {
+      key: `/${PATH.SELLER}/${currentShopId}/${PATH.MANAGE_REVIEW}`,
+      icon: <EditOutlined />,
+      label: "Đánh giá",
     },
     {
       key: `/${PATH.SELLER}/${currentShopId}/${PATH.MANAGE_SHOP}`,

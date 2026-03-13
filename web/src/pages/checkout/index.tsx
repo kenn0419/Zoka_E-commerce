@@ -13,6 +13,7 @@ import {
 } from "../../queries/checkout.query";
 import { useCartQuery } from "../../queries/cart.query";
 import { message, Spin } from "antd";
+import Stepper from "../../components/common/Stepper";
 
 export default function CheckoutPage() {
   const navigate = useNavigate();
@@ -79,6 +80,7 @@ export default function CheckoutPage() {
   return (
     <div className={styles.page}>
       <div className={styles.container}>
+        <Stepper currentStep={1} />
         <div className={styles.block}>
           <AddressBlock
             address={previewQuery.data?.address}

@@ -15,6 +15,13 @@ export const CouponSort = {
   END_AT_DESC: "end_at_desc",
 };
 
+export const CategorySort: Record<string, ICategorySort> = {
+  NAME_ASC: "name_asc",
+  NAME_DESC: "name_desc",
+  NEWEST: "newest",
+  OLDEST: "oldest",
+};
+
 export const ProductStatus = {
   PENDING: "PENDING",
   ACTIVE: "ACTIVE",
@@ -42,11 +49,11 @@ export const SHOP_STATUS_LABEL: Record<IShopStatus, string> = {
   SUSPENDED: "Bị khóa",
 };
 
-export const UserSort: Record<IUserSort, IUserSort> = {
-  OLDEST: "OLDEST",
-  NEWEST: "NEWEST",
-  NAME_ASC: "NAME_ASC",
-  NAME_DESC: "NAME_DESC",
+export const UserSort: Record<string, IUserSort> = {
+  OLDEST: "oldest",
+  NEWEST: "newest",
+  NAME_ASC: "name_asc",
+  NAME_DESC: "name_desc",
 };
 
 export const userStatus = {
@@ -62,4 +69,16 @@ export const ORDER_STATUS_LABEL: Record<IOrderStatus, string> = {
   COMPLETED: "Hoàn thành",
   CANCELLED: "Đã hủy",
   FAILED: "Thanh toán lỗi",
+};
+
+export const ReviewSort = {
+  NEWEST: "newest",
+  OLDEST: "oldest",
+  RATING_ASC: "rating_asc",
+  RATING_DESC: "rating_desc",
+};
+
+export const ProductReviewStatus = {
+  ACTIVE: "ACTIVE",
+  INACTIVE: "INACTIVE",
 };

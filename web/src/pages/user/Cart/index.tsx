@@ -6,6 +6,8 @@ import EmptyCart from "../../../components/cart/EmptyCard.tsx";
 import { useCartQuery } from "../../../queries/cart.query.ts";
 import { useEffect } from "react";
 import { useAuthStore } from "../../../store/auth.store.ts";
+import styles from "./Cart.module.scss";
+import Stepper from "../../../components/common/Stepper/index.tsx";
 
 export default function CartPage() {
   const user = useAuthStore((state) => state.user);
@@ -18,7 +20,7 @@ export default function CartPage() {
     }
   }, [data, init]);
   if (isLoading) return <Spin />;
-  if (!data?.items.length) return <EmptyCart />;
+  if (!data?.items?.length) return <EmptyCart />;
 
   const availableIds = data.items.filter((i) => i.isAvailable).map((i) => i.id);
 
@@ -26,7 +28,8 @@ export default function CartPage() {
     availableIds.length > 0 && availableIds.every((id) => checkedMap[id]);
 
   return (
-    <div style={{ padding: 24, maxWidth: 1200, margin: "0 auto" }}>
+    <div className={styles.wrapper}>
+      <Stepper currentStep={0} />
       <div style={{ marginBottom: 16 }}>
         <Checkbox
           checked={allChecked}

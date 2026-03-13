@@ -41,13 +41,6 @@ export default function ShopOrderBlock({
           </div>
 
           <div className={styles.footer}>
-            <div>
-              <div className={styles.shippingLabel}>Phí vận chuyển</div>
-              <div className={styles.shippingFee}>
-                ₫{shop.shippingFee.toLocaleString()}
-              </div>
-            </div>
-
             <div className={styles.subtotal}>
               Tổng shop: ₫{shop.subtotal.toLocaleString()}
             </div>

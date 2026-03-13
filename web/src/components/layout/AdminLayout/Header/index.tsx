@@ -56,12 +56,12 @@ export default function Header() {
         logoutMutation.mutate(undefined, {
           onSuccess: () => {
             message.success("Đã đăng xuất");
+            navigate(`/${PATH.AUTH}/${PATH.SIGNIN}`);
           },
           onError: () => {
             message.error("Đăng xuất thất bại");
           },
         });
-        navigate(`/${PATH.AUTH}/${PATH.SIGNIN}`);
       },
     },
   ];
@@ -77,9 +77,7 @@ export default function Header() {
         Về trang người dùng
       </Button>
 
-      {/* Right */}
       <div className={styles.right}>
-        {/* Notification */}
         <Dropdown
           menu={{ items: notificationItems }}
           trigger={["click"]}
@@ -94,7 +92,6 @@ export default function Header() {
           </Badge>
         </Dropdown>
 
-        {/* User menu */}
         <Dropdown
           menu={{ items: userMenuItems }}
           trigger={["click"]}
@@ -102,7 +99,7 @@ export default function Header() {
         >
           <div className={styles.user}>
             <Avatar size="small" icon={<UserOutlined />} />
-            <span className={styles.username}>Seller</span>
+            <span className={styles.username}>Admin</span>
           </div>
         </Dropdown>
       </div>

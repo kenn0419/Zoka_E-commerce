@@ -22,6 +22,18 @@ export const useActiveProductsQuery = (
   });
 };
 
+export const useAdminProductsQuery = (
+  params: IProductFilterQueries,
+  options?: any,
+) => {
+  return useQuery<IPaginatedResponse<IProductListItemResponse>>({
+    queryKey: ["products", "admin", params],
+    queryFn: () => productService.fetchAdminProducts(params),
+    placeholderData: keepPreviousData,
+    ...options,
+  });
+};
+
 export const useProductDetailBySlugQuery = (slug?: string) => {
   return useQuery<IProductDetailResponse>({
     queryKey: ["product", "detail", slug],

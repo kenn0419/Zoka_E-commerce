@@ -67,6 +67,8 @@ export class ProductService {
     const variantRows: Prisma.ProductVariantCreateManyInput[] = [];
     const variantImageRows: Prisma.VariantImageCreateManyInput[] = [];
 
+    let minPrice = data.variants[0].price;
+    let maxPrice = data.variants[0].price;
     for (const variant of data.variants) {
       const variantId = crypto.randomUUID();
       variantRows.push({
@@ -88,6 +90,13 @@ export class ProductService {
           imageUrl: variantImages[index].url,
         });
       }
+
+      if (minPrice > variant.price) {
+        minPrice = variant.price;
+      }
+      if (maxPrice < variant.price) {
+        maxPrice = variant.price;
+      }
     }
 
     await this.prisma.$transaction(async (tx) => {
@@ -100,6 +109,8 @@ export class ProductService {
           slug: SlugifyUtil.createSlug(data.name),
           description: data.description,
           thumbnail: thumbnail.url,
+          minPrice: new Prisma.Decimal(minPrice),
+          maxPrice: new Prisma.Decimal(maxPrice),
           status: ProductStatus.PENDING,
         },
         tx,
