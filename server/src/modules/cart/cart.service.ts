@@ -22,8 +22,27 @@ export class CartService {
 
   async getUserCart(userId: string) {
     const cart = await this.getOrCreateCartEntity(userId);
-    console.log(cart);
     const syncedItems = await this.resolveCartItemsRealtime(cart);
+
+    const itemsToUpdate = syncedItems.filter(
+      (item) =>
+        Number(item.priceSnapshot) !== item.displayPrice ||
+        item.stockSnapshot !== item.availableStock,
+    );
+
+    if (itemsToUpdate.length > 0) {
+      await Promise.all(
+        itemsToUpdate.map((item) =>
+          this.cartItemRepo.updateCartItem(
+            { id: item.id },
+            {
+              priceSnapshot: new Prisma.Decimal(item.displayPrice),
+              stockSnapshot: item.availableStock,
+            },
+          ),
+        ),
+      );
+    }
 
     const res = CartMapper.toCartResponse({
       ...cart,

@@ -27,6 +27,7 @@ import { NotificationModule } from './modules/notification/notification.module';
 import { FlashSaleModule } from './modules/flash-sale/flash-sale.module';
 import { ShopFollowerModule } from './modules/shop-follower/shop-follower.module';
 import { StatisticsModule } from './modules/statistics/statistics.module';
+import { AiAgentModule } from './modules/ai-agent/ai-agent.module';
 
 @Module({
   imports: [
@@ -63,6 +64,7 @@ import { StatisticsModule } from './modules/statistics/statistics.module';
     FlashSaleModule,
     ShopFollowerModule,
     StatisticsModule,
+    AiAgentModule,
   ],
 })
 export class AppModule {}

@@ -6,4 +6,7 @@ export const conversationApi = {
   ): Promise<IApiResponse<IInfinityResponse<IConversationResponse>>> => {
     return await instance.get(`/chats/conversations`, { params });
   },
+  fetchAiConversation: async (): Promise<IApiResponse<IConversationResponse>> => {
+    return await instance.get(`/chats/ai-conversation`);
+  },
 };

@@ -8,7 +8,9 @@ import {
 import styles from "./ShopHeader.module.scss";
 import dayjs from "dayjs";
 import { useNavigate } from "react-router-dom";
-import { PATH } from "../../../../../utils/path.util";
+import { PATH } from "../../../utils/path.util";
+import { useChatStore } from "../../../store/chat.store";
+import { useQueryClient } from "@tanstack/react-query";
 
 interface ShopHeaderProps {
   shop: IShopResponse;
@@ -17,6 +19,9 @@ interface ShopHeaderProps {
 
 export default function ShopHeader({ shop, isLoading }: ShopHeaderProps) {
   const navigate = useNavigate();
+  const { openChatWithConversation, openChatWithPartner } = useChatStore();
+  const queryClient = useQueryClient();
+
   if (isLoading) {
     return <Spin />;
   }
@@ -24,6 +29,43 @@ export default function ShopHeader({ shop, isLoading }: ShopHeaderProps) {
   const handleClickThumbnail = () => {
     navigate(`/public/${PATH.SHOP}/${shop.slug}`);
   };
+
+  const handleClickChat = () => {
+    console.log("👆 Chat button clicked", {
+      hasOwner: !!shop?.owner,
+      ownerId: shop?.owner?.id,
+      shopName: shop?.name
+    });
+
+    if (!shop?.owner?.id ) {
+      console.warn("⚠️ Cannot open chat: Shop owner information is missing");
+      return;
+    }
+
+    const conversations = queryClient.getQueryData<{
+      pages: { items: IConversationResponse[] }[];
+    }>(["conversations"]);
+
+    const existing = conversations?.pages
+      .flatMap((page) => page.items)
+      .find((c) => c.partner.id === shop.owner?.id);
+
+    if (existing) {
+      console.log("📍 Found existing conversation:", existing.id);
+      openChatWithConversation(existing.id);
+    } else {
+      console.log("🆕 Creating new chat with partner", shop.owner.id);
+      openChatWithPartner({
+        id: shop.owner.id,
+        fullName: shop.owner.fullName,
+        avatarUrl: shop.owner.avatarUrl || "",
+      });
+    }
+    
+    // Explicitly set open to true to trigger the popup
+    useChatStore.getState().setOpen(true);
+  };
+
   return (
     <div className={styles.wrapper}>
       <div className={styles.left}>
@@ -42,7 +84,9 @@ export default function ShopHeader({ shop, isLoading }: ShopHeaderProps) {
               <Button type="primary" ghost icon={<ShopOutlined />}>
                 Theo dõi
               </Button>
-              <Button icon={<MessageOutlined />}>Chat</Button>
+              <Button icon={<MessageOutlined />} onClick={handleClickChat}>
+                Chat
+              </Button>
             </div>
           </div>
         </div>

@@ -29,7 +29,14 @@ export class FlashSaleRepository {
     const client = tx ?? this.prisma;
     return client.flashSale.findUnique({
       where,
-      include: { items: true },
+      include: {
+        items: {
+          include: {
+            product: true,
+            variant: true,
+          },
+        },
+      },
     });
   }
 
@@ -44,6 +51,7 @@ export class FlashSaleRepository {
         product: {
           include: { variants: true },
         },
+        variant: true,
       },
     });
   }
@@ -115,7 +123,14 @@ export class FlashSaleRepository {
     const [items, totalItems] = await this.prisma.$transaction([
       this.prisma.flashSale.findMany({
         where,
-        include: { items: true },
+        include: {
+          items: {
+            include: {
+              product: true,
+              variant: true,
+            },
+          },
+        },
         skip,
         take: limit,
         orderBy: orderBy ?? { createdAt: 'desc' },
@@ -153,7 +168,7 @@ export class FlashSaleRepository {
 
         tx.flashSale.updateMany({
           where: {
-            status: FlashSaleStatus.ACTIVE,
+            status: { in: [FlashSaleStatus.ACTIVE, FlashSaleStatus.UPCOMING] },
             endTime: { lte: now },
           },
           data: { status: FlashSaleStatus.ENDED },
@@ -173,7 +188,7 @@ export class FlashSaleRepository {
 
       this.prisma.flashSale.updateMany({
         where: {
-          status: FlashSaleStatus.ACTIVE,
+          status: { in: [FlashSaleStatus.ACTIVE, FlashSaleStatus.UPCOMING] },
           endTime: { lte: now },
         },
         data: { status: FlashSaleStatus.ENDED },

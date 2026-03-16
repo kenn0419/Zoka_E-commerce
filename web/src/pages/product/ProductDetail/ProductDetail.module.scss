@@ -25,3 +25,31 @@
     gap: 16px;
   }
 }
+
+.flashSaleBanner {
+  background: linear-gradient(90deg, #f53d2d, #f63);
+  padding: 8px 16px;
+  border-radius: 4px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 16px;
+  color: #fff;
+}
+
+.flashSaleTitle {
+  font-weight: 700;
+  font-size: 18px;
+}
+
+.flashSaleTimer {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.timerText {
+  font-size: 12px;
+  font-weight: 500;
+  color: rgba(255, 255, 255, 0.9);
+}

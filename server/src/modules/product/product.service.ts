@@ -345,6 +345,7 @@ export class ProductService {
         variantId: { in: variantIds },
         flashSale: { status: FlashSaleStatus.ACTIVE },
       },
+      include: { flashSale: true },
     });
     const sold = await this.prisma.orderItem.aggregate({
       _sum: { quantity: true },
@@ -362,6 +363,7 @@ export class ProductService {
           originalPrice: variant.price,
           displayPrice: variant.price,
           isFlashSale: false,
+          flashSaleEndTime: null,
           stock: variant.stock,
           sold: sold._sum.quantity ?? 0,
         };
@@ -372,6 +374,7 @@ export class ProductService {
         originalPrice: variant.price,
         displayPrice: flashSale.salePrice,
         isFlashSale: true,
+        flashSaleEndTime: flashSale.flashSale.endTime,
         stock: flashSale.quantity - flashSale.sold,
         sold: sold._sum.quantity ?? 0,
       };
@@ -379,6 +382,7 @@ export class ProductService {
     return {
       ...product,
       sold: sold._sum.quantity ?? 0,
+      flashSaleEndTime: flashSales[0]?.flashSale?.endTime || null,
       variants,
     };
   }

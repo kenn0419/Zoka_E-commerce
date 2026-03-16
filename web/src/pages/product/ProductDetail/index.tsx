@@ -12,8 +12,9 @@ import VariantSelector from "../../../components/product/VariantSelector";
 import QuantitySelector from "../../../components/product/QuantitySelector";
 import { useProductDetailBySlugQuery } from "../../../queries/product.query";
 import { useDetailShopByProductSlugQuery } from "../../../queries/shop.query";
-import ShopHeader from "../../shop/ShopPage/components/ShopHeader";
+import ShopHeader from "../../../components/shop/ShopHeader";
 import ProductReviewSection from "../../../components/review/ProductReviewSection";
+import Countdown from "../../../components/common/Countdown";
 
 const ProductDetailPage = () => {
   const { productSlug } = useParams<{ productSlug: string }>();
@@ -40,6 +41,17 @@ const ProductDetailPage = () => {
         </div>
 
         <div className={styles.right}>
+          {variant.isFlashSale && (
+            <div className={styles.flashSaleBanner}>
+              <div className={styles.flashSaleTitle}>
+                <span>⚡ FLASH SALE</span>
+              </div>
+              <div className={styles.flashSaleTimer}>
+                <span className={styles.timerText}>KẾT THÚC TRONG</span>
+                <Countdown targetDate={variant.flashSaleEndTime!} />
+              </div>
+            </div>
+          )}
           <ProductInfo
             product={product}
             originalPrice={variant.originalPrice}

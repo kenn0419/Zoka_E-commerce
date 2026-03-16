@@ -82,3 +82,5 @@ export const ProductReviewStatus = {
   ACTIVE: "ACTIVE",
   INACTIVE: "INACTIVE",
 };
+
+export const CHAT_AI_AGENT_ID = "ai-assistant-agent-id-001";

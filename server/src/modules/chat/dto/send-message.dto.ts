@@ -1,10 +1,16 @@
-import { IsNotEmpty, IsString, IsUUID } from 'class-validator';
+import { IsNotEmpty, IsOptional, IsString, IsUUID } from 'class-validator';
 
 export class SendMessageDto {
   @IsUUID()
-  conversationId: string;
+  @IsOptional()
+  conversationId?: string;
+
+  @IsUUID()
+  @IsOptional()
+  receiverId?: string;
 
   @IsString()
   @IsNotEmpty()
   content: string;
 }
+

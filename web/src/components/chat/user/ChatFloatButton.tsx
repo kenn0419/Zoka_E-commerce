@@ -1,26 +1,26 @@
 import { MessageOutlined } from "@ant-design/icons";
 import { Badge, FloatButton, Popover } from "antd";
-import { useState } from "react";
 import ChatPopup from "./ChatPopup";
+import { useChatStore } from "../../../store/chat.store";
 
 export default function ChatFloatButton() {
-  const [open, setOpen] = useState(false);
+  const { isOpen, setOpen } = useChatStore();
 
   return (
     <Popover
       content={<ChatPopup />}
       trigger="click"
-      open={open}
+      open={isOpen}
       onOpenChange={setOpen}
-      placement="topRight"
+      placement="leftBottom"
+      overlayInnerStyle={{ padding: 0 }}
     >
       <FloatButton
         icon={
-          <Badge dot>
+          <Badge dot={true}>
             <MessageOutlined />
           </Badge>
         }
-        style={{ right: 24, bottom: 24 }}
       />
     </Popover>
   );

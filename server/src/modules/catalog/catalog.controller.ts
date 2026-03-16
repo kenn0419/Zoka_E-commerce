@@ -8,8 +8,6 @@ import {
   Delete,
 } from '@nestjs/common';
 import { CatalogService } from './catalog.service';
-import { CreateCatalogDto } from './dto/create-catalog.dto';
-import { UpdateCatalogDto } from './dto/update-catalog.dto';
 import { Serialize } from 'src/common/decorators/serialize.decorator';
 import { ShopResponseDto } from '../shop/dto/shop-response.dto';
 

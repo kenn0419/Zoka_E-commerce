@@ -31,37 +31,45 @@
 }
 
 .price {
-  position: relative;
-  background-color: v.$bg-light;
-  width: 70%;
-  height: 100px;
-  padding: 10px;
-  border: 1px solid #ccc;
-  border-radius: v.$radius-lg;
+  background: v.$bg-light;
+  padding: 16px;
+  border-radius: v.$radius-md;
   display: flex;
-  justify-content: center;
-  gap: 12px;
   align-items: center;
+  gap: 16px;
   margin: 20px 0;
+
+  &.isFlashSale {
+    background: linear-gradient(90deg, #f53d2d, #f63);
+    color: #fff;
+  }
 
   .old {
     text-decoration: line-through;
     color: #999;
+    font-size: 16px;
+
+    .isFlashSale & {
+      color: rgba(255, 255, 255, 0.6);
+    }
   }
 
   .new {
     font-size: 32px;
     font-weight: 700;
-    color: #6d28d9;
+    color: v.$color-primary;
+
+    .isFlashSale & {
+      color: #fff;
+    }
   }
 
-  .rateDifference {
-    position: absolute;
-    bottom: 10px;
-    right: 10px;
-    padding: 10px;
-    background-color: v.$color-accent;
+  .discount {
+    background: #ff4d4f;
     color: #fff;
-    border-radius: v.$radius-md;
+    padding: 2px 6px;
+    border-radius: 2px;
+    font-size: 12px;
+    font-weight: 700;
   }
 }

@@ -1,7 +1,7 @@
 import styles from "./ShopPage.module.scss";
 import { useParams, useSearchParams } from "react-router-dom";
 import parseNumberParam from "../../../helper/parseNumber.helper";
-import ShopHeader from "./components/ShopHeader";
+import ShopHeader from "../../../components/shop/ShopHeader";
 import { Breadcrumb, Layout } from "antd";
 import { Content } from "antd/es/layout/layout";
 import { useActiveShopProducts } from "../../../queries/product.query";

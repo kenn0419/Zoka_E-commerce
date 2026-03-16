@@ -7,6 +7,7 @@ import { UserRepository } from '../user/repositories/user.repository';
 import { RbacRepository } from '../rbac/rbac.repository';
 import { Role } from 'src/common/enums/role.enum';
 import { ConversationMapper } from 'src/common/mappers/conversation.mapper';
+import { CHAT_AI_AGENT_ID } from 'src/common/constants/ai-agent.constant';
 
 @Injectable()
 export class ChatService {
@@ -34,9 +35,52 @@ export class ChatService {
     return conversation.buyerId === userId || conversation.sellerId === userId;
   }
 
-  async sendMessage(senderId: string, dto: SendMessageDto) {
+  async getConversationWithContext(conversationId: string) {
+    const conversation = await this.conversationRepo.findUnique({
+      id: conversationId,
+    });
+    if (!conversation) {
+      throw new BadRequestException('Conversation not found');
+    }
+    return conversation;
+  }
+
+  async getOrCreateAiConversation(userId: string) {
+    return await this.conversationRepo.ensureConversationWithAI(userId);
+  }
+
+  async sendMessage(senderId: string, dto: SendMessageDto, metadata: any = {}) {
+    let conversationId = dto.conversationId;
+
+    if (!conversationId) {
+      if (!dto.receiverId) {
+        throw new WsException(
+          'Either conversationId or receiverId must be provided',
+        );
+      }
+
+      // Find or create conversation
+      const existing = await this.conversationRepo.findConversation(
+        dto.receiverId,
+        senderId,
+      );
+
+      if (existing) {
+        conversationId = existing.id;
+      } else {
+        const newConversation =
+          await this.conversationRepo.prisma.conversation.create({
+            data: {
+              buyerId: senderId,
+              sellerId: dto.receiverId,
+            },
+          });
+        conversationId = newConversation.id;
+      }
+    }
+
     const conversation = await this.conversationRepo.findByIdAndUser(
-      dto.conversationId,
+      conversationId,
       senderId,
     );
 
@@ -45,14 +89,15 @@ export class ChatService {
     }
 
     const message = await this.messageRepo.create({
-      conversationId: dto.conversationId,
+      conversationId,
       senderId,
       content: dto.content,
       isRead: false,
+      metadata: metadata || {},
     });
 
     await this.conversationRepo.updateConversation(
-      { id: conversation.id },
+      { id: conversationId },
       { updatedAt: new Date() },
     );
 
@@ -74,6 +119,8 @@ export class ChatService {
       userId,
       adminUser.id,
     );
+
+    await this.conversationRepo.ensureConversationWithAI(userId);
 
     const conversations = await this.conversationRepo.findUserConversations(
       userId,

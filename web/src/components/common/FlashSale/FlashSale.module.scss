@@ -5,48 +5,132 @@
   background: #fff;
   padding: 16px;
   border-radius: v.$radius-md;
+  box-shadow: 0 1px 1px 0 rgba(0,0,0,.05);
 }
 
 .header {
   @include m.flex-center;
   justify-content: space-between;
-  margin-bottom: 16px;
+  margin-bottom: 20px;
+}
 
-  h3 {
-    color: v.$color-primary;
-    font-weight: 600;
-  }
+.titleWrapper {
+  @include m.flex-center;
+  gap: 12px;
+}
+
+.labelImg {
+  height: 26px;
 }
 
 .timer {
-  background: #000;
-  color: #fff;
-  padding: 4px 8px;
-  border-radius: 4px;
-  font-size: 14px;
+  @include m.flex-center;
+  gap: 4px;
 }
 
-.item {
-  background: #fff;
-  padding: 12px;
-  border-radius: v.$radius-md;
-  cursor: pointer;
+.timeBox {
+  background: #000;
+  color: #fff;
+  padding: 2px 4px;
+  border-radius: 4px;
+  font-size: 14px;
+  font-weight: 700;
+  min-width: 24px;
+  text-align: center;
+}
 
-  img {
-    width: 100%;
-    height: 140px;
-    object-fit: cover;
-    margin-bottom: 8px;
+.divider {
+  font-weight: 700;
+  color: #000;
+}
+
+.viewAll {
+  color: v.$color-primary;
+  cursor: pointer;
+  font-size: 14px;
+  
+  &:hover {
+    opacity: 0.8;
   }
 }
 
-.name {
-  font-size: 13px;
-  @include m.text-ellipsis(2);
+.scrollContainer {
+  display: flex;
+  overflow-x: auto;
+  gap: 12px;
+  padding-bottom: 8px;
+  
+  &::-webkit-scrollbar {
+    height: 4px;
+  }
+  
+  &::-webkit-scrollbar-thumb {
+    background: #e1e1e1;
+    border-radius: 4px;
+  }
+}
+
+.item {
+  flex: 0 0 180px;
+  background: #fff;
+  border-radius: v.$radius-sm;
+  overflow: hidden;
+  border: 1px solid transparent;
+  transition: all 0.2s;
+
+  &:hover {
+    border-color: v.$color-primary;
+  }
+}
+
+.imageWrapper {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 1;
+
+  img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+}
+
+.discountBadge {
+  position: absolute;
+  top: 0;
+  right: 0;
+  background: #ffe97a;
+  color: #ee4d2d;
+  font-size: 12px;
+  padding: 2px 4px;
+  font-weight: 500;
+}
+
+.info {
+  padding: 12px 8px;
+  text-align: center;
 }
 
 .price {
   color: v.$color-primary;
   font-weight: 600;
-  margin: 4px 0;
+  font-size: 18px;
+  margin-bottom: 8px;
+}
+
+.soldInfo {
+  position: relative;
+  height: 16px;
+}
+
+.soldText {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  font-size: 10px;
+  font-weight: 700;
+  color: #fff;
+  white-space: nowrap;
+  text-shadow: 0 0 2px rgba(0,0,0,0.2);
 }

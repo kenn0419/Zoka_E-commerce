@@ -1,10 +1,11 @@
 import { Injectable } from '@nestjs/common';
 import { Prisma } from 'generated/prisma';
 import { PrismaService } from 'src/infrastructure/prisma/prisma.service';
+import { CHAT_AI_AGENT_ID } from 'src/common/constants/ai-agent.constant';
 
 @Injectable()
 export class ConversationRepository {
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(public readonly prisma: PrismaService) {}
 
   findByIdAndUser(conversationId: string, userId: string) {
     return this.prisma.conversation.findFirst({
@@ -86,6 +87,22 @@ export class ConversationRepository {
       create: {
         buyerId: userId,
         sellerId: adminId,
+      },
+    });
+  }
+
+  ensureConversationWithAI(userId: string) {
+    return this.prisma.conversation.upsert({
+      where: {
+        buyerId_sellerId: {
+          buyerId: userId,
+          sellerId: CHAT_AI_AGENT_ID,
+        },
+      },
+      update: {},
+      create: {
+        buyerId: userId,
+        sellerId: CHAT_AI_AGENT_ID,
       },
     });
   }

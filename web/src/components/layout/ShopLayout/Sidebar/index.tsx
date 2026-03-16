@@ -40,6 +40,11 @@ export default function Sidebar() {
       label: "Khuyến mãi",
     },
     {
+      key: `/${PATH.SELLER}/${currentShopId}/${PATH.MANAGE_FLASH_SALE}`,
+      icon: <GiftOutlined />,
+      label: "Flash Sale",
+    },
+    {
       key: `/${PATH.SELLER}/${currentShopId}/${PATH.MANAGE_FINANCE}`,
       icon: <DollarOutlined />,
       label: "Tài chính",

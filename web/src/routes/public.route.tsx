@@ -8,6 +8,7 @@ const ProductDetailPage = lazy(() => import("../pages/product/ProductDetail"));
 const ProductListPage = lazy(() => import("../pages/product/ProductList"));
 const ShopPage = lazy(() => import("../pages/shop/ShopPage"));
 const OrderSuccessPage = lazy(() => import("../pages/result/OrderSuccess"));
+const FlashSalePage = lazy(() => import("../pages/public/FlashSalePage"));
 
 export const PublicRoutes: RouteObject = {
   path: PATH.HOME,
@@ -17,6 +18,7 @@ export const PublicRoutes: RouteObject = {
 
     { path: PATH.PRODUCTS, element: <ProductListPage /> },
     { path: PATH.PRODUCT_DETAIL, element: <ProductDetailPage /> },
+    { path: PATH.FLASH_SALE, element: <FlashSalePage /> },
 
     {
       path: `public/${PATH.SHOP}/:slug`,

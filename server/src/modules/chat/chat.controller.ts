@@ -9,9 +9,18 @@ import {
 } from 'src/common/dto/paginated-query.dto';
 import { MessageResponseDto } from './responses/message.response.dto';
 
+import { CHAT_AI_AGENT_ID } from 'src/common/constants/ai-agent.constant';
+
 @Controller('chats')
 export class ChatController {
   constructor(private readonly chatService: ChatService) {}
+
+  @Get('ai-conversation')
+  @UseGuards(JwtSessionGuard)
+  @SerializePaginated(ConversationResponse, 'Get AI conversation successfully!')
+  getAiConversation(@Req() req) {
+    return this.chatService.getOrCreateAiConversation(req.user.sub);
+  }
 
   @Get('conversations')
   @UseGuards(JwtSessionGuard)
@@ -42,8 +51,8 @@ export class ChatController {
   ) {
     const take = Number(limit);
     return this.chatService.findMessageByConversation(
-      req.user.sub,
       conversationId,
+      req.user.sub,
       cursor,
       Number.isNaN(take) ? 10 : take,
     );

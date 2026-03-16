@@ -10,12 +10,14 @@ export class MessageRepository {
     senderId: string;
     content: string;
     isRead: boolean;
+    metadata?: any;
   }) {
     return this.prisma.message.create({
       data,
       select: {
         id: true,
         content: true,
+        metadata: true,
         createdAt: true,
         sender: true,
         conversationId: true,

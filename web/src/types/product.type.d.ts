@@ -8,6 +8,24 @@ interface IProductListItemResponse {
   maxPrice: number;
   hasStock: boolean;
   status?: string;
+  flashSaleEndTime?: string | null; // Added flashSaleEndTime
+}
+
+interface IVariantImageResponse {
+  id: string;
+  imageUrl: string;
+}
+
+interface IVariantResponse {
+  id: string;
+  name: string;
+  originalPrice: number;
+  displayPrice: number;
+  isFlashSale: boolean;
+  flashSaleEndTime?: string | null;
+  stock: number;
+  sold: number;
+  images: IVariantImage[];
 }
 
 interface IProductDetailResponse {
@@ -21,9 +39,10 @@ interface IProductDetailResponse {
   maxPrice: number;
   hasStock: boolean;
   sold: number;
-  variants: IProductVariantResponse[];
-  category: ICategoryResponse;
-  shop: IShopResponse;
+  flashSaleEndTime?: string | null; // Added flashSaleEndTime
+  variants: IVariantResponse[]; // Changed type to IVariantResponse[]
+  category: ICategoryResponse; // Assuming ICategoryResponse, not ICategoryDetailResponse as per original document
+  shop: IShopResponse; // Assuming IShopResponse, not IShopDetailResponse as per original document
 }
 
 interface IProductFilterQueries extends IPaginationQueries {

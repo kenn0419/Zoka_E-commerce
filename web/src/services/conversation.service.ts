@@ -8,4 +8,8 @@ export const conversationService = {
 
     return res.data;
   },
+  async fetchAiConversation(): Promise<IConversationResponse> {
+    const res = await conversationApi.fetchAiConversation();
+    return res.data;
+  },
 };

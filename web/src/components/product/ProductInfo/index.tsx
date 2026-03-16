@@ -18,20 +18,22 @@ export default function ProductInfo({
     <div className={styles.info}>
       <h1 className={styles.name}>{product.name}</h1>
       <div className={styles.rating}>
-        <Rate value={product.avgRating} />
+        <Rate value={product.avgRating} disabled />
         <span>{`(${product.avgRating})`}</span>
       </div>
 
-      <div className={styles.price}>
-        {isFlashSale && (
-          <span className={styles.old}>{originalPrice.toLocaleString()}</span>
-        )}
-        <span className={styles.new}>{displayPrice.toLocaleString()}</span>
-        {isFlashSale && (
-          <span className={styles.rateDifference}>
-            {Math.round((displayPrice / originalPrice) * 100)}% savings
-          </span>
-        )}
+      <div className={`${styles.price} ${isFlashSale ? styles.isFlashSale : ""}`}>
+        <div className={styles.priceContent}>
+          {isFlashSale && (
+            <span className={styles.old}>{originalPrice.toLocaleString()} ₫</span>
+          )}
+          <span className={styles.new}>{displayPrice.toLocaleString()} ₫</span>
+          {isFlashSale && (
+            <span className={styles.discount}>
+              {Math.round((1 - displayPrice / originalPrice) * 100)}% GIẢM
+            </span>
+          )}
+        </div>
       </div>
     </div>
   );

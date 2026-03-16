@@ -3,8 +3,8 @@ import styles from "./MainLayout.module.scss";
 import Footer from "../../components/layout/MainLayout/Footer";
 import Header from "../../components/layout/MainLayout/Header";
 import { Layout } from "antd";
-import ChatFloatButton from "../../components/chat/ChatFloatButton";
 import { useAuthStore } from "../../store/auth.store";
+import FloatButtonList from "../../components/chat/user/FloatButtonList";
 
 export default function MainLayout() {
   const user = useAuthStore((state) => state.user);
@@ -21,7 +21,7 @@ export default function MainLayout() {
 
       <Footer />
 
-      {user && <ChatFloatButton />}
+      {user && <FloatButtonList />}
     </Layout>
   );
 }

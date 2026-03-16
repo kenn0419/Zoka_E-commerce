@@ -13,6 +13,7 @@ export const PATH = {
   MANAGE_REVIEW: "manage-reviews",
   MANAGE_DISCOUNT: "manage-discounts",
   MANAGE_ADDRESS: "manage-addresses",
+  MANAGE_FLASH_SALE: "manage-flash-sales",
   AUTH: "auth",
   SIGNIN: "signin",
   SIGNUP: "signup",
@@ -37,6 +38,7 @@ export const PATH = {
   CHECKOUT: "checkout",
   ORDER_SUCESS: "order-success",
   PROFILE: "profile",
+  FLASH_SALE: "flash-sale",
   CATEGORIES: "categories",
   REVENUE_REPORT: "revenue-report",
 };

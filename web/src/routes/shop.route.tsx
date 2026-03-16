@@ -20,6 +20,9 @@ const DiscountManagementPage = lazy(
   () => import("../pages/shop/DiscountManagement"),
 );
 const RevenueReportPage = lazy(() => import("../pages/shop/RevenueReport"));
+const FlashSaleManagementPage = lazy(
+  () => import("../pages/shop/FlashSaleManagement"),
+);
 
 export const ShopRoutes: RouteObject = {
   path: `/${PATH.SELLER}/:shopId`,
@@ -38,6 +41,7 @@ export const ShopRoutes: RouteObject = {
         { path: PATH.CREATE_PRODUCT, element: <ProductCreationPage /> },
         { path: PATH.MANAGE_REVIEW, element: <ProductReviewManagementPage /> },
         { path: PATH.MANAGE_DISCOUNT, element: <DiscountManagementPage /> },
+        { path: PATH.MANAGE_FLASH_SALE, element: <FlashSaleManagementPage /> },
         { path: PATH.REVENUE_REPORT, element: <RevenueReportPage /> },
       ],
     },
