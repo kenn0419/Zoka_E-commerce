@@ -2,10 +2,14 @@ import { ForbiddenException, Injectable, NotFoundException } from '@nestjs/commo
 import { PrismaService } from 'src/infrastructure/prisma/prisma.service';
 import { RevenueQueryDto, StatisticsPeriod } from './dto/revenue-query.dto';
 import * as ExcelJS from 'exceljs';
+import { RedisService } from 'src/infrastructure/redis/redis.service';
 
 @Injectable()
 export class StatisticsService {
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(
+    private readonly prisma: PrismaService,
+    private readonly redisService: RedisService,
+  ) {}
 
   async getAdminRevenue(query: RevenueQueryDto) {
     const { period, startDate, endDate } = query;
@@ -16,27 +20,35 @@ export class StatisticsService {
       dateFilter = `AND "createdAt" BETWEEN '${startDate}' AND '${endDate}'`;
     }
 
-    return this.prisma.$queryRawUnsafe(`
-      WITH period_stats AS (
-        SELECT 
-          DATE_TRUNC('${truncType}', "createdAt") AS period_date,
-          SUM("totalPrice") AS revenue
-        FROM "Order"
-        WHERE status = 'COMPLETED' ${dateFilter}
-        GROUP BY 1
-      )
-      SELECT 
-        period_date AS date,
-        revenue::FLOAT,
-        SUM(revenue) OVER (ORDER BY period_date)::FLOAT AS "cumulativeRevenue",
-        LAG(revenue) OVER (ORDER BY period_date)::FLOAT AS "previousRevenue",
-        CASE 
-          WHEN LAG(revenue) OVER (ORDER BY period_date) = 0 OR LAG(revenue) OVER (ORDER BY period_date) IS NULL THEN NULL
-          ELSE ((revenue - LAG(revenue) OVER (ORDER BY period_date)) / LAG(revenue) OVER (ORDER BY period_date) * 100)::FLOAT 
-        END AS "growthPercentage"
-      FROM period_stats
-      ORDER BY period_date ASC;
-    `);
+    const cacheKey = `stat:admin:revenue:${period}:${startDate || 'none'}:${endDate || 'none'}`;
+
+    return this.redisService.getOrSet(
+      cacheKey,
+      async () => {
+        return this.prisma.$queryRawUnsafe(`
+          WITH period_stats AS (
+            SELECT 
+              DATE_TRUNC('${truncType}', "createdAt") AS period_date,
+              SUM("totalPrice") AS revenue
+            FROM "Order"
+            WHERE status = 'COMPLETED' ${dateFilter}
+            GROUP BY 1
+          )
+          SELECT 
+            period_date AS date,
+            revenue::FLOAT,
+            SUM(revenue) OVER (ORDER BY period_date)::FLOAT AS "cumulativeRevenue",
+            LAG(revenue) OVER (ORDER BY period_date)::FLOAT AS "previousRevenue",
+            CASE 
+              WHEN LAG(revenue) OVER (ORDER BY period_date) = 0 OR LAG(revenue) OVER (ORDER BY period_date) IS NULL THEN NULL
+              ELSE ((revenue - LAG(revenue) OVER (ORDER BY period_date)) / LAG(revenue) OVER (ORDER BY period_date) * 100)::FLOAT 
+            END AS "growthPercentage"
+          FROM period_stats
+          ORDER BY period_date ASC;
+        `);
+      },
+      60 * 15, // 15 minutes TTL
+    );
   }
 
   async getShopRevenue(userId: string, shopId: string, query: RevenueQueryDto) {
@@ -61,27 +73,35 @@ export class StatisticsService {
       dateFilter = `AND "createdAt" BETWEEN '${startDate}' AND '${endDate}'`;
     }
 
-    return this.prisma.$queryRawUnsafe(`
-      WITH period_stats AS (
-        SELECT 
-          DATE_TRUNC('${truncType}', "createdAt") AS period_date,
-          SUM("totalPrice") AS revenue
-        FROM "Order"
-        WHERE status = 'COMPLETED' AND "shopId" = '${shopId}' ${dateFilter}
-        GROUP BY 1
-      )
-      SELECT 
-        period_date AS date,
-        revenue::FLOAT,
-        SUM(revenue) OVER (ORDER BY period_date)::FLOAT AS "cumulativeRevenue",
-        LAG(revenue) OVER (ORDER BY period_date)::FLOAT AS "previousRevenue",
-        CASE 
-          WHEN LAG(revenue) OVER (ORDER BY period_date) = 0 OR LAG(revenue) OVER (ORDER BY period_date) IS NULL THEN NULL
-          ELSE ((revenue - LAG(revenue) OVER (ORDER BY period_date)) / LAG(revenue) OVER (ORDER BY period_date) * 100)::FLOAT 
-        END AS "growthPercentage"
-      FROM period_stats
-      ORDER BY period_date ASC;
-    `);
+    const cacheKey = `stat:shop:revenue:${shopId}:${period}:${startDate || 'none'}:${endDate || 'none'}`;
+
+    return this.redisService.getOrSet(
+      cacheKey,
+      async () => {
+        return this.prisma.$queryRawUnsafe(`
+          WITH period_stats AS (
+            SELECT 
+              DATE_TRUNC('${truncType}', "createdAt") AS period_date,
+              SUM("totalPrice") AS revenue
+            FROM "Order"
+            WHERE status = 'COMPLETED' AND "shopId" = '${shopId}' ${dateFilter}
+            GROUP BY 1
+          )
+          SELECT 
+            period_date AS date,
+            revenue::FLOAT,
+            SUM(revenue) OVER (ORDER BY period_date)::FLOAT AS "cumulativeRevenue",
+            LAG(revenue) OVER (ORDER BY period_date)::FLOAT AS "previousRevenue",
+            CASE 
+              WHEN LAG(revenue) OVER (ORDER BY period_date) = 0 OR LAG(revenue) OVER (ORDER BY period_date) IS NULL THEN NULL
+              ELSE ((revenue - LAG(revenue) OVER (ORDER BY period_date)) / LAG(revenue) OVER (ORDER BY period_date) * 100)::FLOAT 
+            END AS "growthPercentage"
+          FROM period_stats
+          ORDER BY period_date ASC;
+        `);
+      },
+      60 * 15, // 15 minutes TTL
+    );
   }
 
   async exportRevenueToExcel(data: any[]) {

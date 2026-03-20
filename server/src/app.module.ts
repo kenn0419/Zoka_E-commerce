@@ -28,9 +28,16 @@ import { FlashSaleModule } from './modules/flash-sale/flash-sale.module';
 import { ShopFollowerModule } from './modules/shop-follower/shop-follower.module';
 import { StatisticsModule } from './modules/statistics/statistics.module';
 import { AiAgentModule } from './modules/ai-agent/ai-agent.module';
+import { ThrottlerModule, ThrottlerGuard } from '@nestjs/throttler';
+import { APP_GUARD, APP_INTERCEPTOR } from '@nestjs/core';
+import { IdempotencyInterceptor } from './common/interceptors/idempotency.interceptor';
 
 @Module({
   imports: [
+    ThrottlerModule.forRoot([{
+      ttl: 60000,
+      limit: 100,
+    }]),
     ScheduleModule.forRoot(),
     EventEmitterModule.forRoot(),
     ConfigModule.forRoot({
@@ -65,6 +72,16 @@ import { AiAgentModule } from './modules/ai-agent/ai-agent.module';
     ShopFollowerModule,
     StatisticsModule,
     AiAgentModule,
+  ],
+  providers: [
+    {
+      provide: APP_GUARD,
+      useClass: ThrottlerGuard,
+    },
+    {
+      provide: APP_INTERCEPTOR,
+      useClass: IdempotencyInterceptor,
+    },
   ],
 })
 export class AppModule {}

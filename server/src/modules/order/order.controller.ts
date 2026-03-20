@@ -28,6 +28,7 @@ import { Roles } from 'src/common/decorators/role.decorator';
 import { Role } from 'src/common/enums/role.enum';
 import { OrderQueryDto } from './dto/order-query.dto';
 import { OrderStatus } from 'src/common/enums/order.enum';
+import { Idempotent } from 'src/common/decorators/idempotent.decorator';
 
 @Controller('orders')
 @UseGuards(JwtSessionGuard, RolesPermissionsGuard)
@@ -42,6 +43,7 @@ export class OrderController {
   }
 
   @Post('/checkout/confirm')
+  @Idempotent() 
   @Serialize(CheckoutConfirmResponseDto, 'Checkout confirm successfully!')
   checkoutConfirm(@Req() req, @Body() dto: CheckoutConfirmDto) {
     return this.orderService.confirm(req.user.sub, dto);

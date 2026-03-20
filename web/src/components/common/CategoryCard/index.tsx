@@ -2,12 +2,13 @@ interface CategoryItemProps {
   category: ICategoryResponse;
 }
 
+import { memo } from "react";
 import { Button } from "antd";
 import styles from "./CategoryCard.module.scss";
 import { useNavigate } from "react-router-dom";
 import { PATH } from "../../../utils/path.util";
 
-export default function CategoryCard({ category }: CategoryItemProps) {
+const CategoryCard = memo(function CategoryCard({ category }: CategoryItemProps) {
   const navigate = useNavigate();
 
   const handleClickCategory = () => {
@@ -53,4 +54,5 @@ export default function CategoryCard({ category }: CategoryItemProps) {
       </div>
     </div>
   );
-}
+});
+export default CategoryCard;

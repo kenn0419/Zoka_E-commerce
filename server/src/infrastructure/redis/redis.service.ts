@@ -61,6 +61,46 @@ export class RedisService implements OnModuleInit, OnModuleDestroy {
     return await this.client.sMembers(key);
   }
 
+  async getOrSet<T>(key: string, fetchFn: () => Promise<T>, ttl?: number): Promise<T> {
+    const cachedData = await this.client.get(key);
+    if (cachedData) {
+      try {
+        return JSON.parse(cachedData) as T;
+      } catch (e) {
+        this.logger.error(`Error parsing cached data for key ${key}`, e);
+      }
+    }
+
+    const data = await fetchFn();
+    
+    if (data !== undefined && data !== null) {
+      try {
+        const stringified = JSON.stringify(data);
+        if (ttl) {
+          await this.client.set(key, stringified, { EX: ttl });
+        } else {
+          await this.client.set(key, stringified);
+        }
+      } catch (e) {
+         this.logger.error(`Error stringifying data for cache key ${key}`, e);
+      }
+    }
+    
+    return data;
+  }
+
+  async delByPattern(pattern: string) {
+    try {
+      const keys = await this.client.keys(pattern);
+      if (keys.length > 0) {
+        await this.client.del(keys);
+        this.logger.debug(`Deleted ${keys.length} keys matching pattern: ${pattern}`);
+      }
+    } catch (e) {
+      this.logger.error(`Error deleting keys by pattern ${pattern}`, e);
+    }
+  }
+
   get cacheClient() {
     return this.client;
   }

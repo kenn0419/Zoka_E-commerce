@@ -26,6 +26,7 @@ import { buildSearchOr } from 'src/common/utils/build-search-or.util';
 import { paginatedResult } from 'src/common/utils/pagninated-result.util';
 import { buildProductFilter } from 'src/common/utils/build-product-filter.util';
 import { ProductSort } from 'src/common/enums/product.enum';
+import { RedisService } from 'src/infrastructure/redis/redis.service';
 
 @Injectable()
 export class ProductService {
@@ -38,6 +39,7 @@ export class ProductService {
     private variantImageRepo: VariantImageRepository,
     private shopRepo: ShopRepository,
     private categoryRepo: CategoryRepository,
+    private redisService: RedisService,
   ) {}
 
   async create(
@@ -122,8 +124,16 @@ export class ProductService {
         await this.variantImageRepo.createMany(tx, variantImageRows);
       }
     });
+    
+    await this.clearProductListsCaches();
 
     return { id: productId };
+  }
+
+  private async clearProductListsCaches() {
+  
+    await this.redisService.delByPattern('product:active:*');
+    await this.redisService.delByPattern('product:suggest:*');
   }
 
   async findAllActiveProduct(
@@ -135,29 +145,37 @@ export class ProductService {
     maxPrice: number,
     rating: number,
   ) {
-    const where: Prisma.ProductWhereInput = {
-      status: ProductStatus.ACTIVE,
-      category: {
-        status: CategoryStatus.ACTIVE,
-      },
-      ...(search && {
-        OR: buildSearchOr(search, ['name', 'description']),
-      }),
-      ...buildProductFilter({
-        minPrice,
-        maxPrice,
-        rating,
-      }),
-    };
+    const cacheKey = `product:active:${search || 'none'}:${page}:${limit}:${sort}:${minPrice}:${maxPrice}:${rating}`;
+    
+    return this.redisService.getOrSet(
+      cacheKey,
+      async () => {
+        const where: Prisma.ProductWhereInput = {
+          status: ProductStatus.ACTIVE,
+          category: {
+            status: CategoryStatus.ACTIVE,
+          },
+          ...(search && {
+            OR: buildSearchOr(search, ['name', 'description']),
+          }),
+          ...buildProductFilter({
+            minPrice,
+            maxPrice,
+            rating,
+          }),
+        };
 
-    return paginatedResult(
-      {
-        where,
-        page,
-        limit,
-        orderBy: buildProductSort(sort),
+        return paginatedResult(
+          {
+            where,
+            page,
+            limit,
+            orderBy: buildProductSort(sort),
+          },
+          (args) => this.productRepo.listPaginatedForPublic(args),
+        );
       },
-      (args) => this.productRepo.listPaginatedForPublic(args),
+      60 * 5,
     );
   }
 
@@ -173,25 +191,33 @@ export class ProductService {
         },
       };
     }
+    
+    const cacheKey = `product:suggest:${search}`;
+    
+    return this.redisService.getOrSet(
+      cacheKey,
+      async () => {
+        const where: Prisma.ProductWhereInput = {
+          status: ProductStatus.ACTIVE,
+          category: {
+            status: CategoryStatus.ACTIVE,
+          },
+          ...(search && {
+            OR: buildSearchOr(search, ['name', 'description']),
+          }),
+        };
 
-    const where: Prisma.ProductWhereInput = {
-      status: ProductStatus.ACTIVE,
-      category: {
-        status: CategoryStatus.ACTIVE,
+        return paginatedResult(
+          {
+            where,
+            page: 1,
+            limit: 4,
+            orderBy: buildProductSort(ProductSort.OLDEST),
+          },
+          (args) => this.productRepo.listPaginatedForPublic(args),
+        );
       },
-      ...(search && {
-        OR: buildSearchOr(search, ['name', 'description']),
-      }),
-    };
-
-    return paginatedResult(
-      {
-        where,
-        page: 1,
-        limit: 4,
-        orderBy: buildProductSort(ProductSort.OLDEST),
-      },
-      (args) => this.productRepo.listPaginatedForPublic(args),
+      60 * 5,
     );
   }
 
@@ -332,59 +358,67 @@ export class ProductService {
   }
 
   async findBySlug(slug: string) {
-    const product = await this.productRepo.findPublicDetail({ slug });
-    if (!product) throw new NotFoundException('Product not found');
+    const cacheKey = `product:detail:${slug}`;
+    
+    return this.redisService.getOrSet(
+      cacheKey,
+      async () => {
+        const product = await this.productRepo.findPublicDetail({ slug });
+        if (!product) throw new NotFoundException('Product not found');
 
-    if (product.status !== ProductStatus.ACTIVE) {
-      throw new BadRequestException('Product is not active');
-    }
+        if (product.status !== ProductStatus.ACTIVE) {
+          throw new BadRequestException('Product is not active');
+        }
 
-    const variantIds = product.variants.map((v) => v.id);
-    const flashSales = await this.prisma.flashSaleItem.findMany({
-      where: {
-        variantId: { in: variantIds },
-        flashSale: { status: FlashSaleStatus.ACTIVE },
-      },
-      include: { flashSale: true },
-    });
-    const sold = await this.prisma.orderItem.aggregate({
-      _sum: { quantity: true },
-      where: { productId: product.id },
-    });
-    const flashSaleMap = new Map<string, (typeof flashSales)[number]>();
-    flashSales.forEach((item) => flashSaleMap.set(item.variantId, item));
+        const variantIds = product.variants.map((v) => v.id);
+        const flashSales = await this.prisma.flashSaleItem.findMany({
+          where: {
+            variantId: { in: variantIds },
+            flashSale: { status: FlashSaleStatus.ACTIVE },
+          },
+          include: { flashSale: true },
+        });
+        const sold = await this.prisma.orderItem.aggregate({
+          _sum: { quantity: true },
+          where: { productId: product.id },
+        });
+        const flashSaleMap = new Map<string, (typeof flashSales)[number]>();
+        flashSales.forEach((item) => flashSaleMap.set(item.variantId, item));
 
-    const variants = product.variants.map((variant) => {
-      const flashSale = flashSaleMap.get(variant.id);
+        const variants = product.variants.map((variant) => {
+          const flashSale = flashSaleMap.get(variant.id);
 
-      if (!flashSale) {
+          if (!flashSale) {
+            return {
+              ...variant,
+              originalPrice: variant.price,
+              displayPrice: variant.price,
+              isFlashSale: false,
+              flashSaleEndTime: null,
+              stock: variant.stock,
+              sold: sold._sum.quantity ?? 0,
+            };
+          }
+
+          return {
+            ...variant,
+            originalPrice: variant.price,
+            displayPrice: flashSale.salePrice,
+            isFlashSale: true,
+            flashSaleEndTime: flashSale.flashSale.endTime,
+            stock: flashSale.quantity - flashSale.sold,
+            sold: sold._sum.quantity ?? 0,
+          };
+        });
         return {
-          ...variant,
-          originalPrice: variant.price,
-          displayPrice: variant.price,
-          isFlashSale: false,
-          flashSaleEndTime: null,
-          stock: variant.stock,
+          ...product,
           sold: sold._sum.quantity ?? 0,
+          flashSaleEndTime: flashSales[0]?.flashSale?.endTime || null,
+          variants,
         };
-      }
-
-      return {
-        ...variant,
-        originalPrice: variant.price,
-        displayPrice: flashSale.salePrice,
-        isFlashSale: true,
-        flashSaleEndTime: flashSale.flashSale.endTime,
-        stock: flashSale.quantity - flashSale.sold,
-        sold: sold._sum.quantity ?? 0,
-      };
-    });
-    return {
-      ...product,
-      sold: sold._sum.quantity ?? 0,
-      flashSaleEndTime: flashSales[0]?.flashSale?.endTime || null,
-      variants,
-    };
+      },
+      60 * 5,
+    );
   }
 
   async findById(id: string) {
@@ -413,7 +447,7 @@ export class ProductService {
         ).url;
       }
 
-      // Case 1 → Không có variants → chỉ update product
+    
       if (!data.variants || data.variants.length === 0) {
         await this.productRepo.update(
           { id },
@@ -482,7 +516,7 @@ export class ProductService {
         }
       }
 
-      // Insert all variants & images
+    
       await this.productVariantRepo.createMany(tx, variantRows);
       if (variantImageRows.length > 0) {
         await this.variantImageRepo.createMany(tx, variantImageRows);
@@ -504,14 +538,17 @@ export class ProductService {
         tx,
       );
 
+      await this.clearProductListsCaches();
       return { productId: existProduct?.id };
     });
   }
 
   remove(slug: string) {
-    return this.prisma.$transaction(
-      async (tx) => await this.productRepo.remove({ slug }, tx),
-    );
+    return this.prisma.$transaction(async (tx) => {
+      const result = await this.productRepo.remove({ slug }, tx);
+      await this.clearProductListsCaches();
+      return result;
+    });
   }
 
   private async validateShop(userId: string, shopId: string) {

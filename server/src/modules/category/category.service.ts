@@ -10,6 +10,7 @@ import { CategoryStatus, Prisma } from 'generated/prisma';
 import { buildSearchOr } from 'src/common/utils/build-search-or.util';
 import { paginatedResult } from 'src/common/utils/pagninated-result.util';
 import { CategorySort } from 'src/common/enums/category.enum';
+import { RedisService } from 'src/infrastructure/redis/redis.service';
 
 @Injectable()
 export class CategoryService {
@@ -17,6 +18,7 @@ export class CategoryService {
     private configService: ConfigService,
     private uploadService: UploadService,
     private categoryRepository: CategoryRepository,
+    private redisService: RedisService,
   ) {}
 
   async createCategory(data: CreateCategoryDto, file?: Express.Multer.File) {
@@ -28,12 +30,20 @@ export class CategoryService {
       );
       thumbnailUrl = upload.url;
     }
-    return this.categoryRepository.createCategory({
+    const result = await this.categoryRepository.createCategory({
       ...data,
       slug: slugify(data.name, { lower: true }) + '-' + crypto.randomUUID(),
       thumbnailUrl: thumbnailUrl ?? '',
       status: CategoryStatus.PENDING,
     });
+    
+    await this.clearCategoryCaches();
+    return result;
+  }
+
+  private async clearCategoryCaches() {
+    await this.redisService.delByPattern('category:tree');
+    await this.redisService.delByPattern('category:active:*');
   }
 
   async findAllCategories(
@@ -65,22 +75,26 @@ export class CategoryService {
     limit: number,
     sort: CategorySort,
   ) {
-    const where: Prisma.CategoryWhereInput = {
-      status: CategoryStatus.ACTIVE,
-      ...(search && {
-        OR: buildSearchOr(search, ['id', 'name', 'description']),
-      }),
-    };
+    const cacheKey = `category:active:${page}:${limit}:${sort}:${search || 'none'}`;
+    
+    return this.redisService.getOrSet(cacheKey, async () => {
+      const where: Prisma.CategoryWhereInput = {
+        status: CategoryStatus.ACTIVE,
+        ...(search && {
+          OR: buildSearchOr(search, ['id', 'name', 'description']),
+        }),
+      };
 
-    return paginatedResult(
-      {
-        where,
-        page,
-        limit,
-        orderBy: buildCategorySort(sort),
-      },
-      (args) => this.categoryRepository.listPagninated(args),
-    );
+      return paginatedResult(
+        {
+          where,
+          page,
+          limit,
+          orderBy: buildCategorySort(sort),
+        },
+        (args) => this.categoryRepository.listPagninated(args),
+      );
+    });
   }
 
   async findOne(slug: string) {
@@ -91,7 +105,9 @@ export class CategoryService {
 
   async update(slug: string, dto: UpdateCategoryDto) {
     await this.findOne(slug);
-    return this.categoryRepository.update(slug, dto);
+    const result = await this.categoryRepository.update(slug, dto);
+    await this.clearCategoryCaches();
+    return result;
   }
 
   async remove(slug: string) {
@@ -107,19 +123,25 @@ export class CategoryService {
     //     }
     //   }
     // }
-    return this.categoryRepository.delete(slug);
+    const result = await this.categoryRepository.delete(slug);
+    await this.clearCategoryCaches();
+    return result;
   }
 
-  activate(slug: string) {
-    return this.categoryRepository.activate(slug);
+  async activate(slug: string) {
+    const result = await this.categoryRepository.activate(slug);
+    await this.clearCategoryCaches();
+    return result;
   }
 
-  deactivate(slug: string) {
-    return this.categoryRepository.deactivate(slug);
+  async deactivate(slug: string) {
+    const result = await this.categoryRepository.deactivate(slug);
+    await this.clearCategoryCaches();
+    return result;
   }
 
-  getTree() {
-    return this.categoryRepository.findRootCategories();
+  async getTree() {
+    return this.redisService.getOrSet('category:tree', () => this.categoryRepository.findRootCategories());
   }
 
   getChildren(slug: string) {

@@ -1,7 +1,8 @@
+import { memo } from "react";
 import { Card, Button, Tag } from "antd";
 import styles from "./OrderCard.module.scss";
 
-export default function OrderCard({ order }: any) {
+const OrderCard = memo(function OrderCard({ order }: any) {
   return (
     <Card className={styles.card}>
       <div className={styles.header}>
@@ -53,4 +54,5 @@ export default function OrderCard({ order }: any) {
       </div>
     </Card>
   );
-}
+});
+export default OrderCard;

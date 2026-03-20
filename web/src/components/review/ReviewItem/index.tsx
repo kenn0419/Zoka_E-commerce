@@ -1,10 +1,10 @@
 import { Avatar, Rate, Button } from "antd";
-import { useState } from "react";
+import { useState, memo } from "react";
 import dayjs from "dayjs";
 import styles from "../ProductReviewSection/ProductReviewSection.module.scss";
 import ReviewReplyList from "../ReviewReplyList";
 
-export default function ReviewItem({ review }: any) {
+const ReviewItem = memo(function ReviewItem({ review }: any) {
   const [showReplies, setShowReplies] = useState(false);
 
   return (
@@ -43,4 +43,5 @@ export default function ReviewItem({ review }: any) {
       {showReplies && <ReviewReplyList reviewId={review.id} />}
     </div>
   );
-}
+});
+export default ReviewItem;

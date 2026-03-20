@@ -1,3 +1,4 @@
+import { memo } from "react";
 import { Card, Rate, Skeleton } from "antd";
 import styles from "./ProductCard.module.scss";
 import { useNavigate } from "react-router-dom";
@@ -7,7 +8,7 @@ interface ProductCardProps {
   product: IProductListItemResponse;
 }
 
-export default function ProductCard({ product }: ProductCardProps) {
+const ProductCard = memo(function ProductCard({ product }: ProductCardProps) {
   const navigate = useNavigate();
   if (!product) {
     return <Skeleton active />;
@@ -33,4 +34,5 @@ export default function ProductCard({ product }: ProductCardProps) {
       </div>
     </Card>
   );
-}
+});
+export default ProductCard;

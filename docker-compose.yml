@@ -1,0 +1,65 @@
+services:
+  db:
+    image: postgres:15-alpine
+    container_name: zoka-db
+    restart: always
+    environment:
+      POSTGRES_USER: ${DB_USER:-postgres}
+      POSTGRES_PASSWORD: ${DB_PASSWORD:-postgres}
+      POSTGRES_DB: ${DB_NAME:-zoka_ecommerce}
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - zoka-network
+    ports:
+      - "5432:5432"
+
+  redis:
+    image: redis:alpine
+    container_name: zoka-redis
+    restart: always
+    networks:
+      - zoka-network
+    ports:
+      - "6379:6379"
+
+  server:
+    build:
+      context: ./server
+      dockerfile: Dockerfile
+    container_name: zoka-server
+    restart: always
+    environment:
+      DATABASE_URL: postgresql://${DB_USER:-postgres}:${DB_PASSWORD:-postgres}@db:5432/${DB_NAME:-zoka_ecommerce}?schema=public
+      REDIS_HOST: redis
+      REDIS_PORT: 6379
+      # Add other mandatory env vars from .env-example here or use a .env file
+    depends_on:
+      - db
+      - redis
+    networks:
+      - zoka-network
+    ports:
+      - "3000:3000"
+
+  web:
+    build:
+      context: ./web
+      dockerfile: Dockerfile
+    container_name: zoka-web
+    restart: always
+    environment:
+      VITE_API_URL: http://localhost:3000/api/v1
+    depends_on:
+      - server
+    networks:
+      - zoka-network
+    ports:
+      - "80:80"
+
+networks:
+  zoka-network:
+    driver: bridge
+
+volumes:
+  postgres_data:
